@@ -6,13 +6,4 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
-"""This is the configuration file."""
-
-WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS = []
-""""""
-
-WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = []
-""""""
-
-WORKFLOW_CAMPUSONLINE_THESES_FILTER = []
-""""""
+"""Workflows."""
