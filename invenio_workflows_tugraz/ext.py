@@ -26,6 +26,21 @@ class InvenioWorkflowsTugraz:
 
     def init_config(self, app):
         """Initialize configuration."""
+        app.config.setdefault("ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS", [])
+        app.config.setdefault("ALMA_ALMA_RECORDS_CREATE_AGGREGATORS", [])
+        app.config.setdefault("CAMPUSONLINE_THESES_FILTER", [])
+
         for k in dir(config):
-            if k.startswith("WORKFLOWS_TUGRAZ_"):
+            if k == "WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS":
+                app.config["ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS"] += getattr(
+                    config, k
+                )
+
+            elif k == "WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS":
+                app.config["ALMA_ALMA_RECORDS_CREATE_AGGREGATORS"] += getattr(config, k)
+
+            elif k == "WORKFLOW_CAMPUSONLINE_THESES_FILTER":
+                app.config["CAMPUSONLINE_THESES_FILTER"] += getattr(config, k)
+
+            elif k.startswith("WORKFLOWS_TUGRAZ_"):
                 app.config.setdefault(k, getattr(config, k))
