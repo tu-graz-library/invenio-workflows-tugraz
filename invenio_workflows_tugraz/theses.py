@@ -19,7 +19,7 @@ def theses_filter_for_locked_records():
 
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="LOCKED"/>""",
+        """<bas:state name="LOCKED" negate="false"><bas:from>2022-11-17</bas:from</bas:state>""",
     ]
     state = ThesesState.LOCKED
     return ThesesFilter(filter_, state)
@@ -32,7 +32,7 @@ def theses_filter_for_open_records():
     return ThesesFilter"""
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="IFG"/>""",
+        """<bas:state name="IFG" negate="false"><bas:from>2022-11-17</bas:from</bas:state>""",
     ]
     state = ThesesState.OPEN
     return ThesesFilter(filter_, state)

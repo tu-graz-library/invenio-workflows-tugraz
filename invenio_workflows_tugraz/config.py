@@ -7,7 +7,7 @@
 # details.
 
 """This is the configuration file."""
-from theses import theses_filter_for_locked_records, theses_filter_for_open_records
+from .theses import theses_filter_for_locked_records, theses_filter_for_open_records
 
 WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS = []
 """"""
@@ -16,7 +16,7 @@ WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = []
 """"""
 
 WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
-    theses_filter_for_locked_records,
-    theses_filter_for_open_records,
+    theses_filter_for_locked_records(),
+    theses_filter_for_open_records(),
 ]
 """"""
