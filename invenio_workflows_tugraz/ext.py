@@ -28,7 +28,7 @@ class InvenioWorkflowsTugraz:
         """Initialize configuration."""
         app.config.setdefault("ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS", [])
         app.config.setdefault("ALMA_ALMA_RECORDS_CREATE_AGGREGATORS", [])
-        app.config.setdefault("CAMPUSONLINE_THESES_FILTER", [])
+        app.config.setdefault("CAMPUSONLINE_THESES_FILTERS", [])
 
         for k in dir(config):
             if k == "WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS":
