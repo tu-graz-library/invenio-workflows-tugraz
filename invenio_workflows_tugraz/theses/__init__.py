@@ -6,23 +6,16 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
-"""This is the configuration file."""
+"""Theses Workflows."""
+
 from .theses import (
     import_func,
     theses_filter_for_locked_records,
     theses_filter_for_open_records,
 )
 
-WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS = []
-""""""
-
-WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = []
-""""""
-
-WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
-    theses_filter_for_locked_records(),
-    theses_filter_for_open_records(),
-]
-""""""
-
-WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_func
+__all__ = (
+    "theses_filter_for_locked_records",
+    "theses_filter_for_open_records",
+    "import_func",
+)
