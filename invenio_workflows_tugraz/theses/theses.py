@@ -31,7 +31,7 @@ def theses_filter_for_locked_records():
 
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="LOCKED" negate="false"></bas:state>""",
+        """<bas:state name="LOCKED" negate="false"><bas:from>2022-01-01T00:01:00+00:00</bas:from></bas:state>""",
     ]
     state = ThesesState.LOCKED
     return ThesesFilter(filter_, state)
@@ -44,7 +44,7 @@ def theses_filter_for_open_records():
     return ThesesFilter"""
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="IFG" negate="false"></bas:state>""",
+        """<bas:state name="IFG" negate="false"><bas:from>2022-01-01T00:01:00+00:00</bas:from></bas:state>""",
     ]
     state = ThesesState.OPEN
     return ThesesFilter(filter_, state)
@@ -71,11 +71,10 @@ def import_func(
     download_file: Callable,
 ):
     """This is the function to import the record into the repository."""
-    print("----------------------import_func--------------------------------------")
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
     if not exists_fulltext(thesis):
-        raise RuntimeError("record has no accosiated file")
+        raise RuntimeError("record has no associated file")
 
     file_path = download_file(configs.endpoint, configs.token, cms_id)
 
