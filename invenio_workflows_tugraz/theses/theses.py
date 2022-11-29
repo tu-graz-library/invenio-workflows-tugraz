@@ -19,8 +19,16 @@ from invenio_campusonline.types import (
 )
 from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_records_marc21 import Marc21Metadata, create_record, current_records_marc21
+from invenio_records_marc21.services.record.utils import check_about_duplicate
 
 from .convert import CampusOnlineToMarc21
+from .types import CampusOnlineId
+
+
+@check_about_duplicate.register
+def _(value: CampusOnlineId):
+    """Check about double campus online id."""
+    check_about_duplicate(str(value), value.category)
 
 
 def theses_filter_for_locked_records():
@@ -71,6 +79,9 @@ def import_func(
     download_file: Callable,
 ):
     """This is the function to import the record into the repository."""
+
+    check_about_duplicate(CampusOnlineId(cms_id))
+
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
     if not exists_fulltext(thesis):

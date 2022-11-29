@@ -9,7 +9,7 @@
 """Theses Workflows."""
 
 
-from invenio_records_marc21.services.records.types import Marc21Category
+from invenio_records_marc21.services.record.types import Marc21Category
 
 
 class CampusOnlineId(Marc21Category):
