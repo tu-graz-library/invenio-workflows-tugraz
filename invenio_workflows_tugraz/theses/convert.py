@@ -56,7 +56,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
-        record.emplace_datafield("970.0.1.a", value=node.text)
+        record.emplace_datafield("995..", subfs={"i": "TUGRAZonline", "d": node.text})
 
     def visit_PAG(self, node, record: Marc21Metadata):
         """Visit PAG."""
@@ -90,14 +90,12 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ORGP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        institute, institute_english, institute_number, *_ = node.text.split("&gt;")
+        institute, *_ = node.text.split("&gt;")
         record.emplace_datafield(
             "971.5..",
             subfs={
                 "a": "Technische Universität Graz",
                 "b": institute,
-                "c": institute_english,
-                "d": institute_number,
             },
         )
 
