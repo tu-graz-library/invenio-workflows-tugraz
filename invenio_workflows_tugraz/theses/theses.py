@@ -20,6 +20,8 @@ from invenio_campusonline.types import (
 from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_records_marc21 import Marc21Metadata, create_record, current_records_marc21
 from invenio_records_marc21.services.record.utils import check_about_duplicate
+from invenio_search import RecordsSearch
+from invenio_search.engine import dsl
 
 from .convert import CampusOnlineToMarc21
 from .types import CampusOnlineId
@@ -56,6 +58,37 @@ def theses_filter_for_open_records():
     ]
     state = ThesesState.OPEN
     return ThesesFilter(filter_, state)
+
+
+def theses_create_aggregator():
+    """This function returns a list of marc21 ids."""
+    print("---------- theses_create_aggregator -----------------")
+    search = RecordsSearch(index="marc21records-marc21")
+    query = {
+        "query": {
+            "bool": {
+                "must_not": [
+                    {
+                        "exists": {
+                            "field": "metadata.fields.008.subfields.a.keyword",
+                        },
+                    }
+                ],
+                "must": [
+                    {
+                        "exists": {
+                            "field": "metadata.fields.100.subfields.a.keyword",
+                        },
+                    }
+                ],
+            }
+        }
+    }
+    search.query = dsl.Q("match", **query)
+    results = search.execute()
+    print(f"results: {results}")
+    # TODO: use results to calculate the marcids
+    return []
 
 
 def exists_fulltext(thesis: Element) -> bool:

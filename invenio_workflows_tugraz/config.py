@@ -9,6 +9,7 @@
 """This is the configuration file."""
 from .theses import (
     import_func,
+    theses_create_aggregator,
     theses_filter_for_locked_records,
     theses_filter_for_open_records,
 )
@@ -16,7 +17,9 @@ from .theses import (
 WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS = []
 """"""
 
-WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = []
+WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = [
+    theses_create_aggregator,
+]
 """"""
 
 WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
