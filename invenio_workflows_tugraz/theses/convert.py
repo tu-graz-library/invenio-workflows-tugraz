@@ -56,7 +56,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
-        record.emplace_datafield("995..", subfs={"i": "TUGRAZonline", "d": node.text})
+        record.emplace_datafield("995...", subfs={"i": "TUGRAZonline", "d": node.text})
 
     def visit_PAG(self, node, record: Marc21Metadata):
         """Visit PAG."""
