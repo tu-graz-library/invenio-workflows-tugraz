@@ -65,30 +65,26 @@ def theses_create_aggregator():
     print("---------- theses_create_aggregator -----------------")
     search = RecordsSearch(index="marc21records-marc21")
     query = {
-        "query": {
-            "bool": {
-                "must_not": [
-                    {
-                        "exists": {
-                            "field": "metadata.fields.008.subfields.a.keyword",
-                        },
-                    }
-                ],
-                "must": [
-                    {
-                        "exists": {
-                            "field": "metadata.fields.100.subfields.a.keyword",
-                        },
-                    }
-                ],
+        "must_not": [
+            {
+                "exists": {
+                    "field": "metadata.fields.001",
+                },
             }
-        }
+        ],
+        "must": [
+            {
+                "exists": {
+                    "field": "metadata.fields.995",
+                },
+            }
+        ],
     }
-    search.query = dsl.Q("match", **query)
-    results = search.execute()
-    print(f"results: {results}")
-    # TODO: use results to calculate the marcids
-    return []
+
+    search.query = dsl.Q("bool", **query)
+    result = search.execute()
+    hits = result["hits"]["hits"]
+    return [record["_source"]["id"] for record in hits]
 
 
 def exists_fulltext(thesis: Element) -> bool:
