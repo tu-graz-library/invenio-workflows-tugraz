@@ -53,6 +53,8 @@ class CampusOnlineToMarc21(Visitor):
         """Constructor."""
         super().__init__()
         self.author_name = "N/A"
+        self.state = ""
+        self.metaclass_name = ""
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
@@ -87,23 +89,25 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ORG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-
-    def visit_ORGP(self, node: Element, record: Marc21Metadata):
-        """Visit ."""
-        institute, *_ = node.text.split("&gt;")
         record.emplace_datafield(
             "971.5..",
             subfs={
                 "a": "Technische Universität Graz",
-                "b": institute,
+                "b": node.text,
             },
         )
+
+    def visit_ORGP(self, node: Element, record: Marc21Metadata):
+        """Visit ."""
 
     def visit_TYPKB(self, node: Element, record: Marc21Metadata):
         """Visit ."""
 
     def visit_TYP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        if self.state == "metaobj":
+            return
+
         record.emplace_datafield(
             "502...",
             subfs={"b": node.text, "c": "Technische Universität Graz"},
