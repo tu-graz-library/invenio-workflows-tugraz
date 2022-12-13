@@ -108,7 +108,10 @@ def import_func(
     download_file: Callable,
 ):
     """This is the function to import the record into the repository."""
-    check_about_duplicate(CampusOnlineId(cms_id))
+    try:
+        check_about_duplicate(CampusOnlineId(cms_id))
+    except DuplicateRecordError:
+        return
 
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
