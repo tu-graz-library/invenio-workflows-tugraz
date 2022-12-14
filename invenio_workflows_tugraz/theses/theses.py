@@ -18,8 +18,13 @@ from invenio_campusonline.types import (
     ThesesState,
 )
 from invenio_config_tugraz import get_identity_from_user_by_email
-from invenio_records_marc21 import Marc21Metadata, create_record, current_records_marc21
-from invenio_records_marc21.services.record.utils import check_about_duplicate
+from invenio_records_marc21 import (
+    DuplicateRecordError,
+    Marc21Metadata,
+    check_about_duplicate,
+    create_record,
+    current_records_marc21,
+)
 from invenio_search import RecordsSearch
 from invenio_search.engine import dsl
 
@@ -63,7 +68,7 @@ def theses_filter_for_open_records():
 def theses_create_aggregator():
     """This function returns a list of marc21 ids."""
     print("---------- theses_create_aggregator -----------------")
-    search = RecordsSearch(index="marc21records-marc21")
+    search = RecordsSearch(index="marc21records-draft")
     query = {
         "must_not": [
             {
@@ -127,12 +132,10 @@ def import_func(
 
     identity = get_identity_from_user_by_email(email=configs.user_email)
     service = current_records_marc21.records_service
-    record = create_record(service, marc21_record, file_path, identity)
+    data = marc21_record.json
+    data["access"] = {
+        "record": "restricted",
+        "files": "restricted",
+    }
 
-    # TODO: set access of record
-    # if cms.state == ThesesState.LOCKED
-    #   set file permission to restricted
-    # elif cms.state == ThesesState.OPEN
-    #   set file permission to public
-
-    return record
+    return create_record(service, data, file_path, identity, do_publish=False)
