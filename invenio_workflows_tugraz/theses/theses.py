@@ -92,6 +92,31 @@ def theses_create_aggregator():
     return [record["_source"]["id"] for record in hits]
 
 
+def theses_update_aggregator():
+    """This function returns a list of tuple(marc21, cms_id)."""
+
+    def cms_id(record):
+        return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["d"][0]
+
+    def marc_id(record):
+        return record["_source"]["id"]
+
+    search = RecordsSearch(index="marc21records-draft")
+    query = {
+        "must_not": [
+            {
+                "exists": {
+                    "field": "metadata.fields.001",
+                },
+            }
+        ]
+    }
+    search.query = dsl.Q("bool", **query)
+    result = search.execute()
+    hits = result["hits"]["hits"]
+    return [(marc_id(record), cms_id(record)) for record in hits]
+
+
 def exists_fulltext(thesis: Element) -> bool:
     """check against fulltext existens."""
     ns = "http://www.campusonline.at/thesisservice/basetypes"
