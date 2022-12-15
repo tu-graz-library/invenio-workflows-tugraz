@@ -68,7 +68,7 @@ def theses_filter_for_open_records():
 def theses_create_aggregator():
     """This function returns a list of marc21 ids."""
     print("---------- theses_create_aggregator -----------------")
-    search = RecordsSearch(index="marc21records-draft")
+    search = RecordsSearch(index="marc21records-drafts")
     query = {
         "must_not": [
             {
