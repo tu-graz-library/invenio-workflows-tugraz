@@ -49,12 +49,34 @@ class Visitor:
 class CampusOnlineToMarc21(Visitor):
     """Convertor from CampusOnline to Marc21."""
 
-    def __init__(self):
+    def __init__(self, record: Marc21Metadata):
         """Constructor."""
         super().__init__()
         self.author_name = "N/A"
         self.state = ""
         self.metaclass_name = ""
+        record.emplace_datafield("040...", subfs={"b": "ger", "e": "rda"})
+        record.emplace_datafield("044...", subfs={"c": "XA-AT"})
+        record.emplace_datafield(
+            "300...", subfs={"a": "1 Online-Ressource ( Seiten )", "b": "ill"}
+        )
+        record.emplace_datafield("336...", subfs={"b": "txt"})
+        record.emplace_datafield("337...", subfs={"b": "c"})
+        record.emplace_datafield("338...", subfs={"b": "cr"})
+        record.emplace_datafield("347...", subfs={"a": "Textdatei", "b": "PDF"})
+        record.emplace_datafield(
+            "506.0..", subfs={"f": "Unrestricted online access", "2": "star"}
+        )
+        record.emplace_datafield("546...", subfs={"a": "Zusammenfassung in"})
+        record.emplace_datafield(
+            "655...",
+            subfs={
+                "a": "Hochschulschrift",
+                "0": "(DE-588)4113937-9",
+                "d": "gnd-content",
+            },
+        )
+        record.emplace_datafield("970...", subfs={"d": "HS-MASTER"})
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
@@ -133,6 +155,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_OLANG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        self.object_language = node.text
 
     def visit_TLANGS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -191,9 +214,14 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_TIT(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        if self.state == "metaobj" and self.language == "DE":
+        if self.state == "metaobj" and self.language == self.object_language:
             record.emplace_datafield(
                 "245.1.0.", subfs={"a": node.text, "c": self.author_name}
+            )
+
+        if self.state == "metaobj" and self.language != self.object_language:
+            record.emplace_datafield(
+                "246.1..", subfs={"i": "TUGRAZonline", "a": node.text}
             )
 
     def visit_ABS(self, node: Element, record: Marc21Metadata):
