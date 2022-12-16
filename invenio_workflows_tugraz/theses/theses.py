@@ -150,8 +150,8 @@ def import_func(
 
     file_path = download_file(configs.endpoint, configs.token, cms_id)
 
-    convert = CampusOnlineToMarc21()
     marc21_record = Marc21Metadata()
+    convert = CampusOnlineToMarc21(marc21_record)
 
     convert.visit(thesis, marc21_record)
 
