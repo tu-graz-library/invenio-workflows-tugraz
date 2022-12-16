@@ -13,6 +13,11 @@ from xml.etree.ElementTree import Element
 from invenio_records_marc21.services.record.metadata import Marc21Metadata, QName
 
 
+def construct_name(name):
+    """Construct name."""
+    return f"{name['ln']}, {name['fn']}"
+
+
 class Visitor:
     """Visitor base class."""
 
@@ -57,6 +62,7 @@ class CampusOnlineToMarc21(Visitor):
         self.metaclass_name = ""
         record.emplace_datafield("040...", subfs={"b": "ger", "e": "rda"})
         record.emplace_datafield("044...", subfs={"c": "XA-AT"})
+        record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "JAHR"})
         record.emplace_datafield(
             "300...", subfs={"a": "1 Online-Ressource ( Seiten )", "b": "ill"}
         )
@@ -76,7 +82,6 @@ class CampusOnlineToMarc21(Visitor):
                 "d": "gnd-content",
             },
         )
-        record.emplace_datafield("970...", subfs={"d": "HS-MASTER"})
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
@@ -111,28 +116,33 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ORG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        record.emplace_datafield(
-            "971.5..",
-            subfs={
-                "a": "Technische Universität Graz",
-                "b": node.text,
-            },
-        )
 
     def visit_ORGP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        orgp = node.text.split("&gt;")
+
+        faculty = orgp[1] if len(orgp) > 1 else ""
+        institute = orgp[2] if len(orgp) > 2 else ""
+
+        record.emplace_datafield(
+            "971.5..",
+            subfs={"a": "Technische Universität Graz", "b": faculty, "c": institute},
+        )
 
     def visit_TYPKB(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        value = "HS-DISS" if node.text == "DISS" else "HS-MASTER"
+        record.emplace_datafield("970.2..", subfs={"d": value})
 
     def visit_TYP(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         if self.state == "metaobj":
+            self.typ = node.text
             return
 
         record.emplace_datafield(
             "502...",
-            subfs={"b": node.text, "c": "Technische Universität Graz"},
+            subfs={"b": node.text, "c": "Technische Universität Graz", "d": "JAHR"},
         )
 
     def visit_ZUGKB(self, node: Element, record: Marc21Metadata):
@@ -146,9 +156,18 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_SPVON(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        text = node.text
+        self.spvon = text.split(" ")[0] if text else ""
 
     def visit_SPBIS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        text = node.text
+
+        if text:
+            record.emplace_datafield(
+                "971.7..",
+                subfs={"a": "gesperrt", "b": self.spvon, "c": text.split(" ")[0]},
+            )
 
     def visit_SPBGR(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -177,22 +196,36 @@ class CampusOnlineToMarc21(Visitor):
             return
 
         self.state = "metaobj"
+        self.name = {"fn": "", "ln": ""}
+
         self.visit(node, record)
+
+        if self.metaclass_name == "AUTHOR":
+            self.author_name = construct_name(self.name)
+            record.emplace_datafield("100.1..", value=self.author_name)
+
+        if self.metaclass_name == "SUPERVISOR":
+            types = {
+                "BTTUG": "0",
+                "MBTUG": "2",
+                "1BUTUG": "1",
+            }
+            ind1 = types.get(node.text, "")
+            record.emplace_datafield(f"971.{ind1}.0.a", value=construct_name(self.name))
+
         self.state = ""
 
     def visit_FN(self, node: Element, record: Marc21Metadata):
         """Visit ."""
 
+        self.name["fn"] = node.text
+
     def visit_LN(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        self.name["ln"] = node.text
 
     def visit_FNLN(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        if self.metaclass_name == "AUTHOR":
-            self.author_name = node.text
-            record.emplace_datafield("100.1..", value=self.author_name)
-        if self.metaclass_name == "SUPERVISOR":
-            record.emplace_datafield("971..0.a", value=node.text)
 
     def visit_AKK(self, node: Element, record: Marc21Metadata):
         """Visit ."""
