@@ -60,6 +60,7 @@ class CampusOnlineToMarc21(Visitor):
         self.author_name = "N/A"
         self.state = ""
         self.metaclass_name = ""
+
         record.emplace_datafield("040...", subfs={"b": "ger", "e": "rda"})
         record.emplace_datafield("044...", subfs={"c": "XA-AT"})
         record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "JAHR"})
@@ -85,7 +86,9 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
-        record.emplace_datafield("995...", subfs={"i": "TUGRAZonline", "d": node.text})
+        record.emplace_datafield(
+            "995...", subfs={"i": "TUGRAZonline", "d": node.text, "9": "local"}
+        )
 
     def visit_PAG(self, node, record: Marc21Metadata):
         """Visit PAG."""
