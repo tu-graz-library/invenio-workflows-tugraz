@@ -18,6 +18,15 @@ def construct_name(name):
     return f"{name['ln']}, {name['fn']}"
 
 
+def language_decode(lang):
+    """Language decode."""
+    languages = {
+        "DE": "deu",
+        "EN": "eng",
+    }
+    return languages.get(lang, "PLATZHALTER")
+
+
 class Visitor:
     """Visitor base class."""
 
@@ -60,8 +69,12 @@ class CampusOnlineToMarc21(Visitor):
         self.author_name = "N/A"
         self.state = ""
         self.metaclass_name = ""
+        self.data_elements = ""
 
-        record.emplace_datafield("040...", subfs={"b": "ger", "e": "rda"})
+        record.emplace_controlfield("007", "cr#|||||||||||")
+        record.emplace_datafield(
+            "040...", subfs={"a": "AT-UBTUG", "b": "ger", "d": "AT-UBTUG", "e": "rda"}
+        )
         record.emplace_datafield("044...", subfs={"c": "XA-AT"})
         record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "JAHR"})
         record.emplace_datafield(
@@ -83,6 +96,12 @@ class CampusOnlineToMarc21(Visitor):
                 "d": "gnd-content",
             },
         )
+
+    def visit(self, node, record: Marc21Metadata):
+        """Override visit."""
+        super().visit(node, record)
+        # TODO: find out what in 008 should be
+        record.emplace_controlfield("008", self.data_elements)
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
@@ -178,6 +197,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_OLANG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         self.object_language = node.text
+        record.emplace_datafield("041...a", value=language_decode(node.text))
 
     def visit_TLANGS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -205,7 +225,9 @@ class CampusOnlineToMarc21(Visitor):
 
         if self.metaclass_name == "AUTHOR":
             self.author_name = construct_name(self.name)
-            record.emplace_datafield("100.1..", value=self.author_name)
+            record.emplace_datafield(
+                "100.1..", subfs={"a": self.author_name, "4": "aut"}
+            )
 
         if self.metaclass_name == "SUPERVISOR":
             types = {
@@ -213,14 +235,13 @@ class CampusOnlineToMarc21(Visitor):
                 "MBTUG": "2",
                 "1BUTUG": "1",
             }
-            ind1 = types.get(node.text, "")
+            ind1 = types.get(self.typ, "")
             record.emplace_datafield(f"971.{ind1}.0.a", value=construct_name(self.name))
 
         self.state = ""
 
     def visit_FN(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-
         self.name["fn"] = node.text
 
     def visit_LN(self, node: Element, record: Marc21Metadata):

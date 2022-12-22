@@ -38,12 +38,23 @@ def _(value: CampusOnlineId):
     check_about_duplicate(str(value), value.category)
 
 
+def cms_id(record):
+    """CMS id."""
+    return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["d"][0]
+
+
+def marc_id(record):
+    """Marc id."""
+    return record["_source"]["id"]
+
+
 def theses_filter_for_locked_records():
     """This function returns a tuple.
+
     FILTER: xml filter to get locked records
     STATE: [open, locked]
-    return ThesesFilter"""
-
+    return ThesesFilter
+    """
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
         """<bas:state name="LOCKED" negate="false"><bas:from>2022-01-01T00:01:00+00:00</bas:from></bas:state>""",
@@ -54,9 +65,11 @@ def theses_filter_for_locked_records():
 
 def theses_filter_for_open_records():
     """This function returns a list of tuples.
+
     FILTER: xml filter to get open records
     STATE: [open, locked]
-    return ThesesFilter"""
+    return ThesesFilter
+    """
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
         """<bas:state name="IFG" negate="false"><bas:from>2022-01-01T00:01:00+00:00</bas:from></bas:state>""",
@@ -87,20 +100,14 @@ def theses_create_aggregator():
     }
 
     search.query = dsl.Q("bool", **query)
+    search = search.params(size=50000)
     result = search.execute()
     hits = result["hits"]["hits"]
-    return [record["_source"]["id"] for record in hits]
+    return [(marc_id(record), cms_id(record)) for record in hits]
 
 
 def theses_update_aggregator():
     """This function returns a list of tuple(marc21, cms_id)."""
-
-    def cms_id(record):
-        return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["d"][0]
-
-    def marc_id(record):
-        return record["_source"]["id"]
-
     search = RecordsSearch(index="marc21records-draft")
     query = {
         "must_not": [
@@ -118,7 +125,7 @@ def theses_update_aggregator():
 
 
 def exists_fulltext(thesis: Element) -> bool:
-    """check against fulltext existens."""
+    """Check against fulltext existens."""
     ns = "http://www.campusonline.at/thesisservice/basetypes"
     xpath = f".//{{{ns}}}attr[@key='VOLLTEXT']"
     ele = thesis.find(xpath)
