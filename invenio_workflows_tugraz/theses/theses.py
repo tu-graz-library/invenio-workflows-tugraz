@@ -170,4 +170,4 @@ def import_func(
         "files": "restricted",
     }
 
-    return create_record(service, data, file_path, identity, do_publish=False)
+    return create_record(service, data, [file_path], identity, do_publish=False)
