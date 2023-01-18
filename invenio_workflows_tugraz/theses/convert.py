@@ -8,6 +8,7 @@
 
 """Convert from CampusOnline to Marc21."""
 
+from re import split
 from xml.etree.ElementTree import Element
 
 from invenio_records_marc21.services.record.metadata import Marc21Metadata, QName
@@ -283,9 +284,16 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ABS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        record.emplace_datafield("520...", value=node.text)
 
     def visit_KEYW(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        subjects = filter(
+            lambda s: len(s) > 0,
+            [s.strip() for s in split(r";|,", node.text)],
+        )
+        for subject in subjects:
+            record.emplace_datafield("650..4.", value=subject)
 
     def visit_LANG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
