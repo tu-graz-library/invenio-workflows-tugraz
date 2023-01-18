@@ -7,6 +7,8 @@
 # details.
 
 """This is the configuration file."""
+
+from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
     import_func,
     theses_create_aggregator,
@@ -29,3 +31,9 @@ WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
 """"""
 
 WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_func
+
+
+WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
+"""See corresponding varaible in invenio-pure."""
+
+WORKFLOW_PURE_SIEVE_FUNC = pure_sieve_func
