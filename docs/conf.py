@@ -18,6 +18,11 @@ project = "invenio-workflows-tugraz"
 copyright = "2022, Graz University of Technology"
 author = "Graz University of Technology"
 
+nitpick_ignore = [
+    ("py:class", "invenio_campusonline.types.CampusOnlineConfigs"),
+    ("py:class", "invenio_pure.types.PureConfigs"),
+]
+
 # -- General configuration ---------------------------------------------------
 
 extensions = [
