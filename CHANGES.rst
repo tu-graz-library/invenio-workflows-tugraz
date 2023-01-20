@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.2 (release 2023-01-20)
+
+- fix: remove print
+
+
 Version v0.1.1 (release 2023-01-18)
 
 - theses: convert abstract and keywords
