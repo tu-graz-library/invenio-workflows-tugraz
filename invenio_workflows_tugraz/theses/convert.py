@@ -288,6 +288,9 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_KEYW(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        if not node:
+            return
+
         subjects = filter(
             lambda s: len(s) > 0,
             [s.strip() for s in split(r";|,", node.text)],
