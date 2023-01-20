@@ -293,7 +293,7 @@ class CampusOnlineToMarc21(Visitor):
             [s.strip() for s in split(r";|,", node.text)],
         )
         for subject in subjects:
-            record.emplace_datafield("650..4.", value=subject)
+            record.emplace_datafield("653...", value=subject)
 
     def visit_LANG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
