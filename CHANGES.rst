@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.6 (release 2023-01-23)
+
+- modification: create an endpoint for theses records
+
+
 Version v0.1.5 (release 2023-01-23)
 
 - fix: return value of import_func
