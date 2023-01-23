@@ -107,7 +107,7 @@ def theses_create_aggregator():
 
 def theses_update_aggregator():
     """This function returns a list of tuple(marc21, cms_id)."""
-    search = RecordsSearch(index="marc21records-draft")
+    search = RecordsSearch(index="marc21records-drafts")
     query = {
         "must_not": [
             {
