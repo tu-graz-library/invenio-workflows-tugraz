@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.1.5 (release 2023-01-23)
+
+- fix: return value of import_func
+- fix: wrong alias name
+
+
 Version v0.1.4 (release 2023-01-20)
 
 - theses fix: play safe with real data
