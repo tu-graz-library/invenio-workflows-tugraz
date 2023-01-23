@@ -8,6 +8,7 @@
 
 """Theses Workflows."""
 
+from collections import namedtuple
 from typing import Callable
 from xml.etree.ElementTree import Element
 
@@ -30,6 +31,8 @@ from invenio_search.engine import dsl
 
 from .convert import CampusOnlineToMarc21
 from .types import CampusOnlineId
+
+error_record = namedtuple("ErrorRecord", ["id"])
 
 
 @check_about_duplicate.register
@@ -147,7 +150,7 @@ def import_func(
     try:
         check_about_duplicate(CampusOnlineId(cms_id))
     except DuplicateRecordError:
-        return
+        return error_record(id="duplicate error")
 
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
