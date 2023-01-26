@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.1.7 (release 2023-01-26)
+
+- theses: change alma import size
+- theses: change import start date
+
+
 Version v0.1.6 (release 2023-01-23)
 
 - modification: create an endpoint for theses records
