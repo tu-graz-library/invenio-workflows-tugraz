@@ -102,7 +102,7 @@ def theses_create_aggregator():
     }
 
     search.query = dsl.Q("bool", **query)
-    search = search.params(size=50000)
+    search = search.params(size=100)
     result = search.execute()
     hits = result["hits"]["hits"]
     return [(marc_id(record), cms_id(record)) for record in hits]
