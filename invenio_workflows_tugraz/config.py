@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -14,9 +14,13 @@ from .theses import (
     theses_create_aggregator,
     theses_filter_for_locked_records,
     theses_filter_for_open_records,
+    update_func,
 )
 
 WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS = []
+""""""
+
+WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_FUNC = update_func
 """"""
 
 WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = [

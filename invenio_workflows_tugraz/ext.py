@@ -35,6 +35,8 @@ class InvenioWorkflowsTugraz:
                 app.config["ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATORS"] += getattr(
                     config, k
                 )
+            elif k == "WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_FUNC":
+                app.config["ALMA_REPOSITORY_RECORDS_UPDATE_FUNC"] = getattr(config, k)
 
             elif k == "WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS":
                 app.config["ALMA_ALMA_RECORDS_CREATE_AGGREGATORS"] += getattr(config, k)
