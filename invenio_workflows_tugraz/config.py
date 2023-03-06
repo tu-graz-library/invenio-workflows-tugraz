@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,7 +8,7 @@
 
 """This is the configuration file."""
 
-from .generators import TugrazmanagerRoleNeed
+from .generators import openaccess_curator_need, publisher_manager_need
 from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
     import_func,
@@ -39,4 +39,6 @@ WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
 
 WORKFLOW_PURE_SIEVE_FUNC = pure_sieve_func
 
-WORKFLOWS_TUGRAZ_RECORD_MANAGER_NEEDS = [TugrazmanagerRoleNeed]
+WORKFLOWS_TUGRAZ_RECORD_MANAGER_NEEDS = [publisher_manager_need]
+
+WORKFLOWS_TUGRAZ_RECORD_CURATOR_NEEDS = [openaccess_curator_need]
