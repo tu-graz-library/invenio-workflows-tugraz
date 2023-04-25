@@ -12,6 +12,7 @@ from collections import namedtuple
 from typing import Callable
 from xml.etree.ElementTree import Element
 
+from invenio_access.permissions import system_process
 from invenio_campusonline.types import (
     CampusOnlineConfigs,
     CampusOnlineID,
@@ -165,6 +166,7 @@ def import_func(
     convert.visit(thesis, marc21_record)
 
     identity = get_identity_from_user_by_email(email=configs.user_email)
+    identity.provides.add(system_process)
     service = current_records_marc21.records_service
     data = marc21_record.json
     data["access"] = {
