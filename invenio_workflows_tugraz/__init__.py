@@ -10,6 +10,6 @@
 
 from .ext import InvenioWorkflowsTugraz
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 __all__ = ("__version__", "InvenioWorkflowsTugraz")
