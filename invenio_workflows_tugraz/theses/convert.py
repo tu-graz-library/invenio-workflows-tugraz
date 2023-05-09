@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,6 +8,7 @@
 
 """Convert from CampusOnline to Marc21."""
 
+from datetime import datetime
 from re import split
 from xml.etree.ElementTree import Element
 
@@ -70,14 +71,15 @@ class CampusOnlineToMarc21(Visitor):
         self.author_name = "N/A"
         self.state = ""
         self.metaclass_name = ""
-        self.data_elements = ""
 
+        record.emplace_leader("07878nam a2200421 c 4500")
         record.emplace_controlfield("007", "cr#|||||||||||")
+        record.emplace_controlfield("008", "230501s########   #a###om####000#0#eng c")
         record.emplace_datafield(
             "040...", subfs={"a": "AT-UBTUG", "b": "ger", "d": "AT-UBTUG", "e": "rda"}
         )
         record.emplace_datafield("044...", subfs={"c": "XA-AT"})
-        record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "JAHR"})
+        record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "DATUM"})
         record.emplace_datafield(
             "300...", subfs={"a": "1 Online-Ressource ( Seiten )", "b": "ill"}
         )
@@ -86,28 +88,27 @@ class CampusOnlineToMarc21(Visitor):
         record.emplace_datafield("338...", subfs={"b": "cr"})
         record.emplace_datafield("347...", subfs={"a": "Textdatei", "b": "PDF"})
         record.emplace_datafield(
-            "506.0..", subfs={"f": "Unrestricted online access", "2": "star"}
+            "506.0..", subfs={"2": "star", "f": "Unrestricted online access"}
         )
         record.emplace_datafield("546...", subfs={"a": "Zusammenfassung in"})
         record.emplace_datafield(
-            "655...",
+            "655..7.",
             subfs={
                 "a": "Hochschulschrift",
                 "0": "(DE-588)4113937-9",
-                "d": "gnd-content",
+                "2": "gnd-content",
             },
         )
+        # TODO: find out what in 008 should be
 
     def visit(self, node, record: Marc21Metadata):
         """Override visit."""
         super().visit(node, record)
-        # TODO: find out what in 008 should be
-        record.emplace_controlfield("008", self.data_elements)
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
         record.emplace_datafield(
-            "995...", subfs={"i": "TUGRAZonline", "d": node.text, "9": "local"}
+            "995...", subfs={"i": "TUGRAZonline", "a": node.text, "9": "local"}
         )
 
     def visit_PAG(self, node, record: Marc21Metadata):
@@ -136,6 +137,10 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_STATUSD(self, node: Element, record: Marc21Metadata):
         """Visit Status date."""
+        try:
+            self.year = datetime.strptime(node.text, "%Y-%M-%D %H:%M:%S").year
+        except ValueError:
+            self.year = "JAHR"
 
     def visit_ORG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -165,7 +170,7 @@ class CampusOnlineToMarc21(Visitor):
 
         record.emplace_datafield(
             "502...",
-            subfs={"b": node.text, "c": "Technische Universität Graz", "d": "JAHR"},
+            subfs={"b": node.text, "c": "Technische Universität Graz", "d": self.year},
         )
 
     def visit_ZUGKB(self, node: Element, record: Marc21Metadata):
@@ -185,11 +190,15 @@ class CampusOnlineToMarc21(Visitor):
     def visit_SPBIS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         text = node.text
+        in_format = "%Y-%M-%D %H:%M:%S"
+        out_format = "%D-%M-%Y"
+        spvon = datetime.strptime(self.spvon, in_format).strftime(out_format)
+        spbis = datetime.strptime(text.split(" ")[0], in_format).strftime(out_format)
 
         if text:
             record.emplace_datafield(
                 "971.7..",
-                subfs={"a": "gesperrt", "b": self.spvon, "c": text.split(" ")[0]},
+                subfs={"a": "gesperrt", "b": spvon, "c": spbis},
             )
 
     def visit_SPBGR(self, node: Element, record: Marc21Metadata):
@@ -232,12 +241,19 @@ class CampusOnlineToMarc21(Visitor):
 
         if self.metaclass_name == "SUPERVISOR":
             types = {
+                "BTEXT": "0",
                 "BTTUG": "0",
                 "MBTUG": "2",
+                "MBEXT": "2",
                 "1BUTUG": "1",
+                "2BUTUG": "1",
+                "3BUTUG": "1",
+                "4BUTUG": "1",
+                "5BUTUG": "1",
+                "6BUTUG": "1",
             }
             ind1 = types.get(self.typ, "")
-            record.emplace_datafield(f"971.{ind1}.0.a", value=construct_name(self.name))
+            record.emplace_datafield(f"971.{ind1}..a", value=construct_name(self.name))
 
         self.state = ""
 
@@ -274,7 +290,8 @@ class CampusOnlineToMarc21(Visitor):
         """Visit ."""
         if self.state == "metaobj" and self.language == self.object_language:
             record.emplace_datafield(
-                "245.1.0.", subfs={"a": node.text, "c": self.author_name}
+                "245.1.0.",
+                subfs={"a": node.text, "c": f"{self.name.fn} {self.name.ln}"},
             )
 
         if self.state == "metaobj" and self.language != self.object_language:
