@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.10 (release 2023-05-10)
+
+- fix: used wrong date format
+
+
 Version v0.1.9 (release 2023-05-10)
 
 - theses: apply marc21 request changes
