@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.1.13 (release 2023-05-10)
+
+- theses: apply requested marc21 field changes
+- fix: date for status
+
+
 Version v0.1.12 (release 2023-05-10)
 
 - fix: the crap from last commit
