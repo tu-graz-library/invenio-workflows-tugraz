@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 #
-# Copyright (C) 2021 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # Invenio-Records-Marc21 is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -11,18 +11,19 @@
 
 """Blueprint definitions."""
 
-from flask import Blueprint, redirect
+from flask import Blueprint, Flask, redirect
+from werkzeug.wrappers import Response as BaseResponse
 
 from .decorators import pass_record_from_pid
 
 
 @pass_record_from_pid
-def record_from_pid(record=None, **kwargs):
+def record_from_pid(record: dict = None, **__: dict) -> BaseResponse:
     """Redirect to record's latest version page."""
     return redirect(record["links"]["self_html"], code=301)
 
 
-def create_blueprint(app):
+def create_blueprint(_: Flask) -> Blueprint:
     """Register blueprint routes on app."""
     blueprint = Blueprint(
         "invenio_workflows_tugraz_theses",

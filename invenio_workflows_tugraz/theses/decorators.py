@@ -9,7 +9,9 @@
 
 """Decorator functions for theses views."""
 
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
 from flask import abort, g
 from invenio_records_marc21.proxies import current_records_marc21
@@ -18,11 +20,11 @@ from invenio_search.engine import dsl
 from sqlalchemy.exc import NoResultFound
 
 
-def pass_record_from_pid(f):
+def pass_record_from_pid(f: Callable) -> Callable:
     """Decorate a view to pass the record from a pid."""
 
     @wraps(f)
-    def view(*args, **kwargs):
+    def view(*_: dict, **kwargs: dict) -> Any:  # noqa: ANN401
         pid_value = kwargs.get("pid_value")
 
         search = RecordsSearch(index="marc21records")
@@ -31,7 +33,7 @@ def pass_record_from_pid(f):
                 {"match_all": {}},
                 {"match_phrase": {"metadata.fields.995.subfields.d": pid_value}},
                 {"match_phrase": {"metadata.fields.995.subfields.i": "TUGRAZonline"}},
-            ]
+            ],
         }
 
         search.query = dsl.Q("bool", **query)
@@ -44,11 +46,13 @@ def pass_record_from_pid(f):
 
         try:
             record = current_records_marc21.records_service.read_draft(
-                id_=hits["id"], identity=g.identity
+                id_=hits["id"],
+                identity=g.identity,
             )
-        except NoResultFound as e:
+        except NoResultFound:
             record = current_records_marc21.records_service.read(
-                id_=hits["id"], identity=g.identity
+                id_=hits["id"],
+                identity=g.identity,
             )
 
         kwargs["record"] = record.to_dict()

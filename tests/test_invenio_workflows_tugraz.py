@@ -10,17 +10,15 @@
 
 from flask import Flask
 
-from invenio_workflows_tugraz import InvenioWorkflowsTugraz
+from invenio_workflows_tugraz import InvenioWorkflowsTugraz, __version__
 
 
-def test_version():
+def test_version() -> None:
     """Test version import."""
-    from invenio_workflows_tugraz import __version__
-
     assert __version__
 
 
-def test_init():
+def test_init() -> None:
     """Test extension initialization."""
     app = Flask("testapp")
     ext = InvenioWorkflowsTugraz(app)

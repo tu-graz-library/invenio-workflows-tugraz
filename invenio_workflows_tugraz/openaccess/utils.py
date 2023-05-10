@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -15,7 +15,7 @@ from .types import PureId
 
 
 @check_about_duplicate.register
-def _(value: PureId):
+def _(value: PureId) -> None:
     """Check about double pure id."""
     check_about_duplicate(str(value), value.category)
 
@@ -52,10 +52,10 @@ def extract_pure_id(pure_record: PureRecord) -> PureID:
 def extract_file_url(pure_record: PureRecord) -> URL:
     """Extract file url."""
 
-    def condition(item):
-        return access_type(item) in ["Open", "Offen"] and license_type(item).startswith(
-            "CC BY"
-        )
+    def condition(item: dict) -> bool:
+        condition_1 = access_type(item) in ["Open", "Offen"]
+        condition_2 = license_type(item).startswith("CC BY")
+        return condition_1 and condition_2
 
     file_urls = []
     for electronic_version in pure_record["electronicVersions"]:

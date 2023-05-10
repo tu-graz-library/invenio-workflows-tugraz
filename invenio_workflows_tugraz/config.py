@@ -6,7 +6,7 @@
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
-"""This is the configuration file."""
+"""Configuration file."""
 
 from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
