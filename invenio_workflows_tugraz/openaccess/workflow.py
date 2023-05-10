@@ -7,7 +7,7 @@
 # details.
 
 """Open Access Workflow."""
-from typing import Callable
+from collections.abc import Callable
 
 from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_pure import PureConfigs, PureRecord
@@ -18,6 +18,7 @@ from invenio_records_marc21 import (
     create_record,
     current_records_marc21,
 )
+from invenio_records_resources.services.records.results import RecordItem
 
 from .convert import Pure2Marc21
 from .types import PureId
@@ -34,7 +35,7 @@ def pure_import_func(
     pure_record: PureRecord,
     configs: PureConfigs,
     download_file: Callable,
-) -> None:
+) -> RecordItem:
     """Import record from pure into the repository."""
     pure_id = extract_pure_id(pure_record)
     file_urls = extract_file_url(pure_record)
@@ -42,7 +43,10 @@ def pure_import_func(
     file_paths = []
     for i, file_url in enumerate(file_urls):
         file_path = download_file(
-            f"{pure_id}-{i}", file_url, configs.pure_username, configs.pure_password
+            f"{pure_id}-{i}",
+            file_url,
+            configs.pure_username,
+            configs.pure_password,
         )
         file_paths.append(file_path)
 

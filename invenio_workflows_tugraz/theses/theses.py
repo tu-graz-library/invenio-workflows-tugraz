@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2023 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -9,7 +9,7 @@
 """Theses Workflows."""
 
 from collections import namedtuple
-from typing import Callable
+from collections.abc import Callable
 from xml.etree.ElementTree import Element
 
 from invenio_access.permissions import system_process
@@ -27,6 +27,7 @@ from invenio_records_marc21 import (
     create_record,
     current_records_marc21,
 )
+from invenio_records_resources.services.records.results import RecordItem
 from invenio_search import RecordsSearch
 from invenio_search.engine import dsl
 
@@ -37,23 +38,23 @@ error_record = namedtuple("ErrorRecord", ["id"])
 
 
 @check_about_duplicate.register
-def _(value: CampusOnlineId):
+def _(value: CampusOnlineId) -> None:
     """Check about double campus online id."""
     check_about_duplicate(str(value), value.category)
 
 
-def cms_id(record):
+def cms_id(record: dict) -> str:
     """CMS id."""
     return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["d"][0]
 
 
-def marc_id(record):
+def marc_id(record: dict) -> str:
     """Marc id."""
     return record["_source"]["id"]
 
 
-def theses_filter_for_locked_records():
-    """This function returns a tuple.
+def theses_filter_for_locked_records() -> ThesesFilter:
+    """Return a ThesesFilter object for locked records.
 
     FILTER: xml filter to get locked records
     STATE: [open, locked]
@@ -61,14 +62,14 @@ def theses_filter_for_locked_records():
     """
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="LOCKED" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",
+        """<bas:state name="LOCKED" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",  # noqa: E501
     ]
     state = ThesesState.LOCKED
     return ThesesFilter(filter_, state)
 
 
-def theses_filter_for_open_records():
-    """This function returns a list of tuples.
+def theses_filter_for_open_records() -> ThesesFilter:
+    """Return a ThesesFilter object for open records.
 
     FILTER: xml filter to get open records
     STATE: [open, locked]
@@ -76,14 +77,14 @@ def theses_filter_for_open_records():
     """
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",
+        """<bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",  # noqa: E501
     ]
     state = ThesesState.OPEN
     return ThesesFilter(filter_, state)
 
 
-def theses_create_aggregator():
-    """This function returns a list of marc21 ids."""
+def theses_create_aggregator() -> list[tuple[str, str]]:
+    """Return list of marc21,cmsid tuple which should be created in alma."""
     search = RecordsSearch(index="marc21records-drafts")
     query = {
         "must_not": [
@@ -91,14 +92,14 @@ def theses_create_aggregator():
                 "exists": {
                     "field": "metadata.fields.001",
                 },
-            }
+            },
         ],
         "must": [
             {
                 "exists": {
                     "field": "metadata.fields.995",
                 },
-            }
+            },
         ],
     }
 
@@ -109,8 +110,8 @@ def theses_create_aggregator():
     return [(marc_id(record), cms_id(record)) for record in hits]
 
 
-def theses_update_aggregator():
-    """This function returns a list of tuple(marc21, cms_id)."""
+def theses_update_aggregator() -> list[tuple[str, str]]:
+    """Return a list of tuple(marc21, cms_id) which should be updated in repo."""
     search = RecordsSearch(index="marc21records-drafts")
     query = {
         "must_not": [
@@ -118,8 +119,8 @@ def theses_update_aggregator():
                 "exists": {
                     "field": "metadata.fields.001",
                 },
-            }
-        ]
+            },
+        ],
     }
     search.query = dsl.Q("bool", **query)
     result = search.execute()
@@ -133,9 +134,9 @@ def exists_fulltext(thesis: Element) -> bool:
     xpath = f".//{{{ns}}}attr[@key='VOLLTEXT']"
     ele = thesis.find(xpath)
 
-    if ele is None:
+    if ele is None:  # noqa: SIM114
         return False
-    elif ele.text == "N":
+    elif ele.text == "N":  # noqa: SIM103, RET505
         return False
     else:
         return True
@@ -146,8 +147,8 @@ def import_func(
     configs: CampusOnlineConfigs,
     get_metadata: Callable,
     download_file: Callable,
-):
-    """This is the function to import the record into the repository."""
+) -> RecordItem:
+    """Import the record into the repository."""
     try:
         check_about_duplicate(CampusOnlineId(cms_id))
     except DuplicateRecordError:
@@ -156,7 +157,8 @@ def import_func(
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
     if not exists_fulltext(thesis):
-        raise RuntimeError("record has no associated file")
+        msg = "record has no associated file"
+        raise RuntimeError(msg)
 
     file_path = download_file(configs.endpoint, configs.token, cms_id)
 
