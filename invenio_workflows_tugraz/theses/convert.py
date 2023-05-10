@@ -190,8 +190,8 @@ class CampusOnlineToMarc21(Visitor):
     def visit_SPBIS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         text = node.text
-        in_format = "%Y-%M-%D %H:%M:%S"
-        out_format = "%D-%M-%Y"
+        in_format = "%Y-%m-%d %H:%M:%S"
+        out_format = "%d.%m.%Y"
         spvon = datetime.strptime(self.spvon, in_format).strftime(out_format)
         spbis = datetime.strptime(text.split(" ")[0], in_format).strftime(out_format)
 
