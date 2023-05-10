@@ -138,7 +138,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_STATUSD(self, node: Element, record: Marc21Metadata):
         """Visit Status date."""
         try:
-            self.year = datetime.strptime(node.text, "%Y-%M-%D %H:%M:%S").year
+            self.year = datetime.strptime(node.text, "%Y-%m-%d %H:%M:%S").year
         except ValueError:
             self.year = "JAHR"
 
