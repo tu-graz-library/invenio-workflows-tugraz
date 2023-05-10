@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.12 (release 2023-05-10)
+
+- fix: the crap from last commit
+
+
 Version v0.1.11 (release 2023-05-10)
 
 - fix: date and format where not compatible
