@@ -248,9 +248,9 @@ class CampusOnlineToMarc21(Visitor):
         self.visit(node, record)
 
         if self.metaclass_name == "AUTHOR":
-            self.author_name = construct_name(self.name)
+            self.author_name = self.name
             record.emplace_datafield(
-                "100.1..", subfs={"a": self.author_name, "4": "aut"}
+                "100.1..", subfs={"a": construct_name(self.author_name), "4": "aut"}
             )
 
         if self.metaclass_name == "SUPERVISOR":
@@ -305,7 +305,10 @@ class CampusOnlineToMarc21(Visitor):
         if self.state == "metaobj" and self.language == self.object_language:
             record.emplace_datafield(
                 "245.1.0.",
-                subfs={"a": node.text, "c": f"{self.name['fn']} {self.name['ln']}"},
+                subfs={
+                    "a": node.text,
+                    "c": f"{self.author_name['fn']} {self.author_name['ln']}",
+                },
             )
 
         if self.state == "metaobj" and self.language != self.object_language:
