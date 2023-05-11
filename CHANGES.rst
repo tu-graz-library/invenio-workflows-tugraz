@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.16 (release 2023-05-11)
+
+- fix: int not serializable
+
+
 Version v0.1.15 (release 2023-05-11)
 
 - theses: fix german language code
