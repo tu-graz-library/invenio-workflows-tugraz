@@ -15,4 +15,4 @@ from invenio_records_marc21.services.record.types import Marc21Category
 class CampusOnlineId(Marc21Category):
     """Campus online ID."""
 
-    category: str = "995.subfields.d.keyword"
+    category: str = "995.subfields.a.keyword"
