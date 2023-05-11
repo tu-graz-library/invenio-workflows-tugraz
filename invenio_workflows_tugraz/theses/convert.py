@@ -200,16 +200,20 @@ class CampusOnlineToMarc21(Visitor):
     def visit_SPBIS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         text = node.text
+
+        if not text:
+            return
+
         in_format = "%Y-%m-%d %H:%M:%S"
         out_format = "%d.%m.%Y"
+
         spvon = datetime.strptime(self.spvon, in_format).strftime(out_format)
         spbis = datetime.strptime(text, in_format).strftime(out_format)
 
-        if text:
-            record.emplace_datafield(
-                "971.7..",
-                subfs={"a": "gesperrt", "b": spvon, "c": spbis},
-            )
+        record.emplace_datafield(
+            "971.7..",
+            subfs={"a": "gesperrt", "b": spvon, "c": spbis},
+        )
 
     def visit_SPBGR(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -301,7 +305,7 @@ class CampusOnlineToMarc21(Visitor):
         if self.state == "metaobj" and self.language == self.object_language:
             record.emplace_datafield(
                 "245.1.0.",
-                subfs={"a": node.text, "c": f"{self.name.fn} {self.name.ln}"},
+                subfs={"a": node.text, "c": f"{self.name['fn']} {self.name['ln']}"},
             )
 
         if self.state == "metaobj" and self.language != self.object_language:
