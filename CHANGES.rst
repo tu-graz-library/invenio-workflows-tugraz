@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.17 (release 2023-05-11)
+
+- fix: errors
+
+
 Version v0.1.16 (release 2023-05-11)
 
 - fix: int not serializable
