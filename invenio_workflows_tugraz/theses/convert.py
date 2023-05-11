@@ -108,7 +108,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
         record.emplace_datafield(
-            "995...", subfs={"i": "TUGRAZonline", "a": node.text, "9": "local"}
+            "995...", subfs={"i": "TUGRAZonline", "a": str(node.text), "9": "local"}
         )
 
     def visit_PAG(self, node, record: Marc21Metadata):
@@ -138,9 +138,10 @@ class CampusOnlineToMarc21(Visitor):
     def visit_STATUSD(self, node: Element, record: Marc21Metadata):
         """Visit Status date."""
         try:
-            self.year = datetime.strptime(node.text, "%Y-%m-%d %H:%M:%S").year
+            year = datetime.strptime(node.text, "%Y-%m-%d %H:%M:%S").year
         except ValueError:
-            self.year = "JAHR"
+            year = "JAHR"
+        self.year = str(year)
 
     def visit_ORG(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -175,7 +176,11 @@ class CampusOnlineToMarc21(Visitor):
 
         record.emplace_datafield(
             "502...",
-            subfs={"b": node.text, "c": "Technische Universität Graz", "d": self.year},
+            subfs={
+                "b": node.text,
+                "c": "Technische Universität Graz",
+                "d": str(self.year),
+            },
         )
 
     def visit_ZUGKB(self, node: Element, record: Marc21Metadata):
