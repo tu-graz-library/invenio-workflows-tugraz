@@ -23,7 +23,7 @@ def construct_name(name):
 def language_decode(lang):
     """Language decode."""
     languages = {
-        "DE": "deu",
+        "DE": "ger",
         "EN": "eng",
     }
     return languages.get(lang, "PLATZHALTER")
