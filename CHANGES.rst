@@ -8,6 +8,16 @@
 Changes
 =======
 
+Version v0.1.18 (release 2023-05-12)
+
+- fix: position 19 was the wrong value
+- fix: keyw was not processed
+- theses: change visitor api
+- theses: implement sorting for 971 fields
+- fix: revert back change of 007 field
+- fix: 245 field missed author
+
+
 Version v0.1.17 (release 2023-05-11)
 
 - fix: errors
