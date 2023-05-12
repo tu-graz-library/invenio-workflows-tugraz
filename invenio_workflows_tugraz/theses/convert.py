@@ -71,6 +71,7 @@ class CampusOnlineToMarc21(Visitor):
         self.author_name = "N/A"
         self.state = ""
         self.metaclass_name = ""
+        self.theses_local_field = {}
 
         record.emplace_leader("07878nam a2200421 c 4500")
         record.emplace_controlfield("007", "cr#|||||||||||")
@@ -99,11 +100,15 @@ class CampusOnlineToMarc21(Visitor):
                 "2": "gnd-content",
             },
         )
+
         # TODO: find out what in 008 should be
 
     def visit(self, node, record: Marc21Metadata):
         """Override visit."""
         super().visit(node, record)
+
+        for key, subfs in sorted(self.theses_local_field.items()):
+            record.emplace_datafield(key, subfs=subfs)
 
     def visit_ID(self, node, record: Marc21Metadata):
         """Visit ID."""
@@ -153,15 +158,12 @@ class CampusOnlineToMarc21(Visitor):
         faculty = orgp[1] if len(orgp) > 1 else ""
         institute = orgp[2] if len(orgp) > 2 else ""
 
-        record.emplace_datafield(
-            "971.5..",
-            subfs={
-                "a": "Technische Universität Graz",
-                "b": faculty,
-                "c": institute,
-                "d": "NUMMER",
-            },
-        )
+        self.theses_local_field["971.5.."] = {
+            "a": "Technische Universität Graz",
+            "b": faculty.strip(),
+            "c": institute.strip(),
+            "d": "NUMMER",
+        }
 
     def visit_TYPKB(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -210,10 +212,7 @@ class CampusOnlineToMarc21(Visitor):
         spvon = datetime.strptime(self.spvon, in_format).strftime(out_format)
         spbis = datetime.strptime(text, in_format).strftime(out_format)
 
-        record.emplace_datafield(
-            "971.7..",
-            subfs={"a": "gesperrt", "b": spvon, "c": spbis},
-        )
+        self.theses_local_field["971.7.."] = {"a": "gesperrt", "b": spvon, "c": spbis}
 
     def visit_SPBGR(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -267,7 +266,7 @@ class CampusOnlineToMarc21(Visitor):
                 "6BUTUG": "1",
             }
             ind1 = types.get(self.typ, "")
-            record.emplace_datafield(f"971.{ind1}..a", value=construct_name(self.name))
+            self.theses_local_field[f"971.{ind1}.."] = {"a": construct_name(self.name)}
 
         self.state = ""
 
