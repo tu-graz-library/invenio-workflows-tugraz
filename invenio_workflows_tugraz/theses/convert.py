@@ -320,13 +320,15 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_KEYW(self, node: Element, record: Marc21Metadata):
         """Visit ."""
-        if not node:
+        text = node.text
+        if not text:
             return
 
         subjects = filter(
             lambda s: len(s) > 0,
-            [s.strip() for s in split(r";|,", node.text)],
+            [s.strip() for s in split(r";|,", text)],
         )
+
         for subject in subjects:
             record.emplace_datafield("653...", value=subject)
 
