@@ -61,6 +61,10 @@ class Visitor:
         for child in node:
             self.process(child, record)
 
+    def convert(self, node, record: Marc21Metadata):
+        """Convert."""
+        self.visit(node, record)
+
 
 class CampusOnlineToMarc21(Visitor):
     """Convertor from CampusOnline to Marc21."""
@@ -75,14 +79,14 @@ class CampusOnlineToMarc21(Visitor):
 
         record.emplace_leader("07878nam a2200421 c 4500")
         record.emplace_controlfield("007", "cr#|||||||||||")
-        record.emplace_controlfield("008", "230501s########   #a###om####000#0#eng c")
+        record.emplace_controlfield("008", "230501s########   #a###om####|||#|#eng c")
         record.emplace_datafield(
             "040...", subfs={"a": "AT-UBTUG", "b": "ger", "d": "AT-UBTUG", "e": "rda"}
         )
         record.emplace_datafield("044...", subfs={"c": "XA-AT"})
         record.emplace_datafield("264..1.", subfs={"a": "Graz", "c": "DATUM"})
         record.emplace_datafield(
-            "300...", subfs={"a": "1 Online-Ressource ( Seiten )", "b": "ill"}
+            "300...", subfs={"a": "1 Online-Ressource (Seiten)", "b": "ill"}
         )
         record.emplace_datafield("336...", subfs={"b": "txt"})
         record.emplace_datafield("337...", subfs={"b": "c"})
@@ -103,9 +107,9 @@ class CampusOnlineToMarc21(Visitor):
 
         # TODO: find out what in 008 should be
 
-    def visit(self, node, record: Marc21Metadata):
-        """Override visit."""
-        super().visit(node, record)
+    def convert(self, node, record: Marc21Metadata):
+        """Override convert."""
+        super().convert(node, record)
 
         for key, subfs in sorted(self.theses_local_field.items()):
             record.emplace_datafield(key, subfs=subfs)
@@ -197,7 +201,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_SPVON(self, node: Element, record: Marc21Metadata):
         """Visit ."""
         text = node.text
-        self.spvon = text.split(" ")[0] if text else ""
+        self.spvon = text if text else ""
 
     def visit_SPBIS(self, node: Element, record: Marc21Metadata):
         """Visit ."""
@@ -301,19 +305,14 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_TIT(self, node: Element, record: Marc21Metadata):
         """Visit ."""
+        text = node.text.replace("\n", " ")
+        author = f"{self.author_name['fn']} {self.author_name['ln']}"
+
         if self.state == "metaobj" and self.language == self.object_language:
-            record.emplace_datafield(
-                "245.1.0.",
-                subfs={
-                    "a": node.text,
-                    "c": f"{self.author_name['fn']} {self.author_name['ln']}",
-                },
-            )
+            record.emplace_datafield("245.1.0.", subfs={"a": text, "c": author})
 
         if self.state == "metaobj" and self.language != self.object_language:
-            record.emplace_datafield(
-                "246.1..", subfs={"i": "TUGRAZonline", "a": node.text}
-            )
+            record.emplace_datafield("246.1..", subfs={"i": "TUGRAZonline", "a": text})
 
     def visit_ABS(self, node: Element, record: Marc21Metadata):
         """Visit ."""

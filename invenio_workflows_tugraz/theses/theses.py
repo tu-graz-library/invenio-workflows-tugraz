@@ -163,7 +163,7 @@ def import_func(
     marc21_record = Marc21Metadata()
     convert = CampusOnlineToMarc21(marc21_record)
 
-    convert.visit(thesis, marc21_record)
+    convert.convert(thesis, marc21_record)
 
     identity = get_identity_from_user_by_email(email=configs.user_email)
     identity.provides.add(system_process)
