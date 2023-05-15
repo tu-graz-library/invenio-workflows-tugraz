@@ -79,7 +79,7 @@ class CampusOnlineToMarc21(Visitor):
 
         record.emplace_leader("07878nam a2200421 c 4500")
         record.emplace_controlfield("007", "cr#|||||||||||")
-        record.emplace_controlfield("008", "230501s########   #####om####|||#|#eng c")
+        record.emplace_controlfield("008", "230501s????####   #####om####|||#|#### c")
         record.emplace_datafield(
             "040...", subfs={"a": "AT-UBTUG", "b": "ger", "d": "AT-UBTUG", "e": "rda"}
         )
