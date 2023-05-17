@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.1.19 (release 2023-05-17)
+
+- fix: apply requested changes for field 008
+
+
 Version v0.1.18 (release 2023-05-12)
 
 - fix: position 19 was the wrong value
