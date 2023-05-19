@@ -11,14 +11,12 @@
 from .theses import (
     import_func,
     theses_create_aggregator,
-    theses_filter_for_locked_records,
     theses_filter_for_open_records,
 )
 from .views import create_blueprint
 
 __all__ = (
     "theses_create_aggregator",
-    "theses_filter_for_locked_records",
     "theses_filter_for_open_records",
     "import_func",
     "create_blueprint",

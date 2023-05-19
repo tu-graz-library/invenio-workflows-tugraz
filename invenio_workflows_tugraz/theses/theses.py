@@ -53,21 +53,6 @@ def marc_id(record: dict) -> str:
     return record["_source"]["id"]
 
 
-def theses_filter_for_locked_records() -> ThesesFilter:
-    """Return a ThesesFilter object for locked records.
-
-    FILTER: xml filter to get locked records
-    STATE: [open, locked]
-    return ThesesFilter
-    """
-    filter_ = [
-        """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="LOCKED" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",  # noqa: E501
-    ]
-    state = ThesesState.LOCKED
-    return ThesesFilter(filter_, state)
-
-
 def theses_filter_for_open_records() -> ThesesFilter:
     """Return a ThesesFilter object for open records.
 

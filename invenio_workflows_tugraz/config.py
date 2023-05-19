@@ -12,7 +12,6 @@ from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
     import_func,
     theses_create_aggregator,
-    theses_filter_for_locked_records,
     theses_filter_for_open_records,
 )
 
@@ -25,7 +24,6 @@ WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = [
 """"""
 
 WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
-    theses_filter_for_locked_records(),
     theses_filter_for_open_records(),
 ]
 """"""
