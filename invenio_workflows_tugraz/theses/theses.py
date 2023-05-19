@@ -19,6 +19,7 @@ from invenio_campusonline.types import (
     ThesesFilter,
     ThesesState,
 )
+from invenio_campusonline.utils import get_embargo_range
 from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_records_marc21 import (
     DuplicateRecordError,
@@ -160,5 +161,12 @@ def import_func(
         "record": "restricted",
         "files": "restricted",
     }
+
+    if bool(embargo := get_embargo_range(thesis)):
+        data["access"]["embargo"] = {
+            "until": embargo.end_date,
+            "active": True,
+            "reason": None,
+        }
 
     return create_record(service, data, [file_path], identity, do_publish=False)
