@@ -12,7 +12,9 @@ from collections import namedtuple
 from collections.abc import Callable
 from xml.etree.ElementTree import Element
 
+from flask_principal import Identity
 from invenio_access.permissions import system_process
+from invenio_alma import AlmaSRUService
 from invenio_campusonline.types import (
     CampusOnlineConfigs,
     CampusOnlineID,
@@ -24,6 +26,7 @@ from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_records_marc21 import (
     DuplicateRecordError,
     Marc21Metadata,
+    Marc21RecordService,
     check_about_duplicate,
     create_record,
     current_records_marc21,
@@ -170,3 +173,22 @@ def import_func(
         }
 
     return create_record(service, data, [file_path], identity, do_publish=False)
+
+
+def update_func(
+    records_service: Marc21RecordService,
+    alma_service: AlmaSRUService,
+    marc_id: str,
+    cms_id: str,
+    identity: Identity,
+) -> None:
+    """This is the function to update the record by metadata from alma."""
+    marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
+    marc21_record_from_alma = Marc21Metadata(metadata=marc21_etree)
+
+    # TODO: change metadata and file access according to existing embargo or not
+    records_service.edit(id_=marc_id, identity=identity)
+    records_service.update_draft(
+        id_=marc_id, identity=identity, metadata=marc21_record_from_alma
+    )
+    records_service.publish(id_=marc_id, identity=identity)
