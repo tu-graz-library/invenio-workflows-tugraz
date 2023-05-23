@@ -182,13 +182,25 @@ def update_func(
     cms_id: str,
     identity: Identity,
 ) -> None:
-    """This is the function to update the record by metadata from alma."""
+    """Update the record by metadata from alma."""
+    data = records_service.read_draft(id_=marc_id, identity=identity).data
+
     marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
-    marc21_record_from_alma = Marc21Metadata(metadata=marc21_etree)
+    marc21_record = Marc21Metadata(metadata=marc21_etree[0])
+
+    is_restricted = marc21_record.exists_field(
+        category="971",
+        ind1="7",
+        ind2=" ",
+        subf_code="a",
+        subf_value="gesperrt",
+    )
+    file_access = "restricted" if is_restricted else "public"
+    data["metadata"] = marc21_record.json
+    data["access"]["record"] = "public"
+    data["access"]["files"] = file_access
 
     # TODO: change metadata and file access according to existing embargo or not
     records_service.edit(id_=marc_id, identity=identity)
-    records_service.update_draft(
-        id_=marc_id, identity=identity, metadata=marc21_record_from_alma
-    )
+    records_service.update_draft(id_=marc_id, identity=identity, metadata=marc21_record)
     records_service.publish(id_=marc_id, identity=identity)
