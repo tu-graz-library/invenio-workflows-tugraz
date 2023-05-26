@@ -200,7 +200,6 @@ def update_func(
     data["access"]["record"] = "public"
     data["access"]["files"] = file_access
 
-    # TODO: change metadata and file access according to existing embargo or not
     records_service.edit(id_=marc_id, identity=identity)
-    records_service.update_draft(id_=marc_id, identity=identity, metadata=marc21_record)
+    records_service.update_draft(id_=marc_id, identity=identity, data=data)
     records_service.publish(id_=marc_id, identity=identity)

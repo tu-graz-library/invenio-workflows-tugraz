@@ -18,6 +18,7 @@ include *.md
 include *.rst
 include *.sh
 include *.txt
+include *.toml
 include babel.ini
 include pytest.ini
 recursive-include docs *.bat
