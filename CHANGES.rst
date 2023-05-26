@@ -8,6 +8,18 @@
 Changes
 =======
 
+Version v0.2.0 (release 2023-05-26)
+
+- fix: use data instead of metadata
+- fix: tests
+- fix: 971 not used all additions
+- theses: rewrite access in update func
+- theses: add update_func to the workflow
+- theses: add embargo on creation
+- theses: remove locked generator
+- setup: migrate to ruff
+
+
 Version v0.1.19 (release 2023-05-17)
 
 - fix: apply requested changes for field 008
