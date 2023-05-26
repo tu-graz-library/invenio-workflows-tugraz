@@ -21,6 +21,12 @@ author = "Graz University of Technology"
 nitpick_ignore = [
     ("py:class", "invenio_campusonline.types.CampusOnlineConfigs"),
     ("py:class", "invenio_pure.types.PureConfigs"),
+    ("py:class", "flask.app.Flask"),
+    ("py:class", "invenio_records_marc21.services.services.Marc21RecordService"),
+    ("py:class", "invenio_alma.services.sru.AlmaSRUService"),
+    ("py:class", "flask_principal.Identity"),
+    ("py:class", "collections.abc.Callable"),
+    ("py:class", "invenio_records_resources.services.records.results.RecordItem"),
 ]
 
 # -- General configuration ---------------------------------------------------
