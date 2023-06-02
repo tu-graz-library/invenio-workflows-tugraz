@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.2.1 (release 2023-06-02)
+
+- theses: not only drafts should be updated
+- fix: theses update_func api used wrong
+
+
 Version v0.2.0 (release 2023-05-26)
 
 - fix: use data instead of metadata
