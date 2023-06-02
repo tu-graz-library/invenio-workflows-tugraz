@@ -196,7 +196,7 @@ def update_func(
         subf_value="gesperrt",
     )
     file_access = "restricted" if is_restricted else "public"
-    data["metadata"] = marc21_record.json
+    data["metadata"] = marc21_record.json["metadata"]
     data["access"]["record"] = "public"
     data["access"]["files"] = file_access
 
