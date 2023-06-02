@@ -23,6 +23,7 @@ from invenio_campusonline.types import (
 )
 from invenio_campusonline.utils import get_embargo_range
 from invenio_config_tugraz import get_identity_from_user_by_email
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_marc21 import (
     DuplicateRecordError,
     Marc21Metadata,
@@ -183,7 +184,14 @@ def update_func(
     identity: Identity,
 ) -> None:
     """Update the record by metadata from alma."""
-    data = records_service.read_draft(id_=marc_id, identity=identity).data
+    try:
+        data = records_service.read(id_=marc_id, identity=identity).data
+    except PIDDoesNotExistError:
+        try:
+            data = records_service.read_draft(id_=marc_id, identity=identity).data
+        except PIDDoesNotExistError as esc:
+            msg = f"pid: {marc_id} not found"
+            raise RuntimeError(msg) from esc
 
     marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
     marc21_record = Marc21Metadata(metadata=marc21_etree[0])
