@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.2.2 (release 2023-06-05)
+
+- fix: wrong method used to get the record
+
+
 Version v0.2.1 (release 2023-06-02)
 
 - theses: not only drafts should be updated
