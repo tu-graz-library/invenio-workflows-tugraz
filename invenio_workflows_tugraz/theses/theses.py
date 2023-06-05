@@ -34,6 +34,7 @@ from invenio_records_marc21 import (
 from invenio_records_resources.services.records.results import RecordItem
 from invenio_search import RecordsSearch
 from invenio_search.engine import dsl
+from sqlalchemy.orm.exc import NoResultFound
 
 from .convert import CampusOnlineToMarc21
 from .types import CampusOnlineId
@@ -183,8 +184,10 @@ def update_func(
     identity: Identity,
 ) -> None:
     """Update the record by metadata from alma."""
-    record_list = records_service.search_versions(id_=marc_id, identity=identity)
-    data = list(record_list.hits)[0]
+    try:
+        data = records_service.read_draft(id_=marc_id, identity=identity).data
+    except NoResultFound:
+        data = records_service.read(id_=marc_id, identity=identity).data
 
     marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
     marc21_record = Marc21Metadata(metadata=marc21_etree[0])
