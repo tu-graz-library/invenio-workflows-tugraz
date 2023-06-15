@@ -32,3 +32,18 @@ def create_app(instance_path: str) -> Callable:
         return app
 
     return factory
+
+
+@pytest.fixture()
+def embargoed_record_xml() -> str:
+    """Embargoed record fixture."""
+    return """
+    <record xmlns="http://www.loc.gov/MARC21/slim">
+          <leader>06215nam a2200505 c 4500</leader>
+          <datafield ind1="7" ind2=" " tag="971">
+            <subfield code="a">gesperrt</subfield>
+            <subfield code="b">27.01.2023</subfield>
+            <subfield code="c">27.01.2025</subfield>
+          </datafield>
+    </record>
+    """
