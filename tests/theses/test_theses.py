@@ -26,7 +26,28 @@ def test_update_func(embargoed_record_xml: str) -> None:
         def data(self) -> dict:
             """Mock data."""
             return {
-                "metadata": "",
+                "metadata": {
+                    "leader": "",
+                    "fields": {
+                        "971": [
+                            {
+                                "ind1": "7",
+                                "ind2": " ",
+                                "subfields": {
+                                    "a": [
+                                        "gesperrt",
+                                    ],
+                                    "b": [
+                                        "27.01.2023",
+                                    ],
+                                    "c": [
+                                        "27.01.2025",
+                                    ],
+                                },
+                            },
+                        ],
+                    },
+                },
                 "access": {
                     "record": "restricted",
                     "files": "restricted",
