@@ -141,8 +141,8 @@ def import_func(
     """Import the record into the repository."""
     try:
         check_about_duplicate(CampusOnlineId(cms_id))
-    except DuplicateRecordError:
-        return error_record(id="duplicate error")
+    except DuplicateRecordError as error:
+        return str(error)
 
     thesis = get_metadata(configs.endpoint, configs.token, cms_id)
 
