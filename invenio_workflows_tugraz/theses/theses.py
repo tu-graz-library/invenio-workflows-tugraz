@@ -187,22 +187,30 @@ def update_func(
     try:
         data = records_service.read_draft(id_=marc_id, identity=identity).data
     except NoResultFound:
+        # if this raises also the NoResultFound error it should break!
         data = records_service.read(id_=marc_id, identity=identity).data
 
-    marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
-    marc21_record = Marc21Metadata(metadata=marc21_etree[0])
+    db_marc21_record = Marc21Metadata(json=data["metadata"])
 
-    is_restricted = marc21_record.exists_field(
+    # The existens of the "gesperrt" field will be checked from the
+    # database metadata because the field could be removed by
+    # accident. It would be a feature to open the files within the
+    # repository by the metadata comming from alma but the risk of
+    # exposing files without intention is to high.
+    is_restricted = db_marc21_record.exists_field(
         category="971",
         ind1="7",
         ind2=" ",
         subf_code="a",
         subf_value="gesperrt",
     )
-    file_access = "restricted" if is_restricted else "public"
-    data["metadata"] = marc21_record.json["metadata"]
+
+    alma_marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
+    alma_marc21_record = Marc21Metadata(metadata=alma_marc21_etree[0])
+
+    data["metadata"] = alma_marc21_record.json["metadata"]
     data["access"]["record"] = "public"
-    data["access"]["files"] = file_access
+    data["access"]["files"] = "restricted" if is_restricted else "public"
 
     records_service.edit(id_=marc_id, identity=identity)
     records_service.update_draft(id_=marc_id, identity=identity, data=data)
