@@ -40,7 +40,6 @@ if [[ ${keep_services} -eq 0 ]]; then
   trap cleanup EXIT
 fi
 
-
 ruff check .
 
 python -m check_manifest
