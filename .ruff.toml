@@ -1,4 +1,4 @@
 select = ["ALL"]
-ignore = ["ANN101", "ANN102", "D203", "D211", "D212", "D213", "N802", "UP009", "S101", "INP001", "PLR0913", "DTZ007"]
+ignore = ["ANN101", "ANN102", "D203", "D211", "D212", "D213", "N802", "UP009", "S101", "INP001", "PLR0913", "DTZ007", "PERF203", "FA102"]
 
 exclude = ["docs"]

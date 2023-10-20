@@ -18,7 +18,7 @@ from .decorators import pass_record_from_pid
 
 
 @pass_record_from_pid
-def record_from_pid(record: dict = None, **__: dict) -> BaseResponse:
+def record_from_pid(record: dict, **__: dict) -> BaseResponse:
     """Redirect to record's latest version page."""
     return redirect(record["links"]["self_html"], code=301)
 
