@@ -31,7 +31,7 @@ def pass_record_from_pid(f: Callable) -> Callable:
         query = {
             "filter": [
                 {"match_all": {}},
-                {"match_phrase": {"metadata.fields.995.subfields.d": pid_value}},
+                {"match_phrase": {"metadata.fields.995.subfields.a": pid_value}},
                 {"match_phrase": {"metadata.fields.995.subfields.i": "TUGRAZonline"}},
             ],
         }

@@ -50,7 +50,7 @@ def _(value: CampusOnlineId) -> None:
 
 def cms_id(record: dict) -> str:
     """CMS id."""
-    return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["d"][0]
+    return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["a"][0]
 
 
 def marc_id(record: dict) -> str:
