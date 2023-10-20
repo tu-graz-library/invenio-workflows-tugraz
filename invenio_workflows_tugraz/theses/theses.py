@@ -8,8 +8,8 @@
 
 """Theses Workflows."""
 
-from collections import namedtuple
 from collections.abc import Callable
+from typing import NamedTuple
 from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
@@ -39,7 +39,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from .convert import CampusOnlineToMarc21
 from .types import CampusOnlineId
 
-error_record = namedtuple("ErrorRecord", ["id"])
+error_record = NamedTuple("ErrorRecord", ["id"])
 
 
 @check_about_duplicate.register
