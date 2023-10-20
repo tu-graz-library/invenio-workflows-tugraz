@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version v0.2.4 (release 2023-10-20)
+
+- fix: ruff upgrade introduced discrepancy
+- fix: 995 subfield notation was wrong
+- tests: add test for update_func
+
+
 Version v0.2.3 (release 2023-06-05)
 
 - theses: revert to simple version
