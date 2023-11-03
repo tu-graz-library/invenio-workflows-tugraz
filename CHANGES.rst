@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version v0.3.0 (release 2023-11-03)
+
+- theses: add implementation for duplicate check
+- theses: add check if record has AC number
+- theses: change behavior checking file restriction
+- theses: pass through the duplicate error message
+- ruff: apply new ruff rules
+
+
 Version v0.2.4 (release 2023-10-20)
 
 - fix: ruff upgrade introduced discrepancy
