@@ -40,6 +40,7 @@ def embargoed_record_xml() -> str:
     return """
     <record xmlns="http://www.loc.gov/MARC21/slim">
           <leader>06215nam a2200505 c 4500</leader>
+          <controlfield tag="009">AC11111111</controlfield>
           <datafield ind1="7" ind2=" " tag="971">
             <subfield code="a">gesperrt</subfield>
             <subfield code="b">27.01.2023</subfield>
