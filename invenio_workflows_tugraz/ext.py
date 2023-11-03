@@ -50,5 +50,8 @@ class InvenioWorkflowsTugraz:
             elif k == "WORKFLOW_CAMPUSONLINE_IMPORT_FUNC":
                 app.config["CAMPUSONLINE_IMPORT_FUNC"] = getattr(config, k)
 
+            elif k == "WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC":
+                app.config["CAMPUSONLINE_DUPLICATE_FUNC"] = getattr(config, k)
+
             elif k.startswith("WORKFLOWS_TUGRAZ_"):
                 app.config.setdefault(k, getattr(config, k))
