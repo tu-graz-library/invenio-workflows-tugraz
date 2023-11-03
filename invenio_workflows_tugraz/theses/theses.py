@@ -208,6 +208,14 @@ def update_func(
     alma_marc21_etree = alma_service.get_record(cms_id, search_key="local_field_995")
     alma_marc21_record = Marc21Metadata(metadata=alma_marc21_etree[0])
 
+    # only update and publish records which are associated with
+    # "verbund" and have therefore an AC* number. this also shows that
+    # the record was viewed by a librarian
+    ac_field = alma_marc21_record.get_value("009")
+    if not ac_field.startswith("AC"):
+        msg = f"marcid: {marc_id}, cms_id: {cms_id} not yet updated in alma"
+        raise RuntimeError(msg)
+
     data["metadata"] = alma_marc21_record.json["metadata"]
     data["access"]["record"] = "public"
     data["access"]["files"] = "restricted" if is_restricted else "public"
