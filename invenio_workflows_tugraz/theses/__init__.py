@@ -9,6 +9,7 @@
 """Theses Workflows."""
 
 from .theses import (
+    duplicate_func,
     import_func,
     theses_create_aggregator,
     theses_filter_for_open_records,
@@ -19,6 +20,7 @@ from .views import create_blueprint
 __all__ = (
     "theses_create_aggregator",
     "theses_filter_for_open_records",
+    "duplicate_func",
     "import_func",
     "update_func",
     "create_blueprint",

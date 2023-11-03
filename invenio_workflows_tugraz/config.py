@@ -10,6 +10,7 @@
 
 from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
+    duplicate_func,
     import_func,
     theses_create_aggregator,
     theses_filter_for_open_records,
@@ -33,6 +34,8 @@ WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
 """"""
 
 WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_func
+
+WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
 
 
 WORKFLOW_PURE_IMPORT_FUNC = pure_import_func

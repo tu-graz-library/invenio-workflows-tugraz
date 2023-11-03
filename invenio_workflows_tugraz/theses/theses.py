@@ -223,3 +223,12 @@ def update_func(
     records_service.edit(id_=marc_id, identity=identity)
     records_service.update_draft(id_=marc_id, identity=identity, data=data)
     records_service.publish(id_=marc_id, identity=identity)
+
+
+def duplicate_func(cms_id: str) -> bool:
+    """Check if the cms_id has already been imported."""
+    try:
+        check_about_duplicate(CampusOnlineId(cms_id))
+        return False
+    except DuplicateRecordError:
+        return True
