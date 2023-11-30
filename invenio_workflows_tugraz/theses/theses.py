@@ -166,9 +166,12 @@ def import_func(
         "files": "restricted",
     }
 
-    if bool(embargo := get_embargo_range(thesis)):
+    if bool(_ := get_embargo_range(thesis)):
+        # the embargo end date from tugonline is ignored on purpose and set to a
+        # infinity value to express that the enddate will not be reached!
+        # the requirement forces a manual removal of the embargo.
         data["access"]["embargo"] = {
-            "until": embargo.end_date,
+            "until": "9999-12-12",
             "active": True,
             "reason": None,
         }
