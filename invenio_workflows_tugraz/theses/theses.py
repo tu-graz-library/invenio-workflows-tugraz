@@ -23,6 +23,7 @@ from invenio_campusonline.types import (
 )
 from invenio_campusonline.utils import get_embargo_range
 from invenio_config_tugraz import get_identity_from_user_by_email
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_marc21 import (
     DuplicateRecordError,
     Marc21Metadata,
@@ -189,7 +190,7 @@ def update_func(
     """Update the record by metadata from alma."""
     try:
         data = records_service.read_draft(id_=marc_id, identity=identity).data
-    except NoResultFound:
+    except (NoResultFound, PIDDoesNotExistError):
         # if this raises also the NoResultFound error it should break!
         data = records_service.read(id_=marc_id, identity=identity).data
 
