@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.3.1 (release 2024-01-07)
+
+- fix: add changed error except
+- theses: implement changed requirement for embargo
+
+
 Version v0.3.0 (release 2023-11-03)
 
 - theses: add implementation for duplicate check
