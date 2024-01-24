@@ -14,6 +14,7 @@ from functools import wraps
 from typing import Any
 
 from flask import abort, g
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_marc21.proxies import current_records_marc21
 from invenio_search import RecordsSearch
 from invenio_search.engine import dsl
@@ -49,7 +50,7 @@ def pass_record_from_pid(f: Callable) -> Callable:
                 id_=hits["id"],
                 identity=g.identity,
             )
-        except NoResultFound:
+        except (PIDDoesNotExistError, NoResultFound):
             record = current_records_marc21.records_service.read(
                 id_=hits["id"],
                 identity=g.identity,
