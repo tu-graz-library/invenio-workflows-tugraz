@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.3.2 (release 2024-01-24)
+
+- theses: fix not catched exception
+
+
 Version v0.3.1 (release 2024-01-07)
 
 - fix: add changed error except
