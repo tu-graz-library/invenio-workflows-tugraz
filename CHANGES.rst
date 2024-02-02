@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.4.0 (release 2024-02-02)
+
+- theses: change error to 423
+- theses: add endpoint for theses uploads
+
+
 Version v0.3.2 (release 2024-01-24)
 
 - theses: fix not catched exception
