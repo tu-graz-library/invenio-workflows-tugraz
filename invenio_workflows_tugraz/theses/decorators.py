@@ -41,7 +41,7 @@ def pass_record_from_pid(f: Callable) -> Callable:
         search = search.params(size=1)
         result = search.execute()
         if len(result["hits"]["hits"]) == 0:
-            abort(404)
+            abort(423)
         hits = result["hits"]["hits"][0]["_source"]
         hits = hits.to_dict()
 
