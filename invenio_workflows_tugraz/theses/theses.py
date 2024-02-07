@@ -69,6 +69,9 @@ def theses_filter_for_open_records() -> ThesesFilter:
     filter_ = [
         """<bas:thesesType>ALL</bas:thesesType>""",
         """<bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",  # noqa: E501
+        """<bas:state name="PUBLISHABLE" negate="false"></bas:state>""",
+        """<bas:state name="ARCH" negate="true"></bas:state>""",
+        """<bas:state name="PUB" negate="true"></bas:state>""",
     ]
     state = ThesesState.OPEN
     return ThesesFilter(filter_, state)
