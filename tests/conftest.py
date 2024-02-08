@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -13,10 +13,13 @@ fixtures are available.
 """
 
 
+from collections import namedtuple
 from collections.abc import Callable
 
 import pytest
 from flask import Flask
+from invenio_db import InvenioDB
+from invenio_search import InvenioSearch
 
 from invenio_workflows_tugraz import InvenioWorkflowsTugraz
 
@@ -29,6 +32,8 @@ def create_app(instance_path: str) -> Callable:
         app = Flask("testapp", instance_path=instance_path)
         app.config.update(**config)
         InvenioWorkflowsTugraz(app)
+        InvenioSearch(app)
+        InvenioDB(app)
         return app
 
     return factory
@@ -48,3 +53,27 @@ def embargoed_record_xml() -> str:
           </datafield>
     </record>
     """
+
+
+RunningApp = namedtuple(  # noqa: PYI024
+    "RunningApp",
+    [
+        "app",
+        "location",
+        "cache",
+    ],
+)
+
+
+@pytest.fixture()
+def running_app(
+    app,  # noqa: ANN001
+    location,  # noqa: ANN001
+    cache,  # noqa: ANN001
+) -> RunningApp:
+    """Fixture provides an app with the typically needed db data loaded."""
+    return RunningApp(
+        app,
+        location,
+        cache,
+    )

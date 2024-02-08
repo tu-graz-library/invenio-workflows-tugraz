@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -32,6 +32,7 @@ from invenio_search import RecordsSearch
 from invenio_search.engine import dsl
 from sqlalchemy.orm.exc import NoResultFound
 
+from ..proxies import current_workflows_tugraz
 from .convert import CampusOnlineToMarc21
 from .types import CampusOnlineId
 
@@ -60,9 +61,10 @@ def theses_filter() -> ThesesFilter:
     FILTER: xml filter to get open records
     return ThesesFilter
     """
-    _filter = """
+    start_time_tag = "<bas:from>2022-11-17T00:01:00+00:00</bas:from>"
+    _filter = f"""
         <bas:thesesType>ALL</bas:thesesType>
-        <bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>
+        <bas:state name="IFG" negate="false">{start_time_tag}</bas:state>
         <bas:state name="PUBLISHABLE" negate="false"></bas:state>
         <bas:state name="ARCH" negate="true"></bas:state>
         <bas:state name="PUB" negate="true"></bas:state>
@@ -174,7 +176,12 @@ def import_func(
             "reason": None,
         }
 
-    return create_record(service, data, [file_path], identity, do_publish=False)
+    theses_service = current_workflows_tugraz.theses_service
+
+    record = create_record(service, data, [file_path], identity, do_publish=False)
+    theses_service.create(record.id, cms_id)
+
+    return record
 
 
 def update_func(
@@ -224,6 +231,9 @@ def update_func(
     records_service.edit(id_=marc_id, identity=identity)
     records_service.update_draft(id_=marc_id, identity=identity, data=data)
     records_service.publish(id_=marc_id, identity=identity)
+
+    theses_service = current_workflows_tugraz.theses_service
+    theses_service.set_ready_to(identity, id_=marc_id, state="publish")
 
 
 def duplicate_func(cms_id: str) -> bool:
