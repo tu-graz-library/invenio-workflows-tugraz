@@ -13,7 +13,7 @@ from .theses import (
     duplicate_func,
     import_func,
     theses_create_aggregator,
-    theses_filter_for_open_records,
+    theses_filter,
     update_func,
 )
 
@@ -28,8 +28,8 @@ WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATORS = [
 ]
 """"""
 
-WORKFLOW_CAMPUSONLINE_THESES_FILTERS = [
-    theses_filter_for_open_records(),
+WORKFLOW_CAMPUSONLINE_THESES_FILTER = [
+    theses_filter(),
 ]
 """"""
 
