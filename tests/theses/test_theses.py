@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2023-2024 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -10,13 +10,17 @@
 
 from xml.etree.ElementTree import fromstring
 
+from flask import Flask
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
 
 from invenio_workflows_tugraz.theses.theses import update_func
 
 
-def test_update_func(embargoed_record_xml: str) -> None:
+def test_update_func(
+    running_app: Flask,  # noqa: ARG001
+    embargoed_record_xml: str,
+) -> None:
     """Test update func."""
 
     class MockRecordItem:

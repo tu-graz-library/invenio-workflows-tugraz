@@ -8,6 +8,8 @@
 
 """Theses Workflows."""
 
+from .config import WorkflowThesesServiceConfig
+from .service import WorkflowThesesService
 from .theses import (
     duplicate_func,
     import_func,
@@ -24,4 +26,6 @@ __all__ = (
     "import_func",
     "update_func",
     "create_blueprint",
+    "WorkflowThesesServiceConfig",
+    "WorkflowThesesService",
 )
