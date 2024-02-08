@@ -15,12 +15,7 @@ from xml.etree.ElementTree import Element
 from flask_principal import Identity
 from invenio_access.permissions import system_process
 from invenio_alma import AlmaSRUService
-from invenio_campusonline.types import (
-    CampusOnlineConfigs,
-    CampusOnlineID,
-    ThesesFilter,
-    ThesesState,
-)
+from invenio_campusonline.types import CampusOnlineConfigs, CampusOnlineID, ThesesFilter
 from invenio_campusonline.utils import get_embargo_range
 from invenio_config_tugraz import get_identity_from_user_by_email
 from invenio_pidstore.errors import PIDDoesNotExistError
@@ -59,22 +54,21 @@ def marc_id(record: dict) -> str:
     return record["_source"]["id"]
 
 
-def theses_filter_for_open_records() -> ThesesFilter:
+def theses_filter() -> ThesesFilter:
     """Return a ThesesFilter object for open records.
 
     FILTER: xml filter to get open records
-    STATE: [open, locked]
     return ThesesFilter
     """
-    filter_ = [
-        """<bas:thesesType>ALL</bas:thesesType>""",
-        """<bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>""",  # noqa: E501
-        """<bas:state name="PUBLISHABLE" negate="false"></bas:state>""",
-        """<bas:state name="ARCH" negate="true"></bas:state>""",
-        """<bas:state name="PUB" negate="true"></bas:state>""",
-    ]
-    state = ThesesState.OPEN
-    return ThesesFilter(filter_, state)
+    _filter = """
+        <bas:thesesType>ALL</bas:thesesType>
+        <bas:state name="IFG" negate="false"><bas:from>2022-11-17T00:01:00+00:00</bas:from></bas:state>
+        <bas:state name="PUBLISHABLE" negate="false"></bas:state>
+        <bas:state name="ARCH" negate="true"></bas:state>
+        <bas:state name="PUB" negate="true"></bas:state>
+    """
+
+    return ThesesFilter(_filter)
 
 
 def theses_create_aggregator() -> list[tuple[str, str]]:
