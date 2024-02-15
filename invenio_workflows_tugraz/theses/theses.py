@@ -14,7 +14,8 @@ from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
 from invenio_access.permissions import system_process
-from invenio_alma import AlmaSRUService
+from invenio_alma import AlmaRESTService, AlmaSRUService
+from invenio_alma.api import create_alma_record
 from invenio_campusonline.types import CampusOnlineConfigs, CampusOnlineID, ThesesFilter
 from invenio_campusonline.utils import get_embargo_range
 from invenio_config_tugraz import get_identity_from_user_by_email
@@ -75,47 +76,16 @@ def theses_filter() -> ThesesFilter:
 
 def theses_create_aggregator() -> list[tuple[str, str]]:
     """Return list of marc21,cmsid tuple which should be created in alma."""
-    search = RecordsSearch(index="marc21records-drafts")
-    query = {
-        "must_not": [
-            {
-                "exists": {
-                    "field": "metadata.fields.001",
-                },
-            },
-        ],
-        "must": [
-            {
-                "exists": {
-                    "field": "metadata.fields.995",
-                },
-            },
-        ],
-    }
-
-    search.query = dsl.Q("bool", **query)
-    search = search.params(size=100)
-    result = search.execute()
-    hits = result["hits"]["hits"]
-    return [(marc_id(record), cms_id(record)) for record in hits]
+    theses_service = current_workflows_tugraz.theses_service
+    ids = theses_service.get_ready_to(system_identity, state="create_in_alma")
+    return [(id_.id_, id_.cms_id) for id_ in ids]
 
 
 def theses_update_aggregator() -> list[tuple[str, str]]:
     """Return a list of tuple(marc21, cms_id) which should be updated in repo."""
-    search = RecordsSearch(index="marc21records-drafts")
-    query = {
-        "must_not": [
-            {
-                "exists": {
-                    "field": "metadata.fields.001",
-                },
-            },
-        ],
-    }
-    search.query = dsl.Q("bool", **query)
-    result = search.execute()
-    hits = result["hits"]["hits"]
-    return [(marc_id(record), cms_id(record)) for record in hits]
+    theses_service = current_workflows_tugraz.theses_service
+    ids = theses_service.get_ready_to(system_identity, state="update_in_repo")
+    return [(id_.id_, id_.cms_id) for id_ in ids]
 
 
 def exists_fulltext(thesis: Element) -> bool:
@@ -176,12 +146,28 @@ def import_func(
             "reason": None,
         }
 
-    theses_service = current_workflows_tugraz.theses_service
-
     record = create_record(service, data, [file_path], identity, do_publish=False)
-    theses_service.create(record.id, cms_id)
+
+    theses_service = current_workflows_tugraz.theses_service
+    theses_service.create(identity, record.id, cms_id)
+    theses_service.set_ready_to(identity, id_=marc_id, state="archive_in_cms")
 
     return record
+
+
+def create_func(
+    records_service: Marc21RecordService,
+    alma_service: AlmaRESTService,
+    identity: Identity,
+    marc_id: str,
+    cms_id: str = "",
+):
+    """Create record in alma."""
+    create_alma_record(records_service, alma_service, identity, marc_id, cms_id)
+
+    theses_service = current_workflows_tugraz.theses_service
+    theses_service.set_state(identity, id_=marc_id, state="created_in_alma")
+    theses_service.set_ready_to(identity, id_=marc_id, state="update_in_repo")
 
 
 def update_func(
@@ -233,7 +219,7 @@ def update_func(
     records_service.publish(id_=marc_id, identity=identity)
 
     theses_service = current_workflows_tugraz.theses_service
-    theses_service.set_ready_to(identity, id_=marc_id, state="publish")
+    theses_service.set_ready_to(identity, id_=marc_id, state="publish_in_cms")
 
 
 def duplicate_func(cms_id: str) -> bool:

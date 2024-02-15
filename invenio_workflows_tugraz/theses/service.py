@@ -31,7 +31,7 @@ class WorkflowThesesService(Service):
         # self.require_permission(identity, state) # noqa: ERA001
         self.theses_cls.set_ready_to(id_, state=state)
 
-    def get_ready_to(self, state: str) -> list[tuple[str, str]]:
+    def get_ready_to(self, _: Identity, state: str) -> list[tuple[str, str]]:
         """Get archived."""
         # self.require_permission(identity, state) # noqa: ERA001
         return self.theses_cls.get_ready_to(state=state)

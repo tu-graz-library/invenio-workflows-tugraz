@@ -22,10 +22,16 @@ class WorkflowThesesMetadata(db.Model):
 
     cms_id = db.Column(db.Integer)
 
-    archived = db.Column(BOOLEAN, default=False)
+    archived_in_cms = db.Column(BOOLEAN, default=False)
 
-    published = db.Column(BOOLEAN, default=False)
+    created_in_alma = db.Column(BOOLEAN, default=False)
 
-    ready_to_archive = db.Column(BOOLEAN, default=False)
+    published_in_cms = db.Column(BOOLEAN, default=False)
 
-    ready_to_publish = db.Column(BOOLEAN, default=False)
+    ready_to_archive_in_cms = db.Column(BOOLEAN, default=False)
+
+    ready_to_create_in_alma = db.Column(BOOLEAN, default=False)
+
+    ready_to_update_in_repo = db.Column(BOOLEAN, default=False)
+
+    ready_to_publish_in_cms = db.Column(BOOLEAN, default=False)
