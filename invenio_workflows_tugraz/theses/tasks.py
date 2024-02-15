@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 
 from celery import shared_task
 from flask import current_app
+from invenio_access.permissions import system_identity
 from invenio_campusonline.api import set_status
 from invenio_campusonline.utils import config_variables
 
@@ -25,11 +26,12 @@ def status_arch() -> None:
     today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
 
     service = current_workflows_tugraz.theses_service
-    cms_ids = service.get_ready_to(state="archive")
+    cms_ids = service.get_ready_to(system_identity, state="archive_in_cms")
 
     for id_, cms_id in cms_ids:
         set_status(configs.endpoint, configs.token, cms_id, "ARCH", today)
-        service.set_state(id_, state="archived")
+        service.set_state(system_identity, id_, state="archived")
+        service.set_ready_to(system_identity, id_, state="create_in_alma")
         current_app.logger.info("Theses %s has been imported successfully.", cms_id)
 
 
@@ -40,9 +42,9 @@ def status_pub() -> None:
     today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
 
     service = current_workflows_tugraz.theses_service
-    cms_ids = service.get_ready_to(state="publish")
+    cms_ids = service.get_ready_to(system_identity, state="publish_in_cms")
 
     for id_, cms_id in cms_ids:
         set_status(configs.endpoint, configs.token, cms_id, "PUB", today)
-        service.set_state(id_, state="published")
+        service.set_state(system_identity, id_, state="published")
         current_app.logger.info("Theses %s has been updated successfully.", cms_id)

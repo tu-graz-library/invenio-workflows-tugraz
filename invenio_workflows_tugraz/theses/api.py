@@ -22,42 +22,61 @@ class WorkflowTheses(Record):
     @classmethod
     def create(cls, id_: str, cms_id: str) -> WorkflowThesesMetadata:
         """Create."""
-        entry = cls.model_cls(id=id_, cms_id=cms_id, ready_to_archive=True)
+        entry = cls.model_cls(id=id_, cms_id=cms_id)
         db.session.add(entry)
         db.session.commit()
         return entry
 
     @classmethod
-    def set_ready_to(cls, id_: str, state: str) -> None:
-        """Set is ready."""
-        record = cls.model_cls.query.filter_by(id=id_)
-        if state == "archive":
-            record.ready_to_archive = True
-        if state == "publish":
-            record.ready_to_publish = True
-
-    @classmethod
     def set_state(cls, id_: str, state: str) -> None:
         """Set archived."""
         record = cls.model_cls.query.filter_by(id=id_)
-        if state == "archived":
-            record.archived = True
-        if state == "published":
-            record.published = True
+        if state == "archived_in_cms":
+            record.archived_in_cms = True
+        if state == "created_in_alma":
+            record.created_in_alma = True
+        if state == "published_in_cms":
+            record.published_in_cms = True
+
+    @classmethod
+    def set_ready_to(cls, id_: str, state: str) -> None:
+        """Set is ready."""
+        record = cls.model_cls.query.filter_by(id=id_)
+        if state == "archive_in_cms":
+            record.ready_to_archive_in_cms = True
+        if state == "create_in_alma":
+            record.ready_to_create_in_alma = True
+        if state == "update_in_repo":
+            record.ready_to_update_in_repo = True
+        if state == "publish_in_cms":
+            record.ready_to_publish_in_cms = True
 
     @classmethod
     def get_ready_to(cls, state: str) -> list[tuple[str, str]]:
         """Get ready to."""
         entries = []
-        if state == "archive":
+        if state == "archive_in_cms":
             entries = cls.model_cls.query.filter_by(
                 ready_to_archive=True,
-                archived=False,
+                archived_in_cms=False,
             )
-        if state == "publish":
+
+        if state == "create_in_alma":
+            entries = cls.model_cls.query.filter_by(
+                created_in_alma=False,
+                archived_in_cms=True,
+            )
+
+        if state == "update_in_repo":
+            entries = cls.model_cls.query.filter_by(
+                created_in_alma=True,
+                published_in_cms=False,
+            )
+
+        if state == "publish_in_cms":
             entries = cls.model_cls.query.filter_by(
                 ready_to_publish=True,
-                published=False,
+                published_in_cms=False,
             )
 
         return [(entry.id, entry.cms_id) for entry in entries]
