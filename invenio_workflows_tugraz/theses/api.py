@@ -20,36 +20,37 @@ class WorkflowTheses(Record):
     model_cls = WorkflowThesesMetadata
 
     @classmethod
+    def get(cls, id_: str):
+        """Get."""
+        return cls.model_cls.query.filter_by(pid=id_).one_or_none()
+
+    @classmethod
     def create(cls, id_: str, cms_id: str) -> WorkflowThesesMetadata:
         """Create."""
-        entry = cls.model_cls(id=id_, cms_id=cms_id)
-        db.session.add(entry)
-        db.session.commit()
+        entry = cls.model_cls(pid=id_, cms_id=cms_id)
         return entry
 
-    @classmethod
-    def set_state(cls, id_: str, state: str) -> None:
+    def set_state(self, id_: str, state: str) -> None:
         """Set archived."""
-        record = cls.model_cls.query.filter_by(id=id_)
         if state == "archived_in_cms":
-            record.archived_in_cms = True
+            self.model.archived_in_cms = True
         if state == "created_in_alma":
-            record.created_in_alma = True
+            self.model.created_in_alma = True
         if state == "published_in_cms":
-            record.published_in_cms = True
+            self.model.published_in_cms = True
+        db.session.merge(self.model)
 
-    @classmethod
-    def set_ready_to(cls, id_: str, state: str) -> None:
+    def set_ready_to(self, id_: str, state: str) -> None:
         """Set is ready."""
-        record = cls.model_cls.query.filter_by(id=id_)
         if state == "archive_in_cms":
-            record.ready_to_archive_in_cms = True
+            self.model.ready_to_archive_in_cms = True
         if state == "create_in_alma":
-            record.ready_to_create_in_alma = True
+            self.model.ready_to_create_in_alma = True
         if state == "update_in_repo":
-            record.ready_to_update_in_repo = True
+            self.model.ready_to_update_in_repo = True
         if state == "publish_in_cms":
-            record.ready_to_publish_in_cms = True
+            self.model.ready_to_publish_in_cms = True
+        db.session.merge(self.model)
 
     @classmethod
     def get_ready_to(cls, state: str) -> list[tuple[str, str]]:

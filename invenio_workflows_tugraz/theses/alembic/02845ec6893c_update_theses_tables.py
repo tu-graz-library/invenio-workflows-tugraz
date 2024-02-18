@@ -59,7 +59,6 @@ def upgrade():
 
 def downgrade():
     """Downgrade database."""
-    op.drop_table("")
     op.drop_column("workflows_theses", "archived_in_cms")
     op.drop_column("workflows_theses", "created_in_alma")
     op.drop_column("workflows_theses", "published_in_cms")

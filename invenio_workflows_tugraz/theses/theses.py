@@ -8,17 +8,16 @@
 
 """Theses Workflows."""
 
-from collections.abc import Callable
+
 from typing import NamedTuple
-from xml.etree.ElementTree import Element
 
 from flask_principal import Identity
-from invenio_access.permissions import system_process
+from invenio_access.permissions import system_identity
 from invenio_alma import AlmaRESTService, AlmaSRUService
 from invenio_alma.api import create_alma_record
-from invenio_campusonline.types import CampusOnlineConfigs, CampusOnlineID, ThesesFilter
-from invenio_campusonline.utils import get_embargo_range
-from invenio_config_tugraz import get_identity_from_user_by_email
+from invenio_campusonline import CampusOnlineRESTService
+from invenio_campusonline.types import CampusOnlineID, ThesesFilter
+from invenio_campusonline.utils import extract_embargo_range
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_marc21 import (
     DuplicateRecordError,
@@ -29,8 +28,6 @@ from invenio_records_marc21 import (
     current_records_marc21,
 )
 from invenio_records_resources.services.records.results import RecordItem
-from invenio_search import RecordsSearch
-from invenio_search.engine import dsl
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..proxies import current_workflows_tugraz
@@ -46,16 +43,6 @@ def _(value: CampusOnlineId) -> None:
     check_about_duplicate(str(value), value.category)
 
 
-def cms_id(record: dict) -> str:
-    """CMS id."""
-    return record["_source"]["metadata"]["fields"]["995"][0]["subfields"]["a"][0]
-
-
-def marc_id(record: dict) -> str:
-    """Marc id."""
-    return record["_source"]["id"]
-
-
 def theses_filter() -> ThesesFilter:
     """Return a ThesesFilter object for open records.
 
@@ -63,7 +50,7 @@ def theses_filter() -> ThesesFilter:
     return ThesesFilter
     """
     start_time_tag = "<bas:from>2022-11-17T00:01:00+00:00</bas:from>"
-    _filter = f"""
+    filter_ = f"""
         <bas:thesesType>ALL</bas:thesesType>
         <bas:state name="IFG" negate="false">{start_time_tag}</bas:state>
         <bas:state name="PUBLISHABLE" negate="false"></bas:state>
@@ -71,42 +58,25 @@ def theses_filter() -> ThesesFilter:
         <bas:state name="PUB" negate="true"></bas:state>
     """
 
-    return ThesesFilter(_filter)
+    return ThesesFilter(filter_)
 
 
 def theses_create_aggregator() -> list[tuple[str, str]]:
     """Return list of marc21,cmsid tuple which should be created in alma."""
     theses_service = current_workflows_tugraz.theses_service
-    ids = theses_service.get_ready_to(system_identity, state="create_in_alma")
-    return [(id_.id_, id_.cms_id) for id_ in ids]
+    return theses_service.get_ready_to(system_identity, state="create_in_alma")
 
 
 def theses_update_aggregator() -> list[tuple[str, str]]:
     """Return a list of tuple(marc21, cms_id) which should be updated in repo."""
     theses_service = current_workflows_tugraz.theses_service
-    ids = theses_service.get_ready_to(system_identity, state="update_in_repo")
-    return [(id_.id_, id_.cms_id) for id_ in ids]
-
-
-def exists_fulltext(thesis: Element) -> bool:
-    """Check against fulltext existens."""
-    ns = "http://www.campusonline.at/thesisservice/basetypes"
-    xpath = f".//{{{ns}}}attr[@key='VOLLTEXT']"
-    ele = thesis.find(xpath)
-
-    if ele is None:  # noqa: SIM114
-        return False
-    elif ele.text == "N":  # noqa: SIM103, RET505
-        return False
-    else:
-        return True
+    return theses_service.get_ready_to(system_identity, state="update_in_repo")
 
 
 def import_func(
     cms_id: CampusOnlineID,
-    configs: CampusOnlineConfigs,
-    get_metadata: Callable,
-    download_file: Callable,
+    identity: Identity,
+    cms_service: CampusOnlineRESTService,
 ) -> RecordItem:
     """Import the record into the repository."""
     try:
@@ -114,29 +84,21 @@ def import_func(
     except DuplicateRecordError as error:
         return str(error)
 
-    thesis = get_metadata(configs.endpoint, configs.token, cms_id)
-
-    if not exists_fulltext(thesis):
-        msg = "record has no associated file"
-        raise RuntimeError(msg)
-
-    file_path = download_file(configs.endpoint, configs.token, cms_id)
+    thesis = cms_service.get_metadata(identity, cms_id)
+    file_path = cms_service.download_file(identity, cms_id)
 
     marc21_record = Marc21Metadata()
-    convert = CampusOnlineToMarc21(marc21_record)
+    converter = CampusOnlineToMarc21(marc21_record)
+    converter.convert(thesis, marc21_record)
 
-    convert.convert(thesis, marc21_record)
-
-    identity = get_identity_from_user_by_email(email=configs.user_email)
-    identity.provides.add(system_process)
-    service = current_records_marc21.records_service
+    marc21_service = current_records_marc21.records_service
     data = marc21_record.json
     data["access"] = {
         "record": "restricted",
         "files": "restricted",
     }
 
-    if bool(_ := get_embargo_range(thesis)):
+    if bool(_ := extract_embargo_range(thesis)):
         # the embargo end date from tugonline is ignored on purpose and set to a
         # infinity value to express that the enddate will not be reached!
         # the requirement forces a manual removal of the embargo.
@@ -146,11 +108,17 @@ def import_func(
             "reason": None,
         }
 
-    record = create_record(service, data, [file_path], identity, do_publish=False)
+    record = create_record(
+        marc21_service,
+        data,
+        [file_path],
+        identity,
+        do_publish=False,
+    )
 
     theses_service = current_workflows_tugraz.theses_service
     theses_service.create(identity, record.id, cms_id)
-    theses_service.set_ready_to(identity, id_=marc_id, state="archive_in_cms")
+    theses_service.set_ready_to(identity, id_=record.id, state="archive_in_cms")
 
     return record
 
