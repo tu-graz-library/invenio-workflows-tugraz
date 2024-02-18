@@ -10,7 +10,6 @@
 
 from invenio_db import db
 from sqlalchemy import BOOLEAN
-from sqlalchemy_utils import UUIDType
 
 
 class WorkflowThesesMetadata(db.Model):
@@ -18,7 +17,7 @@ class WorkflowThesesMetadata(db.Model):
 
     __tablename__ = "workflows_theses"
 
-    id = db.Column(UUIDType, primary_key=True)
+    pid = db.Column(db.String(255), primary_key=True)
 
     cms_id = db.Column(db.Integer)
 

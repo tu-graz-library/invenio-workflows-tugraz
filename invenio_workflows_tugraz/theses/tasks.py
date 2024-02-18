@@ -13,8 +13,7 @@ from datetime import datetime, timezone
 from celery import shared_task
 from flask import current_app
 from invenio_access.permissions import system_identity
-from invenio_campusonline.api import set_status
-from invenio_campusonline.utils import config_variables
+from invenio_campusonline import current_campusonline
 
 from ..proxies import current_workflows_tugraz
 
@@ -22,29 +21,30 @@ from ..proxies import current_workflows_tugraz
 @shared_task(ignore_result=True)
 def status_arch() -> None:
     """Set status to ARCH (archived)."""
-    configs = config_variables(current_app)
     today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
 
-    service = current_workflows_tugraz.theses_service
-    cms_ids = service.get_ready_to(system_identity, state="archive_in_cms")
+    theses_service = current_workflows_tugraz.theses_service
+    cms_service = current_campusonline.campusonline_rest_service
 
-    for id_, cms_id in cms_ids:
-        set_status(configs.endpoint, configs.token, cms_id, "ARCH", today)
-        service.set_state(system_identity, id_, state="archived")
-        service.set_ready_to(system_identity, id_, state="create_in_alma")
+    ids = theses_service.get_ready_to(system_identity, state="archive_in_cms")
+
+    for marc_id, cms_id in ids:
+        cms_service.set_status(cms_id, "ARCH", today)
+        theses_service.set_state(system_identity, marc_id, state="archived")
+        theses_service.set_ready_to(system_identity, marc_id, state="create_in_alma")
         current_app.logger.info("Theses %s has been imported successfully.", cms_id)
 
 
 @shared_task(ignore_result=True)
 def status_pub() -> None:
     """Set status to PUB (published)."""
-    configs = config_variables(current_app)
     today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
 
-    service = current_workflows_tugraz.theses_service
-    cms_ids = service.get_ready_to(system_identity, state="publish_in_cms")
+    theses_service = current_workflows_tugraz.theses_service
+    cms_service = current_campusonline.campusonline_rest_service
+    ids = theses_service.get_ready_to(system_identity, state="publish_in_cms")
 
-    for id_, cms_id in cms_ids:
-        set_status(configs.endpoint, configs.token, cms_id, "PUB", today)
-        service.set_state(system_identity, id_, state="published")
+    for marc_id, cms_id in ids:
+        cms_service.set_status(cms_id, "PUB", today)
+        theses_service.set_state(system_identity, marc_id, state="published")
         current_app.logger.info("Theses %s has been updated successfully.", cms_id)
