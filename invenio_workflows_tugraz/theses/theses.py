@@ -118,7 +118,7 @@ def import_func(
 
     theses_service = current_workflows_tugraz.theses_service
     theses_service.create(identity, record.id, cms_id)
-    theses_service.set_ready_to(identity, id_=record.id, state="archive_in_cms")
+    theses_service.set_state(identity, id_=record.id, state="imported_in_repo")
 
     return record
 
@@ -135,7 +135,6 @@ def create_func(
 
     theses_service = current_workflows_tugraz.theses_service
     theses_service.set_state(identity, id_=marc_id, state="created_in_alma")
-    theses_service.set_ready_to(identity, id_=marc_id, state="update_in_repo")
 
 
 def update_func(
@@ -187,7 +186,7 @@ def update_func(
     records_service.publish(id_=marc_id, identity=identity)
 
     theses_service = current_workflows_tugraz.theses_service
-    theses_service.set_ready_to(identity, id_=marc_id, state="publish_in_cms")
+    theses_service.set_state(identity, id_=marc_id, state="updated_in_repo")
 
 
 def duplicate_func(cms_id: str) -> bool:

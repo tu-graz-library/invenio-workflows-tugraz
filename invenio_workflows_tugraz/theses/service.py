@@ -34,7 +34,7 @@ class WorkflowThesesService(Service):
     def set_ready_to(self, _: Identity, id_: str, state: str, uow=None) -> None:
         """Archive."""
         # self.require_permission(identity, state) # noqa: ERA001
-        entry = self.theses_cls.get(id_)
+        entry = self.theses_cls.resolve(id_)
         entry.set_ready_to(id_, state=state)
         uow.register(RecordCommitOp(entry))
 
@@ -47,6 +47,6 @@ class WorkflowThesesService(Service):
     def set_state(self, _: Identity, id_: str, state: str, uow=None) -> None:
         """Archive."""
         # self.require_permission(identity, state) # noqa: ERA001
-        entry = self.theses_cls.get(id_)
+        entry = self.theses_cls.resolve(id_)
         entry.set_state(id_, state=state)
         uow.register(RecordCommitOp(entry))
