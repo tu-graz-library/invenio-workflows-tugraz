@@ -9,75 +9,87 @@
 """API for theses workflow."""
 
 from invenio_db import db
-from invenio_records.api import Record
 
 from .models import WorkflowThesesMetadata
 
 
-class WorkflowTheses(Record):
+class WorkflowTheses:
     """Workflow thesis api."""
 
     model_cls = WorkflowThesesMetadata
 
-    @classmethod
-    def get(cls, id_: str):
-        """Get."""
-        return cls.model_cls.query.filter_by(pid=id_).one_or_none()
+    def __init__(self, model=None):
+        """Construct WorkflowTheses"""
+        self.model = model
+
+    @property
+    def pid(self):
+        """"""
+        return self.model.pid
+
+    @property
+    def cms_id(self):
+        return self.model.cms_id
 
     @classmethod
-    def create(cls, id_: str, cms_id: str) -> WorkflowThesesMetadata:
+    def resolve(cls, id_: str):
+        """Get."""
+        model = cls.model_cls.query.filter_by(pid=id_).one_or_none()
+        return cls(model=model)
+
+    @classmethod
+    def create(cls, id_: str, cms_id: str):
         """Create."""
-        entry = cls.model_cls(pid=id_, cms_id=cms_id)
+        with db.session.begin_nested():
+            entry = cls(model=cls.model_cls(pid=id_, cms_id=cms_id))
+            db.session.add(entry.model)
         return entry
+
+    def commit(self):
+        """Commit."""
+        with db.session.begin_nested():
+            db.session.merge(self.model)
 
     def set_state(self, id_: str, state: str) -> None:
         """Set archived."""
         if state == "archived_in_cms":
             self.model.archived_in_cms = True
+        if state == "imported_in_repo":
+            self.model.imported_in_repo = True
         if state == "created_in_alma":
             self.model.created_in_alma = True
+        if state == "updated_in_repo":
+            self.model.updated_in_repo = True
         if state == "published_in_cms":
             self.model.published_in_cms = True
         db.session.merge(self.model)
 
-    def set_ready_to(self, id_: str, state: str) -> None:
-        """Set is ready."""
-        if state == "archive_in_cms":
-            self.model.ready_to_archive_in_cms = True
-        if state == "create_in_alma":
-            self.model.ready_to_create_in_alma = True
-        if state == "update_in_repo":
-            self.model.ready_to_update_in_repo = True
-        if state == "publish_in_cms":
-            self.model.ready_to_publish_in_cms = True
-        db.session.merge(self.model)
-
     @classmethod
-    def get_ready_to(cls, state: str) -> list[tuple[str, str]]:
+    def get_ready_to(cls, state: str):
         """Get ready to."""
         entries = []
         if state == "archive_in_cms":
             entries = cls.model_cls.query.filter_by(
-                ready_to_archive=True,
+                imported_in_repo=True,
                 archived_in_cms=False,
             )
 
         if state == "create_in_alma":
             entries = cls.model_cls.query.filter_by(
-                created_in_alma=False,
                 archived_in_cms=True,
+                created_in_alma=False,
             )
 
         if state == "update_in_repo":
             entries = cls.model_cls.query.filter_by(
                 created_in_alma=True,
-                published_in_cms=False,
+                updated_in_repo=False,
             )
 
         if state == "publish_in_cms":
             entries = cls.model_cls.query.filter_by(
-                ready_to_publish=True,
+                updated_in_repo=True,
                 published_in_cms=False,
             )
 
-        return [(entry.id, entry.cms_id) for entry in entries]
+        return [cls(model=entry) for entry in entries.all()]
