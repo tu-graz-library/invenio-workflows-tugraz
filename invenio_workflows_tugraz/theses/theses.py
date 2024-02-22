@@ -87,7 +87,7 @@ def import_from_alma_func(
     embargo: Union[str, None] = None,  # change: str|None after end python3.9 support
     marcid: Union[str, None] = None,
     alma_service: AlmaSRUService = None,
-    **_: any,
+    **_: dict,
 ) -> None:
     """Process a single import by cli of a alma record by ac number.
 
@@ -108,13 +108,13 @@ def import_from_alma_func(
     try:
         check_about_duplicate(ACNumber(ac_number))
     except DuplicateRecordError as error:
-        raise RuntimeError(str(error))
+        raise RuntimeError(str(error)) from error
 
     try:
         metadata = alma_service.get_record(ac_number)[0]
     except AlmaRESTError as error:
-        msg = f"ERROR: alma rest search_value: {ac_number}, error: {str(error)}"
-        raise RuntimeError(msg)
+        msg = f"ERROR: alma rest search_value: {ac_number}, error: {error}"
+        raise RuntimeError(msg) from error
 
     marc21_record = Marc21Metadata(metadata=metadata)
 
@@ -125,7 +125,7 @@ def import_from_alma_func(
     }
 
     if not Path(file_path).is_file():
-        msg = f"ERROR: FileNotFoundError search_value: {ac_number}, file_path: {file_path}"
+        msg = f"ERROR: FileNotFoundError search_value: {ac_number}, file_path: {file_path}"  # noqa: E501
         raise RuntimeError(msg)
 
     if embargo:
@@ -137,12 +137,12 @@ def import_from_alma_func(
 
     try:
         record = create_record(marc21_service, data, [file_path], identity)
-    except StaleDataError:
+    except StaleDataError as error:
         msg = f"ERROR: StaleDataError search_value: {ac_number}"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
     except ValidationError as error:
         msg = f"ValidationError   search_value: {ac_number}, error: {error}"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
 
     return record
 
@@ -159,13 +159,13 @@ def import_from_cms_func(
     try:
         check_about_duplicate(CampusOnlineId(cms_id))
     except DuplicateRecordError as error:
-        raise RuntimeError(str(error))
+        raise RuntimeError(str(error)) from error
 
     try:
         thesis = cms_service.get_metadata(identity, cms_id)
         file_path = cms_service.download_file(identity, cms_id)
     except CampusOnlineRESTError as error:
-        raise RuntimeError(str(error))
+        raise RuntimeError(str(error)) from error
 
     marc21_record = Marc21Metadata()
     converter = CampusOnlineToMarc21(marc21_record)
@@ -195,12 +195,12 @@ def import_from_cms_func(
             identity,
             do_publish=False,
         )
-    except StaleDataError:
+    except StaleDataError as error:
         msg = f"ERROR: StaleDataError cms_id: {cms_id}"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
     except ValidationError as error:
         msg = f"ValidationError cms_id: {cms_id}, error: {error}"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
 
     theses_service.create(identity, record.id, cms_id)
     theses_service.set_state(identity, id_=record.id, state="imported_in_repo")
@@ -213,7 +213,7 @@ def create_func(
     marc_id: str,
     cms_id: str,
     alma_service: AlmaRESTService,
-):
+) -> None:
     """Create a record in alma.
 
     Normally - depending on the API_KEY - the record will be created in
@@ -228,17 +228,17 @@ def create_func(
 
     try:
         record = marc21_service.read_draft(identity, marc_id)
-    except (NoResultFound, PIDDoesNotExistError):
+    except (NoResultFound, PIDDoesNotExistError) as error:
         msg = f"ERROR: marc_id: {marc_id}, cms_id: {cms_id} not found in db"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
 
     marc21_record_etree = convert_json_to_marc21xml(record.to_dict()["metadata"])
 
     try:
         alma_service.create_record(marc21_record_etree)
     except AlmaRESTError as error:
-        msg = f"ERROR: alma rest error on marc_id: {marc_id}, cms_id: {cms_id}, error: {str(error)}"
-        raise RuntimeError(msg)
+        msg = f"ERROR: alma rest error on marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"  # noqa: E501
+        raise RuntimeError(msg) from error
 
     theses_service.set_state(identity, id_=marc_id, state="created_in_alma")
 
@@ -259,9 +259,9 @@ def update_func(
         try:
             # if this raises also the NoResultFound error it should break!
             data = marc21_service.read(id_=marc_id, identity=identity).data
-        except (NoResultFound, PIDDoesNotExistError):
-            msg = f"ERROR: update recordmarc_id: {marc_id}, cms_id: {cms_id} not found in db"
-            raise RuntimeError(msg)
+        except (NoResultFound, PIDDoesNotExistError) as error:
+            msg = f"ERROR: update record marc_id: {marc_id}, cms_id: {cms_id} not found in db"  # noqa: E501
+            raise RuntimeError(msg) from error
 
     db_marc21_record = Marc21Metadata(json=data["metadata"])
 
@@ -281,8 +281,8 @@ def update_func(
     try:
         alma_marc21_etree = alma_service.get_record(cms_id, "local_field_995")
     except AlmaRESTError as error:
-        msg = f"ERROR: alma rest marc_id: {marc_id}, cms_id: {cms_id}, error: {str(error)}"
-        raise RuntimeError(msg)
+        msg = f"ERROR: alma rest marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"
+        raise RuntimeError(msg) from error
 
     alma_marc21_record = Marc21Metadata(metadata=alma_marc21_etree[0])
 
@@ -304,7 +304,7 @@ def update_func(
         marc21_service.publish(id_=marc_id, identity=identity)
     except ValidationError as error:
         msg = f"ValidationError cms_id: {cms_id}, error: {error}"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from error
 
     theses_service.set_state(identity, id_=marc_id, state="updated_in_repo")
 

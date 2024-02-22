@@ -9,7 +9,6 @@
 """Alembic create tables for theses workflow."""
 
 import sqlalchemy as sa
-import sqlalchemy_utils
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -19,7 +18,7 @@ branch_labels = ()
 depends_on = "02845ec6893c"
 
 
-def upgrade():
+def upgrade() -> None:
     """Upgrade database."""
     op.add_column(
         "workflows_theses",
@@ -35,7 +34,7 @@ def upgrade():
     op.drop_column("workflows_theses", "ready_to_publish_in_cms")
 
 
-def downgrade():
+def downgrade() -> None:
     """Downgrade database."""
     op.add_column(
         "workflows_theses",

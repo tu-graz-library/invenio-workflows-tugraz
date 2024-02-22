@@ -8,6 +8,10 @@
 
 """API for theses workflow."""
 
+from __future__ import annotations
+
+from typing import Self
+
 from invenio_db import db
 
 from .models import WorkflowThesesMetadata
@@ -18,39 +22,40 @@ class WorkflowTheses:
 
     model_cls = WorkflowThesesMetadata
 
-    def __init__(self, model=None):
-        """Construct WorkflowTheses"""
+    def __init__(self, model: WorkflowThesesMetadata = None) -> None:
+        """Construct WorkflowTheses."""
         self.model = model
 
     @property
-    def pid(self):
-        """"""
+    def pid(self) -> str:
+        """Get Pid."""
         return self.model.pid
 
     @property
-    def cms_id(self):
+    def cms_id(self) -> str:
+        """Get cms_id."""
         return self.model.cms_id
 
     @classmethod
-    def resolve(cls, id_: str):
+    def resolve(cls, id_: str) -> Self:
         """Get."""
         model = cls.model_cls.query.filter_by(pid=id_).one_or_none()
         return cls(model=model)
 
     @classmethod
-    def create(cls, id_: str, cms_id: str):
+    def create(cls, id_: str, cms_id: str) -> Self:
         """Create."""
         with db.session.begin_nested():
             entry = cls(model=cls.model_cls(pid=id_, cms_id=cms_id))
             db.session.add(entry.model)
         return entry
 
-    def commit(self):
+    def commit(self) -> None:
         """Commit."""
         with db.session.begin_nested():
             db.session.merge(self.model)
 
-    def set_state(self, id_: str, state: str) -> None:
+    def set_state(self, state: str) -> None:
         """Set archived."""
         if state == "archived_in_cms":
             self.model.archived_in_cms = True
@@ -65,7 +70,7 @@ class WorkflowTheses:
         db.session.merge(self.model)
 
     @classmethod
-    def get_ready_to(cls, state: str):
+    def get_ready_to(cls, state: str) -> list[Self]:
         """Get ready to."""
         entries = []
         if state == "archive_in_cms":

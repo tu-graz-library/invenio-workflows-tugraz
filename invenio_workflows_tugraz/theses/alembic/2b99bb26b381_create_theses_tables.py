@@ -19,7 +19,7 @@ branch_labels = ()
 depends_on = "9d446c6a77e2"
 
 
-def upgrade():
+def upgrade() -> None:
     """Upgrade database."""
     op.create_table(
         "workflows_theses",
@@ -58,6 +58,6 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade() -> None:
     """Downgrade database."""
     op.drop_table("workflows_theses")

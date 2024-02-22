@@ -10,7 +10,11 @@
 
 from flask_principal import Identity
 from invenio_records_resources.services.base import Service
-from invenio_records_resources.services.uow import RecordCommitOp, unit_of_work
+from invenio_records_resources.services.uow import (
+    RecordCommitOp,
+    UnitOfWork,
+    unit_of_work,
+)
 
 from .api import WorkflowTheses
 
@@ -24,29 +28,43 @@ class WorkflowThesesService(Service):
         return self.config.theses_cls
 
     @unit_of_work()
-    def create(self, _: Identity, id_: str, cms_id: str, uow=None) -> None:
+    def create(
+        self,
+        _: Identity,
+        id_: str,
+        cms_id: str,
+        uow: UnitOfWork = None,
+    ) -> None:
         """Create."""
-        print(f"WorkflowThesesService.create id_: {id_}, cms_id: {cms_id}")
         entry = self.theses_cls.create(id_, cms_id)
         uow.register(RecordCommitOp(entry))
 
     @unit_of_work()
-    def set_ready_to(self, _: Identity, id_: str, state: str, uow=None) -> None:
+    def set_ready_to(
+        self,
+        _: Identity,
+        id_: str,
+        state: str,
+        uow: UnitOfWork = None,
+    ) -> None:
         """Archive."""
-        # self.require_permission(identity, state) # noqa: ERA001
         entry = self.theses_cls.resolve(id_)
         entry.set_ready_to(id_, state=state)
         uow.register(RecordCommitOp(entry))
 
     def get_ready_to(self, _: Identity, state: str) -> list[tuple[str, str]]:
         """Get archived."""
-        # self.require_permission(identity, state) # noqa: ERA001
         return self.theses_cls.get_ready_to(state=state)
 
     @unit_of_work()
-    def set_state(self, _: Identity, id_: str, state: str, uow=None) -> None:
+    def set_state(
+        self,
+        _: Identity,
+        id_: str,
+        state: str,
+        uow: UnitOfWork = None,
+    ) -> None:
         """Archive."""
-        # self.require_permission(identity, state) # noqa: ERA001
         entry = self.theses_cls.resolve(id_)
-        entry.set_state(id_, state=state)
+        entry.set_state(state=state)
         uow.register(RecordCommitOp(entry))

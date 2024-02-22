@@ -16,9 +16,9 @@ branch_labels = ("workflows_theses",)
 depends_on = "dbdbc1b19cf2"
 
 
-def upgrade():
+def upgrade() -> None:
     """Upgrade database."""
 
 
-def downgrade():
+def downgrade() -> None:
     """Downgrade database."""
