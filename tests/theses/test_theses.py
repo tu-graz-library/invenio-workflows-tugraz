@@ -13,7 +13,10 @@ from xml.etree.ElementTree import fromstring
 from flask import Flask
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
+from invenio_records_marc21.proxies import current_records_marc21
+from invenio_records_resources.services.uow import UnitOfWork
 
+from invenio_workflows_tugraz.proxies import current_workflows_tugraz
 from invenio_workflows_tugraz.theses.theses import update_func
 
 
@@ -88,7 +91,20 @@ def test_update_func(
             doc = fromstring(embargoed_record_xml)  # noqa: S314
             return [doc]
 
-    records_service = MockRecordsService()
+    class MockThesesService:
+        """Mock ThesesService class."""
+
+        def set_state(
+            self,
+            identity: Identity,
+            id_: str,
+            state: str,
+            uow: UnitOfWork = None,
+        ) -> None:
+            """Mock set state."""
+
+    current_records_marc21.records_service = MockRecordsService()
+    current_workflows_tugraz.theses_service = MockThesesService()
     alma_service = MockAlmaService()
 
-    update_func(records_service, alma_service, "aiekd-23382", "77777", system_identity)
+    update_func(system_identity, "aiekd-23382", "77777", alma_service)

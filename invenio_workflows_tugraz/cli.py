@@ -14,7 +14,7 @@ from .theses.cli import theses_group
 
 
 @group()
-def workflows():
+def workflows() -> None:
     """Workflows cli."""
 
 

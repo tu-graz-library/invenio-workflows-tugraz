@@ -39,9 +39,10 @@ WORKFLOW_CAMPUSONLINE_THESES_FILTER = theses_filter()
 """"""
 
 WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_from_cms_func
+""""""
 
 WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
-
+""""""
 
 WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
 """See corresponding varaible in invenio-pure."""

@@ -19,6 +19,7 @@ from collections.abc import Callable
 import pytest
 from flask import Flask
 from invenio_db import InvenioDB
+from invenio_records_marc21 import InvenioRecordsMARC21
 from invenio_search import InvenioSearch
 
 from invenio_workflows_tugraz import InvenioWorkflowsTugraz
@@ -34,6 +35,7 @@ def create_app(instance_path: str) -> Callable:
         InvenioWorkflowsTugraz(app)
         InvenioSearch(app)
         InvenioDB(app)
+        InvenioRecordsMARC21(app)
         return app
 
     return factory
