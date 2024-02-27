@@ -8,6 +8,21 @@
 Changes
 =======
 
+Version v0.5.0 (release 2024-02-27)
+
+- fix: due python version not possible to use Self
+- theses: add update_access parameter
+- setup: move ruff configuration
+- theses: make it more fail prove
+- thesis: add cli, update models
+- theses: improve
+- theses: add logic for tasks
+- theses: add alembic
+- theses: add model to set state
+- theses: improve campusonline filter
+- theses: change requirement for import
+
+
 Version v0.4.0 (release 2024-02-02)
 
 - theses: change error to 423
