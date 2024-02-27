@@ -10,8 +10,6 @@
 
 from __future__ import annotations
 
-from typing import Self
-
 from invenio_db import db
 
 from .models import WorkflowThesesMetadata
@@ -37,13 +35,13 @@ class WorkflowTheses:
         return self.model.cms_id
 
     @classmethod
-    def resolve(cls, id_: str) -> Self:
+    def resolve(cls, id_: str):  # noqa: ANN206
         """Get."""
         model = cls.model_cls.query.filter_by(pid=id_).one_or_none()
         return cls(model=model)
 
     @classmethod
-    def create(cls, id_: str, cms_id: str) -> Self:
+    def create(cls, id_: str, cms_id: str):  # noqa: ANN206
         """Create."""
         with db.session.begin_nested():
             entry = cls(model=cls.model_cls(pid=id_, cms_id=cms_id))
@@ -70,7 +68,7 @@ class WorkflowTheses:
         db.session.merge(self.model)
 
     @classmethod
-    def get_ready_to(cls, state: str) -> list[Self]:
+    def get_ready_to(cls, state: str) -> list:
         """Get ready to."""
         entries = []
         if state == "archive_in_cms":
