@@ -248,8 +248,14 @@ def update_func(
     marc_id: str,
     cms_id: str,
     alma_service: AlmaSRUService,
+    *,
+    update_access: bool = True,
 ) -> None:
-    """Update the record by metadata from alma."""
+    """Update the record by metadata from alma.
+
+    :param bool update_access: normally true, but if updated by cli it would be
+    nice to update records without worring to mess up the access.
+    """
     marc21_service = current_records_marc21.records_service
     theses_service = current_workflows_tugraz.theses_service
 
@@ -263,20 +269,23 @@ def update_func(
             msg = f"ERROR: update record marc_id: {marc_id}, cms_id: {cms_id} not found in db"  # noqa: E501
             raise RuntimeError(msg) from error
 
-    db_marc21_record = Marc21Metadata(json=data["metadata"])
+    if update_access:
+        db_marc21_record = Marc21Metadata(json=data["metadata"])
 
-    # The existens of the "gesperrt" field will be checked from the
-    # database metadata because the field could be removed by
-    # accident. It would be a feature to open the files within the
-    # repository by the metadata comming from alma but the risk of
-    # exposing files without intention is to high.
-    is_restricted = db_marc21_record.exists_field(
-        category="971",
-        ind1="7",
-        ind2=" ",
-        subf_code="a",
-        subf_value="gesperrt",
-    )
+        # The existens of the "gesperrt" field will be checked from the
+        # database metadata because the field could be removed by
+        # accident. It would be a feature to open the files within the
+        # repository by the metadata comming from alma but the risk of
+        # exposing files without intention is to high.
+        is_restricted = db_marc21_record.exists_field(
+            category="971",
+            ind1="7",
+            ind2=" ",
+            subf_code="a",
+            subf_value="gesperrt",
+        )
+        data["access"]["record"] = "public"
+        data["access"]["files"] = "restricted" if is_restricted else "public"
 
     try:
         alma_marc21_etree = alma_service.get_record(cms_id, "local_field_995")
@@ -295,8 +304,6 @@ def update_func(
         raise RuntimeError(msg)
 
     data["metadata"] = alma_marc21_record.json["metadata"]
-    data["access"]["record"] = "public"
-    data["access"]["files"] = "restricted" if is_restricted else "public"
 
     try:
         marc21_service.edit(id_=marc_id, identity=identity)
