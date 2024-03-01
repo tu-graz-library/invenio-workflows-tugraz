@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.5.1 (release 2024-03-01)
+
+- setup: add missing dependency
+- theses: fix alembic
+
+
 Version v0.5.0 (release 2024-02-27)
 
 - fix: due python version not possible to use Self
