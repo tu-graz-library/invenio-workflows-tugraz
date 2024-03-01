@@ -10,6 +10,7 @@
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy_utils import UUIDType
 
 # revision identifiers, used by Alembic.
 revision = "937ba80502f3"
@@ -24,7 +25,7 @@ def upgrade() -> None:
         "workflows_theses",
         "id",
         new_column_name="pid",
-        existing_type=sa.UUIDType(),
+        existing_type=UUIDType(),
         type_=sa.String(255),
     )
 
