@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.5.2 (release 2024-03-12)
+
+- fix: theses task variable handling
+
+
 Version v0.5.1 (release 2024-03-01)
 
 - setup: add missing dependency
