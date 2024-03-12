@@ -18,6 +18,7 @@ from collections.abc import Callable
 
 import pytest
 from flask import Flask
+from invenio_app.factory import create_api
 from invenio_db import InvenioDB
 from invenio_records_marc21 import InvenioRecordsMARC21
 from invenio_search import InvenioSearch
@@ -26,19 +27,25 @@ from invenio_workflows_tugraz import InvenioWorkflowsTugraz
 
 
 @pytest.fixture(scope="module")
-def create_app(instance_path: str) -> Callable:
+def create_app(instance_path, entry_points):
     """Application factory fixture."""
+    return create_api
 
-    def factory(**config: dict) -> Flask:
-        app = Flask("testapp", instance_path=instance_path)
-        app.config.update(**config)
-        InvenioWorkflowsTugraz(app)
-        InvenioSearch(app)
-        InvenioDB(app)
-        InvenioRecordsMARC21(app)
-        return app
 
-    return factory
+# @pytest.fixture(scope="module")
+# def create_app(instance_path: str) -> Callable:
+#     """Application factory fixture."""
+
+#     def factory(**config: dict) -> Flask:
+#         app = Flask("testapp", instance_path=instance_path)
+#         app.config.update(**config)
+#         InvenioWorkflowsTugraz(app)
+#         InvenioSearch(app)
+#         InvenioDB(app)
+#         InvenioRecordsMARC21(app)
+#         return app
+
+#     return factory
 
 
 @pytest.fixture()

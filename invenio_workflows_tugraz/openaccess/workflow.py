@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
 # details.
 
 """Open Access Workflow."""
-from collections.abc import Callable
 
-from invenio_config_tugraz import get_identity_from_user_by_email
-from invenio_pure import PureConfigs, PureRecord
+
+from flask_principal import Identity
+from invenio_pure import PureRuntimeError
+from invenio_pure.records.models import PureRESTError
+from invenio_pure.services import PureRESTService
+from invenio_pure.types import PureID
 from invenio_records_marc21 import (
     DuplicateRecordError,
     Marc21Metadata,
@@ -19,66 +22,81 @@ from invenio_records_marc21 import (
     current_records_marc21,
 )
 from invenio_records_resources.services.records.results import RecordItem
+from marshmallow.exceptions import ValidationError
+from sqlalchemy.orm.exc import StaleDataError
 
 from .convert import Pure2Marc21
 from .types import PureId
-from .utils import (
-    access_type,
-    extract_file_url,
-    extract_pure_id,
-    license_type,
-    workflow,
-)
+from .utils import change_to_exported, extract_files
 
 
-def pure_import_func(
-    pure_record: PureRecord,
-    configs: PureConfigs,
-    download_file: Callable,
+def openaccess_filter() -> dict:
+    """Openaccess filter."""
+    return {
+        "keywordUris": ["dk/atira/pure/researchoutput/keywords/export2repo/validated"],
+    }
+
+
+def import_func(
+    identity: Identity,
+    pure_id: PureID,
+    pure_service: PureRESTService,
 ) -> RecordItem:
     """Import record from pure into the repository."""
-    pure_id = extract_pure_id(pure_record)
-    file_urls = extract_file_url(pure_record)
+    marc21_service = current_records_marc21.records_service
 
-    file_paths = []
-    for i, file_url in enumerate(file_urls):
-        file_path = download_file(
-            f"{pure_id}-{i}",
-            file_url,
-            configs.pure_username,
-            configs.pure_password,
-        )
-        file_paths.append(file_path)
+    try:
+        check_about_duplicate(PureId(pure_id))
+    except DuplicateRecordError as error:
+        raise RuntimeError(str(error)) from error
+
+    try:
+        pure_record = pure_service.get_metadata(identity, pure_id)
+        files = extract_files(pure_record)
+        file_paths = [pure_service.download_file(identity, file_) for file_ in files]
+    except (PureRESTError, PureRuntimeError) as error:
+        raise RuntimeError(str(error)) from error
 
     marc21_record = Marc21Metadata()
-    convert = Pure2Marc21()
-    convert.convert(pure_record, marc21_record)
+    converter = Pure2Marc21()
+    converter.convert(pure_record, marc21_record)
 
-    identity = get_identity_from_user_by_email(email=configs.user_email)
-    service = current_records_marc21.records_service
     data = marc21_record.json
-    data["access"] = {"record": "public", "files": "public"}
+    data["access"] = {
+        "record": "public",
+        "files": "public",
+    }
 
-    return create_record(service, data, file_paths, identity, do_publish=True)
-
-
-def pure_sieve_func(pure_record: PureRecord) -> bool:
-    """Check if the record fullfills the import criteria."""
     try:
-        pure_id = extract_pure_id(pure_record)
-        check_about_duplicate(PureId(pure_id))
-        duplicate_sieve = True
-    except DuplicateRecordError:
-        return False
+        record = create_record(
+            marc21_service,
+            data,
+            file_paths,
+            identity,
+            do_publish=False,
+        )
+        # validate the draft here so that the record could be marked as exported
+        # because the publish will go through without problems
+        marc21_service.validate_draft(
+            identity,
+            id_=record.id,
+            ignore_field_permissions=True,
+        )
+    except StaleDataError as error:
+        msg = f"ERROR: PureImport StaleDataError pure_id: {pure_id}"
+        raise RuntimeError(msg) from error
+    except ValidationError as error:
+        msg = f"ERROR: PureImport ValidationError pure_id: {pure_id}, error: {error}"
+        raise RuntimeError(msg) from error
 
-    file_sieve = False
-    for electronic_version in pure_record["electronicVersions"]:
-        if (
-            "file" in electronic_version
-            and access_type(electronic_version) in ["Open", "Offen"]
-            and license_type(electronic_version).startswith("CC BY")
-            and workflow(pure_record["workflow"]) in ["Valid"]
-        ):
-            file_sieve = True
+    try:
+        change_to_exported(pure_record)
+        pure_service.mark_as_exported(identity, pure_id, pure_record)
+    except PureRESTError as error:
+        raise RuntimeError(str(error)) from error
 
-    return duplicate_sieve and file_sieve
+    # since the valid import has been checked directly after creating the draft
+    # the publish should work without errors.
+    marc21_service.publish(id_=record.id, identity=identity)
+
+    return record
