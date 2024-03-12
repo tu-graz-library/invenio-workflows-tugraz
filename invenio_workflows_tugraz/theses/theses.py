@@ -15,7 +15,7 @@ from typing import NamedTuple, Union
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
 from invenio_alma import AlmaRESTService, AlmaSRUService
-from invenio_alma.services import AlmaRESTError
+from invenio_alma.services import AlmaAPIError, AlmaRESTError
 from invenio_alma.utils import is_duplicate_in_alma, validate_date
 from invenio_campusonline import CampusOnlineRESTService
 from invenio_campusonline.records.models import CampusOnlineRESTError
@@ -289,7 +289,7 @@ def update_func(
 
     try:
         alma_marc21_etree = alma_service.get_record(cms_id, "local_field_995")
-    except AlmaRESTError as error:
+    except (AlmaRESTError, AlmaAPIError) as error:
         msg = f"ERROR: alma rest marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"
         raise RuntimeError(msg) from error
 
