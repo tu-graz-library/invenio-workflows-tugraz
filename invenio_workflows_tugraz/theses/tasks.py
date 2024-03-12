@@ -26,19 +26,21 @@ def status_arch() -> None:
     theses_service = current_workflows_tugraz.theses_service
     cms_service = current_campusonline.campusonline_rest_service
 
-    ids = theses_service.get_ready_to(system_identity, state="archive_in_cms")
+    entries = theses_service.get_ready_to(system_identity, state="archive_in_cms")
 
-    for marc_id, cms_id in ids:
+    for entry in entries:
+        cms_id = entry.cms_id
+        pid = entry.pid
+
         try:
             cms_service.set_status(system_identity, cms_id, "ARCH", today)
-            theses_service.set_state(system_identity, marc_id, state="archived_in_cms")
-            current_app.logger.info("Theses %s has been archived successfully.", cms_id)
+            theses_service.set_state(system_identity, pid, state="archived_in_cms")
+
+            msg = "Theses %s has been archived successfully."
+            current_app.logger.info(msg, cms_id)
         except RuntimeError as e:
-            current_app.logger.error(
-                "Theses %s have been produced error %s on archiving.",
-                cms_id,
-                str(e),
-            )
+            msg = "Theses %s have been produced error %s on archiving."
+            current_app.logger.error(msg, cms_id, str(e))
 
 
 @shared_task(ignore_result=True)
@@ -48,19 +50,18 @@ def status_pub() -> None:
 
     theses_service = current_workflows_tugraz.theses_service
     cms_service = current_campusonline.campusonline_rest_service
-    ids = theses_service.get_ready_to(system_identity, state="publish_in_cms")
+    entries = theses_service.get_ready_to(system_identity, state="publish_in_cms")
 
-    for marc_id, cms_id in ids:
+    for entry in entries:
+        cms_id = entry.cms_id
+        pid = entry.pid
+
         try:
             cms_service.set_status(system_identity, cms_id, "PUB", today)
-            theses_service.set_state(system_identity, marc_id, state="published_in_cms")
-            current_app.logger.info(
-                "Theses %s has been published successfully.",
-                cms_id,
-            )
+            theses_service.set_state(system_identity, pid, state="published_in_cms")
+
+            msg = "Theses %s has been published successfully."
+            current_app.logger.info(msg, cms_id)
         except RuntimeError as e:
-            current_app.logger.error(
-                "Theses %s have been produced error %s on publishing.",
-                cms_id,
-                str(e),
-            )
+            msg = "Theses %s have been produced error %s on publishing."
+            current_app.logger.error(msg, cms_id, str(e))
