@@ -21,7 +21,7 @@ from invenio_workflows_tugraz.theses.theses import update_func
 
 
 def test_update_func(
-    running_app: Flask,  # noqa: ARG001
+    app: Flask,  # noqa: ARG001
     embargoed_record_xml: str,
 ) -> None:
     """Test update func."""

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,7 +8,7 @@
 
 """Openaccess Workflow utils."""
 
-from invenio_pure import URL, PureID, PureRecord, PureRuntimeError
+from invenio_pure import URL, PureRuntimeError
 from invenio_records_marc21 import check_about_duplicate
 
 from .types import PureId
@@ -23,7 +23,7 @@ def _(value: PureId) -> None:
 def access_type(electronic_version: dict) -> str:
     """Get Access type."""
     try:
-        return electronic_version["accessType"]["term"]["text"][0]["value"]
+        return electronic_version["accessType"]["uri"]
     except (KeyError, TypeError):
         return False
 
@@ -31,42 +31,81 @@ def access_type(electronic_version: dict) -> str:
 def license_type(electronic_version: dict) -> str:
     """Get license type."""
     try:
-        return electronic_version["licenseType"]["term"]["text"][0]["value"]
+        return electronic_version["licenseType"]["uri"]
     except (KeyError, TypeError):
         return False
 
 
-def workflow(electronic_version: dict) -> str:
-    """Get workflow status."""
-    try:
-        return electronic_version["workflow"]["value"]["text"][0]["value"]
-    except (KeyError, TypeError):
-        return False
-
-
-def extract_pure_id(pure_record: PureRecord) -> PureID:
-    """Extract pure id."""
-    return pure_record["pureId"]
-
-
-def extract_file_url(pure_record: PureRecord) -> URL:
+def extract_files(pure_record: dict) -> URL:
     """Extract file url."""
 
     def condition(item: dict) -> bool:
-        condition_1 = access_type(item) in ["Open", "Offen"]
-        condition_2 = license_type(item).startswith("CC BY")
+        condition_1 = (
+            access_type(item) == "/dk/atira/pure/core/openaccesspermission/open"
+        )
+        condition_2 = "cc_by" in license_type(item)
         return condition_1 and condition_2
 
-    file_urls = []
+    files = []
     for electronic_version in pure_record["electronicVersions"]:
         try:
-            file_url = electronic_version["file"]["fileURL"]
             if condition(electronic_version):
-                file_urls.append(file_url)
+                files.append(electronic_version["file"])
         except (KeyError, TypeError):
             continue
 
-    if len(file_urls) == 0:
-        raise PureRuntimeError(pure_record)
+    if len(files) == 0:
+        msg = f"record: {pure_record["uuid"]} doesn't provide downloadable files"
+        raise RuntimeError(msg)
 
-    return file_urls
+    return files
+
+
+def change_to_exported(pure_record: dict) -> dict:
+    """Replace the keyword group."""
+    replaced = False
+    for keyword_group in pure_record["keywordGroups"]:
+        if (
+            keyword_group["logicalName"]
+            == "dk/atira/pure/researchoutput/keywords/export2repo"
+        ):
+            replaced = True
+            keyword_group["classifications"] = [
+                {
+                    "uri": "dk/atira/pure/researchoutput/keywords/export2repo/exported",
+                    "term": {
+                        "en_GB": "Exported",
+                        "de_DE": "Exportiert",
+                    },
+                },
+            ]
+
+    # necessary if the keyword group does not show up in keywordGroups due to
+    # pure configuration
+    if not replaced:
+        keyword_group_validated = {
+            "typeDiscriminator": "ClassificationsKeywordGroup",
+            "pureId": 76333629,
+            "logicalName": "dk/atira/pure/researchoutput/keywords/export2repo",
+            "name": {
+                "en_GB": "Export to Repository",
+                "de_DE": "Export ins Repository",
+            },
+            "classifications": [
+                {
+                    "uri": "dk/atira/pure/researchoutput/keywords/export2repo/validated",
+                    "term": {
+                        "en_GB": "Validated",
+                        "de_DE": "Validiert",
+                    },
+                },
+                {
+                    "uri": "dk/atira/pure/researchoutput/keywords/export2repo/exported",
+                    "term": {
+                        "en_GB": "Exported",
+                        "de_DE": "Exportiert",
+                    },
+                },
+            ],
+        }
+        pure_record["keywordGroups"].append(keyword_group_validated)

@@ -8,11 +8,12 @@
 
 """Configuration file."""
 
+
 from invenio_i18n import gettext as _
 from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
 
 from .imoox import imoox_import_func
-from .openaccess import pure_import_func, pure_sieve_func
+from .openaccess import import_func, openaccess_filter
 from .teachcenter import teachcenter_import_func
 from .theses import (
     create_func,
@@ -49,12 +50,6 @@ WORKFLOWS_CAMPUSONLINE_IMPORT_FUNC = import_from_cms_func
 WORKFLOWS_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
 """"""
 
-WORKFLOWS_PURE_IMPORT_FUNC = pure_import_func
-"""See corresponding varaible in invenio-pure."""
-
-WORKFLOWS_PURE_SIEVE_FUNC = pure_sieve_func
-""""""
-
 WORKFLOWS_IMOOX_REPOSITORY_IMPORT_FUNC = imoox_import_func
 """"""
 
@@ -85,3 +80,8 @@ The values are added to the LOM_PERSISTENT_IDENTIFIERS dict.
 
 WORKFLOWS_MOODLE_REPOSITORY_IMPORT_FUNC = teachcenter_import_func
 """"""
+
+WORKFLOWS_PURE_IMPORT_FUNC = import_func
+"""See corresponding varaible in invenio-pure."""
+
+WORKFLOWS_PURE_FILTER_RECORDS = openaccess_filter()

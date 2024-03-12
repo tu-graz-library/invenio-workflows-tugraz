@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -43,7 +43,7 @@ class Converter:
         record: Marc21Metadata,
     ) -> None:
         """Traverse first level elements of dictionary and extract attributes."""
-        convert_function = getattr(self, f"convert_{attribute}", lambda _: None)
+        convert_function = getattr(self, f"convert_{attribute}", lambda _, __: None)
         convert_function(value, record)
 
 
@@ -52,46 +52,65 @@ class Pure2Marc21(Converter):
 
     def convert_abstract(self, value: dict, record: Marc21Metadata) -> None:
         """Add the abstract to the Marc21Metadata."""
-        for abstract in value["text"]:
-            record.emplace_field("520...", value=abstract["value"])
+        try:
+            abstract = value["de_DE"]
+        except KeyError:
+            try:
+                abstract = value["en_GB"]
+            except KeyError:
+                abstract = None
+
+        if abstract:
+            record.emplace_datafield("520...", value=abstract)
 
     def convert_additionalLinks(self, value: list, record: Marc21Metadata) -> None:
         """Add the additionalLinks attribute to the Marc21Metadata."""
         for link in value:
             if "url" in link:
-                record.emplace_field("856.4.1.u", value=link["url"])
+                record.emplace_datafield("856.4.1.u", value=link["url"])
 
     def convert_bibliographicalNote(self, value: dict, record: Marc21Metadata) -> None:
         """Add the bibliographicalNote attribute to the Marc21Metadata."""
         for text in value["text"]:
-            record.emplace_field("500...", value=text["value"])
+            record.emplace_datafield("500...", value=text["value"])
 
     def convert_edition(self, value: str, record: Marc21Metadata) -> None:
         """Add the edition attribute to the Marc21Metadata."""
-        record.emplace_field("250...", value=value)
+        record.emplace_datafield("250...", value=value)
 
     def convert_electronicIsbns(self, value: list, record: Marc21Metadata) -> None:
         """Add the electronicIsbns attribute to the Marc21Metadata."""
-        record.emplace_field("020...", value=str(value[0]).strip())
+        record.emplace_datafield("020...", value=str(value[0]).strip())
 
     def convert_event(self, value: dict, record: Marc21Metadata) -> None:
         """Add the event attribute to the Marc21Metadata."""
         for event_name in value["name"]["text"]:
-            record.emplace_field("711.2..", value=event_name["value"])
+            record.emplace_datafield("711.2..", value=event_name["value"])
 
     def convert_isbns(self, value: list, record: Marc21Metadata) -> None:
         """Add the isbns attribute to the Marc21Metadata."""
         for isbn in value:
-            record.emplace_field("020...", value=isbn)
+            record.emplace_datafield("020...", value=isbn)
 
     def convert_journalAssociation(self, value: dict, record: Marc21Metadata) -> None:
         """Add the journalAssociation attribute to the Marc21Metadata."""
-        value = value["title"]["value"]
-        record.emplace_field("773.0.8.t", value=value)
+        subfs = {}
+        try:
+            subfs["t"] = value["title"]["title"]
+        except KeyError:
+            pass
+
+        try:
+            subfs["x"] = value["issn"]["issn"]
+        except KeyError:
+            pass
+
+        if subfs:
+            record.emplace_datafield("773.0.8.", subfs=subfs)
 
     def convert_journalNumber(self, value: str, record: Marc21Metadata) -> None:
         """Add the journalNumber attribute to the Marc21Metadata."""
-        record.emplace_field("773.0.8.g", value=value)
+        record.emplace_datafield("773.0.8.g", value=value)
 
     def convert_keywordGroups(self, value: list, record: Marc21Metadata) -> None:
         """Add the keywordGroups attribute to the Marc21Metadata."""
@@ -101,10 +120,9 @@ class Pure2Marc21(Converter):
 
     def convert_language(self, value: dict, record: Marc21Metadata) -> None:
         """Add the language attribute to the Marc21Metadata."""
-        for locale in value["term"]["text"]:
-            language = locale["value"]
-            language_iso6393 = self.languages[language]
-            record.emplace_field("041...", value=language_iso6393)
+        language = value["term"]["en_GB"]
+        language_iso6393 = self.languages[language]
+        record.emplace_datafield("041...", value=language_iso6393)
 
     def convert_managingOrganisationalUnit(
         self,
@@ -118,7 +136,7 @@ class Pure2Marc21(Converter):
 
     def convert_numberOfPages(self, value: int, record: Marc21Metadata) -> None:
         """Add the numberOfPages attribute to the Marc21Metadata."""
-        record.emplace_field("300...", value=str(value))
+        record.emplace_datafield("300...", value=str(value))
 
     def convert_organisationalUnits(self, value: list, record: Marc21Metadata) -> None:
         """Add the organisationalUnits attribute to the Marc21Metadata."""
@@ -130,11 +148,11 @@ class Pure2Marc21(Converter):
     def convert_pages(self, value: str, record: Marc21Metadata) -> None:
         """Add the pages attriute to the Marc21Metadata."""
         pages = value
-        record.emplace_field("300...", value=pages)
+        record.emplace_datafield("300...", value=pages)
 
     def convert_patentNumber(self, value: str, record: Marc21Metadata) -> None:
         """Add the patentNumber attribute to the Marc21Metadata."""
-        record.emplace_field("013...", value=value)
+        record.emplace_datafield("013...", value=value)
 
     def convert_peerReview(
         self,
@@ -144,16 +162,16 @@ class Pure2Marc21(Converter):
         """Add the peerReview attribute to the Marc21Metadata."""
         if value:
             status = "Refereed/Peer-reviewed"
-            record.emplace_field("500...", value=status)
+            record.emplace_datafield("500...", value=status)
 
     def convert_placeOfPublication(self, value: str, record: Marc21Metadata) -> None:
         """Add the placeOfPublication attribute to the Marc21Metadata."""
-        record.emplace_field("264...", value=value)
+        record.emplace_datafield("264..1.", value=value)
 
     def convert_publicationSeries(self, value: list, record: Marc21Metadata) -> None:
         """Add the publicationSeries attribute to the Marc21Metadata."""
         for series in value:
-            record.emplace_field("490.0..", value=series["name"])
+            record.emplace_datafield("490.0..", value=series["name"])
 
     def convert_publicationStatuses(self, value: list, record: Marc21Metadata) -> None:
         """Add the publicationStatuses attribute to the Marc21Metadata."""
@@ -164,26 +182,26 @@ class Pure2Marc21(Converter):
     def convert_publisher(self, value: dict, record: Marc21Metadata) -> None:
         """Add the publisher attribute to the Marc21Metadata."""
         for text in value["name"]["text"]:
-            record.emplace_field("264...b", value=text["value"])
+            record.emplace_datafield("264..1.b", value=text["value"])
 
     def convert_relatedProjects(self, value: list, record: Marc21Metadata) -> None:
         """Add the relatedProjects attribute to the Marc21Metadata."""
         for entry in value:
             for locale in entry["name"]["text"]:
-                record.emplace_field("536...", value=locale["value"])
+                record.emplace_datafield("536...", value=locale["value"])
 
     def convert_subTitle(self, value: dict, record: Marc21Metadata) -> None:
         """Add the subTitle attribute to the Marc21Metadata."""
-        record.emplace_field("245.1.0.b", value=value["value"])
+        record.emplace_datafield("245.1.0.b", value=value["value"])
 
     def convert_title(self, value: dict, record: Marc21Metadata) -> None:
         """Add the title attribute to the Marc21Metadata."""
-        record.emplace_field("245.1.0.", value=value["value"])
+        record.emplace_datafield("245.1.0.", value=value["value"])
 
     def convert_volume(self, value: str, record: Marc21Metadata) -> None:
         """Add the volume attribute to the Marc21Metadata."""
-        record.emplace_field("490.0..", value=value)
-        record.emplace_field("773.0.8.g", value=value)
+        record.emplace_datafield("490.0..", value=value)
+        record.emplace_datafield("773.0.8.g", value=value)
 
 
 class KeywordGroup(Converter):
@@ -198,12 +216,12 @@ class KeywordGroup(Converter):
         """Add free keywords."""
         for free_keyword in value:
             for word in free_keyword["freeKeywords"]:
-                record.emplace_field("650..4.g", value=word)
+                record.emplace_datafield("650..4.g", value=word)
 
     def convert_structuredKeyword(self, value: dict, record: Marc21Metadata) -> None:
         """Add free keywords."""
         for word in value["term"]["text"]:
-            record.emplace_field("650..4.", value=word["value"])
+            record.emplace_datafield("650..4.", value=word["value"])
 
 
 class PublicationStatus(Converter):
@@ -211,9 +229,9 @@ class PublicationStatus(Converter):
 
     def convert_publicationDate(self, value: dict, record: Marc21Metadata) -> None:
         """Add the publication date to the Marc21Metadata."""
-        record.emplace_field("264...c", value=value["year"])
+        # without cast not serializable
+        record.emplace_datafield("264..1.c", value=str(value["year"]))
 
     def convert_publicationStatus(self, value: dict, record: Marc21Metadata) -> None:
         """Add the publication status to the Marc21Metadata."""
-        for text in value["term"]["text"]:
-            record.emplace_field("250...", value=text["value"])
+        record.emplace_datafield("250...", value=value["term"]["de_DE"])
