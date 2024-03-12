@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2024 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,7 +8,7 @@
 
 """Openaccess Workflow utils."""
 
-from invenio_pure import URL, PureID, PureRecord, PureRuntimeError
+from invenio_pure import URL, PureRuntimeError
 from invenio_records_marc21 import check_about_duplicate
 
 from .types import PureId
@@ -36,20 +36,7 @@ def license_type(electronic_version: dict) -> str:
         return False
 
 
-def workflow(electronic_version: dict) -> str:
-    """Get workflow status."""
-    try:
-        return electronic_version["workflow"]["value"]["text"][0]["value"]
-    except (KeyError, TypeError):
-        return False
-
-
-def extract_pure_id(pure_record: PureRecord) -> PureID:
-    """Extract pure id."""
-    return pure_record["pureId"]
-
-
-def extract_file_url(pure_record: PureRecord) -> URL:
+def extract_file_urls(pure_record) -> URL:
     """Extract file url."""
 
     def condition(item: dict) -> bool:
