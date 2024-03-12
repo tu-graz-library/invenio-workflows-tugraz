@@ -8,7 +8,7 @@
 
 """Configuration file."""
 
-from .openaccess import pure_import_func, pure_sieve_func
+from .openaccess import import_func, openaccess_filter
 from .theses import (
     create_func,
     duplicate_func,
@@ -44,7 +44,7 @@ WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_from_cms_func
 WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
 """"""
 
-WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
+WORKFLOW_PURE_IMPORT_FUNC = import_func
 """See corresponding varaible in invenio-pure."""
 
-WORKFLOW_PURE_SIEVE_FUNC = pure_sieve_func
+WORKFLOW_PURE_FILTER_RECORDS = openaccess_filter()
