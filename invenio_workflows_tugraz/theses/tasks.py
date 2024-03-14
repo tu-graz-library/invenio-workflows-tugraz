@@ -33,7 +33,7 @@ def status_arch() -> None:
         pid = entry.pid
 
         try:
-            cms_service.set_status(system_identity, cms_id, "ARCH", today)
+            cms_service.set_status(system_identity, cms_id, "ARCHIVED", today)
             theses_service.set_state(system_identity, pid, state="archived_in_cms")
 
             msg = "Theses %s has been archived successfully."
@@ -57,7 +57,7 @@ def status_pub() -> None:
         pid = entry.pid
 
         try:
-            cms_service.set_status(system_identity, cms_id, "PUB", today)
+            cms_service.set_status(system_identity, cms_id, "PUBLISHED", today)
             theses_service.set_state(system_identity, pid, state="published_in_cms")
 
             msg = "Theses %s has been published successfully."
