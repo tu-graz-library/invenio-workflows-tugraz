@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.5.3 (release 2024-03-14)
+
+- fix: thesis tasks wrong wording
+
+
 Version v0.5.2 (release 2024-03-12)
 
 - fix: theses task variable handling
