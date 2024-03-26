@@ -33,29 +33,11 @@ class InvenioWorkflowsTugraz:
         for k in dir(config):
             attr = getattr(config, k)
 
-            if k == "WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATOR":
-                app.config["ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATOR"] = attr
-
-            elif k == "WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_FUNC":
-                app.config["ALMA_REPOSITORY_RECORDS_UPDATE_FUNC"] = attr
-
-            elif k == "WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATOR":
-                app.config["ALMA_ALMA_RECORDS_CREATE_AGGREGATOR"] = attr
-
-            elif k == "WORKFLOW_ALMA_ALMA_RECORDS_CREATE_FUNC":
-                app.config["ALMA_ALMA_RECORDS_CREATE_FUNC"] = attr
-
-            elif k == "WORKFLOW_CAMPUSONLINE_THESES_FILTER":
-                app.config["CAMPUSONLINE_THESES_FILTER"] = attr
-
-            elif k == "WORKFLOW_CAMPUSONLINE_IMPORT_FUNC":
-                app.config["CAMPUSONLINE_IMPORT_FUNC"] = attr
-
-            elif k == "WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC":
-                app.config["CAMPUSONLINE_DUPLICATE_FUNC"] = attr
-
-            elif k.startswith("WORKFLOWS_TUGRAZ_"):
+            if k.startswith("WORKFLOWS_TUGRAZ_"):
                 app.config.setdefault(k, attr)
+
+            elif k.startswith("WORKFLOWS_"):
+                app.config[k.replace("WORKFLOWS_", "")] = attr
 
     def init_services(self, app: Flask) -> None:
         """Init services."""
