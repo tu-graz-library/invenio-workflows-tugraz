@@ -8,6 +8,7 @@
 
 """Configuration file."""
 
+from .imoox import imoox_import_func
 from .openaccess import pure_import_func, pure_sieve_func
 from .theses import (
     create_func,
@@ -48,3 +49,6 @@ WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
 """See corresponding varaible in invenio-pure."""
 
 WORKFLOW_PURE_SIEVE_FUNC = pure_sieve_func
+
+WORKFLOW_IMOOX_REPOSITORY_IMPORT_FUNC = imoox_import_func
+""""""
