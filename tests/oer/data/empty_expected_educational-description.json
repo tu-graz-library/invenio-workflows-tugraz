@@ -141,6 +141,28 @@
                         ]
                     }
                 }
+            ],
+            "520": [
+                {
+                    "ind1": "0",
+                    "ind2": "0",
+                    "subfields": {
+                        "a": [
+                            "general.description.eng."
+                        ]
+                    }
+                }
+            ],
+            "521": [
+                {
+                    "ind1": "0",
+                    "ind2": "0",
+                    "subfields": {
+                        "a": [
+                            "Educational.description.eng."
+                        ]
+                    }
+                }
             ]
         }
     }

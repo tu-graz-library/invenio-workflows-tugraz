@@ -121,7 +121,7 @@
                         ],
                         "2": [
                             "star"
-                        ]
+                        ],
                     }
                 }
             ],
@@ -139,6 +139,55 @@
                         "2": [
                             "gnd-content"
                         ]
+                    }
+                }
+            ],
+            "700": [
+                {
+                    "ind1": "1",
+                    "ind2": "0",
+                    "subfields": {
+                        "a": ["Scott, Robin"],
+                        "4": ["author"]
+                    }
+                },
+                {
+                    "ind1": "1",
+                    "ind2": "0",
+                    "subfields": {
+                        "a": ["Hunter, Austin"],
+                        "4": ["author"]
+                    }
+                },
+                {
+                    "ind1": "1",
+                    "ind2": "0",
+                    "subfields" {
+                        "a": ["Brennan, Kenneth"],
+                        "4": ["instructional designer"]
+                    }
+                },
+                {
+                    "ind1": "1",
+                    "ind2": "0",
+                    "subfields" {
+                        "a": ["Anderson, Julie"],
+                        "4": ["instructional designer"]
+                    }
+                },
+            "545": [
+                {
+                    "ind1": "0",
+                    "ind2": "0",
+                    "subfields": {
+                        "a":["Sport add example reduce product central."]
+                    }
+                },
+                {
+                    "ind1": "0",
+                    "ind2": "0",
+                    "subfields": {
+                        "a":["Big beyond responsibility one various move."]
                     }
                 }
             ]

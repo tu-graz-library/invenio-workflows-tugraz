@@ -141,6 +141,23 @@
                         ]
                     }
                 }
+            ],
+            "540": [
+                {
+                    "ind1": "0",
+                    "ind2": "0",
+                    "subfields": {
+                        "a": [
+                            "MOOC"
+                        ],
+                        "u": [
+                            "https://creativecommons.org/licenses/by-nc-sa/4.0"
+                        ],
+                        "2": [
+                            "cc"
+                        ]
+                    }
+                }
             ]
         }
     }

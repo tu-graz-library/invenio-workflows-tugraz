@@ -1,0 +1,23 @@
+{
+    "general": {
+        "description": [
+            {
+                "langstring": {
+                    "lang": "eng",
+                    "#text": "general.description.eng."
+                }
+            }
+        ]
+    },
+    "educational": {
+        "description": [
+            {
+                "langstring": {
+                    "lang": "eng",
+                    "#text": "Educational.description.eng."
+                }
+            }
+        ]
+    }
+
+}
