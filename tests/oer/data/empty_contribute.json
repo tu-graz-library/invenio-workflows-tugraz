@@ -1,0 +1,62 @@
+{
+    "contribute": [
+        {
+            "date": {
+                "datetime": "2003-09-03",
+                "description": {
+                    "langstring": {
+                        "lang": "eng-US",
+                        "#text": "Sport add example reduce product central."
+                    }
+                }
+            }
+            "role": {
+                "value": {
+                    "langstring": {
+                        "lang": "x-none",
+                        "#text": "author"
+                    }
+                },
+                "source": {
+                    "langstring": {
+                        "lang": "x-none",
+                        "#text": "LOMv1.0"
+                    }
+                }
+            },
+            "entity": [
+                "Scott, Robin",
+                "Hunter, Austin"
+            ]
+        },
+        {
+            "date": {
+                "datetime": "1983-12-20",
+                "description":
+                    "langstring": {
+                        "lang": "EN",
+                        "#text": "Big beyond responsibility one various move."
+                    }
+                }
+            },
+            "role": {
+                "value": {
+                    "langstring": {
+                        "lang": "x-none",
+                        "#text": "instructional designer"
+                    }
+                },
+                "source": {
+                    "langstring": {
+                        "lang": "x-none",
+                        "#text": "LOMv1.0"
+                    }
+                }
+            },
+            "entity": [
+                "Brennan, Kenneth",
+                "Anderson, Julie"
+            ]
+        }
+    }
+}

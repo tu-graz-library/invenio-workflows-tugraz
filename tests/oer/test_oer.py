@@ -36,14 +36,30 @@ def load_as_json(func: callable) -> any:
     ("test", "expected"),
     [
         ("empty_test", "empty_expected"),
+        ("empty_general-title", "empty_expected_general-title"),
+        ("empty_general-description", "empty_expected_general-description"),
+        ("empty_technical-location", "empty_expected_technical-location"),
+        ("empty_general-language", "empty_expected_general-language"),
+        ("empty_test", "empty_expected_hardcoded"),
+        ("empty_educational-description", "empty_expected_educational-description"),
+        ("empty_rights-url", "empty_expected_right-url"),
+        (
+            "empty_technical-licenses-thumbnail",
+            "empty_expected_technical-licenses-thumbnail",
+        ),
     ],
 )
 @load_as_json
 def test_convert(test: dict, expected: dict) -> None:
     """Test convert."""
     record = Marc21Metadata()
-    visitor = LOM2Marc21(record)
+    doi = "10.0123/10393-38347"
+    visitor = LOM2Marc21(record, doi)
 
     visitor.visit(test, record)
+
+    from json import dumps
+
+    # print(dumps(record.json, indent=4))
 
     assert record.json == expected

@@ -141,6 +141,26 @@
                         ]
                     }
                 }
+            ],
+            "856": [
+                {
+                    "ind1": "4",
+                    "ind2": "0",
+                    "subfields": {
+                        "u": [
+                            "http://baker-bowers.info/wp-contentcategory.html"
+                        ],
+                        "x": [
+                            "IMOOX"
+                        ],
+                        "z": [
+                            "kostenfrei"
+                        ],
+                        "3": [
+                            "Volltext"
+                        ]
+                    }
+                }
             ]
         }
     }

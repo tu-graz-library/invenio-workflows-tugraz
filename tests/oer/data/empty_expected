@@ -2,17 +2,6 @@
     "metadata": {
         "leader": "00000nam a2200000zca4500",
         "fields": {
-            "024": [
-                {
-                    "ind1": "7",
-                    "ind2": "0",
-                    "subfields": {
-                        "a": [
-                            "10.0123/10393-38347"
-                        ]
-                    }
-                }
-            ],
             "040": [
                 {
                     "ind1": "0",
@@ -80,26 +69,6 @@
                     }
                 }
             ],
-            "347": [
-                {
-                    "ind1": "0",
-                    "ind2": "0",
-                    "subfields": {
-                        "a": [
-                            "Textdatei"
-                        ]
-                    }
-                },
-                {
-                    "ind1": "0",
-                    "ind2": "0",
-                    "subfields": {
-                        "a": [
-                            "Videodatei"
-                        ]
-                    }
-                }
-            ],
             "500": [
                 {
                     "ind1": "0",
@@ -118,9 +87,6 @@
                     "subfields": {
                         "f": [
                             "Unrestricted online access"
-                        ],
-                        "2": [
-                            "star"
                         ]
                     }
                 }
