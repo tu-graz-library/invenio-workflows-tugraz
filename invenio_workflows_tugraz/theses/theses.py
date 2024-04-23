@@ -34,6 +34,7 @@ from invenio_records_marc21 import (
 from invenio_records_marc21.services.record.types import ACNumber
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
+from opensearchpy.exceptions import RequestError
 from sqlalchemy.orm.exc import NoResultFound, StaleDataError
 
 from ..proxies import current_workflows_tugraz
@@ -311,6 +312,9 @@ def update_func(
         marc21_service.publish(id_=marc_id, identity=identity)
     except ValidationError as error:
         msg = f"ValidationError cms_id: {cms_id}, error: {error}"
+        raise RuntimeError(msg) from error
+    except RequestError as error:
+        msg = f"RequestError cms_id: {cms_id}, error: {error}"
         raise RuntimeError(msg) from error
 
     theses_service.set_state(identity, id_=marc_id, state="updated_in_repo")
