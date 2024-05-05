@@ -8,6 +8,8 @@
 
 """Convert from LOM to Marc21."""
 
+from datetime import datetime
+
 from invenio_records_marc21.services.record.metadata import Marc21Metadata
 
 
@@ -41,7 +43,10 @@ class LOM2Marc21(Visitor):
     def __init__(self, record: Marc21Metadata, doi: str) -> None:
         """Construct."""
         super().__init__()
-        record.emplace_datafield("024.7.0.", subfs={"a": doi})
+
+        record.emplace_leader("07878nai a2200421 c 4500")
+        record.emplace_controlfield("007", "ccr|||||||||||")
+        record.emplace_datafield("024.7.0.", subfs={"a": doi, "2": "doi"})
         record.emplace_datafield("040.0.0.", subfs={"b": "ger", "e": "rda"})
         record.emplace_datafield("044.0.0.", subfs={"c": "XA-AT"})
         record.emplace_datafield("336.0.0.", subfs={"b": "txt"})
@@ -77,7 +82,7 @@ class LOM2Marc21(Visitor):
         subfs = {"a": self.title}
 
         if len(self.entities) > 0:
-            subfs["c"] = ",".join(self.entities)
+            subfs["c"] = ",".join(self.entities[0]["name"])
 
         record.emplace_datafield(
             "245.0.0.",
@@ -183,13 +188,39 @@ class LOM2Marc21(Visitor):
         """Process lifecycle."""
         super().visit(value, record)
 
+    def visit_datetime(self, value: str, record: Marc21Metadata) -> None:
+        """Process datetime."""
+        dt = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        startdate = value
+        record.emplace_datafield(
+            "264.3.1.",
+            subfs={"a": "Graz", "b": "Technische Universität Graz", "c": startdate},
+        )
+        record.emplace_controlfield(
+            "008",
+            f"230501c{dt.year}9999   #####o#####|||#|2### #",
+        )
+        # TODO empty_expected
+
     def visit_contribute(self, value: list, record: Marc21Metadata) -> None:
         """Process contribute."""
         for contribute in value:
             description = contribute["date"]["description"]["langstring"]["#text"]
             role = contribute["role"]["value"]["langstring"]["#text"]
             entities = contribute["entity"]
-            self.entities += entities
-            for name in entities:
-                record.emplace_datafield("700.1.0.", subfs={"a": name, "4": role})
+
+            for entity in entities:
+                self.entities += [{"name": entity, "role": role}]
             record.emplace_datafield("545.0.0.", subfs={"a": description})
+
+        for idx, x in enumerate(self.entities):
+            if idx == 0:
+                record.emplace_datafield("100.1.0.", subfs={"a": x["name"], "4": "aut"})
+            else:
+                record.emplace_datafield(
+                    "700.1.0.",
+                    subfs={
+                        "a": x["name"],
+                        "4": x["role"],
+                    },
+                )
