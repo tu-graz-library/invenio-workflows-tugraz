@@ -12,17 +12,28 @@ import time
 
 from flask_principal import Identity
 from invenio_records_lom import current_records_lom
-from invenio_records_lom.utils import LOMMetadata
+from invenio_records_lom.utils import (
+    LOMDuplicateRecordError,
+    LOMMetadata,
+    check_about_duplicate,
+)
+from marshmallow.exceptions import ValidationError
 
 from .visiter import MoocToLOM
 
 
 def imoox_import_func(imoox_record: dict, identity: Identity) -> None:
     """Create and publish function."""
-    visiter = MoocToLOM()
+    course_code = imoox_record["attributes"]["courseCode"]
+    try:
+        check_about_duplicate(course_code, "imoox")
+    except LOMDuplicateRecordError as error:
+        raise RuntimeError(str(error)) from error
+
+    converter = MoocToLOM()
     lom_record = LOMMetadata()
 
-    visiter.visit(imoox_record, lom_record)
+    converter.convert(imoox_record, lom_record)
 
     data = {
         "access": {"record": "public", "files": "public"},
@@ -30,11 +41,16 @@ def imoox_import_func(imoox_record: dict, identity: Identity) -> None:
         "metadata": lom_record.json,
         "resource_type": "link",
     }
+
     lom_service = current_records_lom.records_service
-    draft = lom_service.create(data=data, identity=identity)
+    try:
+        draft = lom_service.create(data=data, identity=identity)
 
-    # to prevent the race condition bug.
-    # see https://github.com/inveniosoftware/invenio-rdm-records/issues/809
-    time.sleep(0.5)
+        # to prevent the race condition bug.
+        # see https://github.com/inveniosoftware/invenio-rdm-records/issues/809
+        time.sleep(0.5)
 
-    lom_service.publish(id_=draft.id, identity=identity)
+        lom_service.publish(id_=draft.id, identity=identity)
+    except ValidationError as error:
+        msg = f"ValidationError courseCode: {course_code}, error: {error}"
+        raise RuntimeError(msg) from error

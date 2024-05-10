@@ -21,34 +21,35 @@ from .theses import (
     update_func,
 )
 
-WORKFLOW_ALMA_REPOSITORY_RECORDS_IMPORT_FUNC = import_from_alma_func
+WORKFLOWS_ALMA_REPOSITORY_RECORDS_IMPORT_FUNC = import_from_alma_func
 """"""
 
-WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATOR = theses_update_aggregator
+WORKFLOWS_ALMA_REPOSITORY_RECORDS_UPDATE_AGGREGATOR = theses_update_aggregator
 """"""
 
-WORKFLOW_ALMA_REPOSITORY_RECORDS_UPDATE_FUNC = update_func
+WORKFLOWS_ALMA_REPOSITORY_RECORDS_UPDATE_FUNC = update_func
 """"""
 
-WORKFLOW_ALMA_ALMA_RECORDS_CREATE_FUNC = create_func
+WORKFLOWS_ALMA_ALMA_RECORDS_CREATE_FUNC = create_func
 """"""
 
-WORKFLOW_ALMA_ALMA_RECORDS_CREATE_AGGREGATOR = theses_create_aggregator
+WORKFLOWS_ALMA_ALMA_RECORDS_CREATE_AGGREGATOR = theses_create_aggregator
 """"""
 
-WORKFLOW_CAMPUSONLINE_THESES_FILTER = theses_filter()
+WORKFLOWS_CAMPUSONLINE_THESES_FILTER = theses_filter()
 """"""
 
-WORKFLOW_CAMPUSONLINE_IMPORT_FUNC = import_from_cms_func
+WORKFLOWS_CAMPUSONLINE_IMPORT_FUNC = import_from_cms_func
 """"""
 
-WORKFLOW_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
+WORKFLOWS_CAMPUSONLINE_DUPLICATE_FUNC = duplicate_func
 """"""
 
-WORKFLOW_PURE_IMPORT_FUNC = pure_import_func
+WORKFLOWS_PURE_IMPORT_FUNC = pure_import_func
 """See corresponding varaible in invenio-pure."""
 
-WORKFLOW_PURE_SIEVE_FUNC = pure_sieve_func
+WORKFLOWS_PURE_SIEVE_FUNC = pure_sieve_func
+""""""
 
-WORKFLOW_IMOOX_REPOSITORY_IMPORT_FUNC = imoox_import_func
+WORKFLOWS_IMOOX_REPOSITORY_IMPORT_FUNC = imoox_import_func
 """"""
