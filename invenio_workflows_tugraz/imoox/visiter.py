@@ -175,10 +175,10 @@ class MoocToLOM(Converter):
         """Convert name attribute."""
         self.record["general"]["title"] = langstring(value, self.language)
 
-    def convert_courseCode(self, value: dict) -> None:
+    def convert_courseCode(self, value: dict[list]) -> None:
         """Convert courseCode attribute."""
 
-    def convert_courseMode(self, value: dict) -> None:
+    def convert_courseMode(self, value: dict[list]) -> None:
         """Convert courseMode attribute."""
 
     @ensure_value_str
@@ -196,7 +196,8 @@ class MoocToLOM(Converter):
         self.record["general"]["description"].append(langstring(value, self.language))
 
     @ensure_value_list(str)
-    def convert_languages(self, value: str) -> None:
+    # def convert_languages(self, value: str) -> None:
+    def convert_inIanguages(self, value: str) -> None:
         """Convert languages attribute."""
         self.record["general"]["language"] = value
 
@@ -209,10 +210,17 @@ class MoocToLOM(Converter):
 
     def convert_endDate(self, value: str) -> None:
         """Convert endDate attribute."""
+        # see startDate
 
-    def convert_image(self, value: str) -> None:
+    def convert_image(self, value: dict) -> None:
         """Convert image attribute."""
-        self.record["technical"]["thumbnail"] = value
+        self.record["technical"]["thumbnail"] = {
+            "url": value["contentURL"],
+            "license": {
+                "identifier": value["license"][0]["identifier"],
+                "url": value["license"][0]["url"],
+            },
+        }
 
     def convert_video(self, value: str) -> None:
         """Convert video attribute."""
@@ -300,34 +308,148 @@ class MoocToLOM(Converter):
             "description": langstring(value[0]["url"], "x-t-cc-url"),
         }
 
-    def convert_access(self, value: dict) -> None:
+    def convert_licenses(self, value: list) -> None:
+        """Convert courseLicenses attribute."""
+        self.record["rights"] = {
+            "copyrightandotherrestrictions": {
+                "source": langstring("LOMv1.0"),
+                "value": langstring("yes"),
+            },
+            "url": value[0]["url"],
+            "description": langstring(value[0]["url"], "x-t-cc-url"),
+        }
+
+    def convert_access(self, value: dict[list]) -> None:
         """Convert access attribute."""
 
     def convert_categories(self, value: dict) -> None:
         """Convert categories attribute."""
         super().convert(value)
 
-    def convert_oefos(self, value: dict) -> None:
-        """Convert oefos attribute."""
-        taxon = [
+    def convert_learningResourceType(self, value: dict) -> None:
+        """Convert learningResourceType."""
+
+    def convert_expires(self, value: list[str]) -> None:
+        """Convert expires."""
+
+    def convert_trailer(self, value: dict) -> None:
+        """Convert trailer."""
+
+    def convert_teaches(self, value: list[dict]) -> None:
+        """Convert teaches."""
+
+    def convert_contributor(self, value: list[dict]) -> None:
+        """Convert contributor."""
+        for contributor in value:
+            self.record["lifeCycle"]["contribute"].append(
+                {
+                    "role": {
+                        "source": langstring("LOMv1.0"),
+                        "value": langstring(contributor["type"]),
+                    },
+                    "entity": contributor["name"],
+                },
+            )
+
+    def convert_publisher(self, value: dict) -> None:
+        """Convert publisher."""
+        self.record["lifeCycle"]["contribute"].append(
             {
-                "id": f"https://w3id.org/oerbase/vocabs/oefos2012/{o['identifier']}",
-                "entry": [langstring(o["name"], "de")],
-            }
-            for o in value
-        ]
-        self.record["classification"].append(
-            {
-                "purpose": {
+                "role": {
                     "source": langstring("LOMv1.0"),
-                    "value": langstring("discipline"),
+                    "value": langstring(value["type"]),
                 },
-                "taxonpath": {
-                    "source": langstring(
-                        "https://w3id.org/oerbase/vocabs/oefos2012",
-                        "x-t-oefos",
-                    ),
-                    "taxon": taxon,
-                },
+                "entity": value["name"],
             },
         )
+
+    def convert_audience(self, value: list[str]) -> None:
+        """Convert audience."""
+
+    def convert_educationalAlignment(self, value: list[dict]) -> None:
+        """Convert educationalAlignment."""
+        for item in value:
+            taxon = [
+                {
+                    "id": f"https://w3id.org/oerbase/vocabs/oefos2012/{item['shortCode']}",
+                    "entry": [langstring(o["name"], o["inLanguage"])],
+                }
+                for o in item["item"]
+            ]
+
+            self.record["classification"].append(
+                {  # vielleicht richtig (aber ich glaube nicht)
+                    "purpose": {
+                        "source": langstring("LOMv1.0"),
+                        "value": langstring("discipline"),
+                    },
+                    "taxonpath": {
+                        "source": langstring(
+                            "https://w3id.org/oerbase/vocabs/oefos2012",
+                            "x-t-oefos",
+                        ),
+                        "taxon": taxon,
+                    },
+                },
+            )
+
+    def convert_educationalLevel(self, value: list[dict]) -> None:
+        """Convert educationallevel."""
+
+    def convert_creator(self, value: list[dict]) -> None:
+        """Convert creator."""
+        for creator in value:
+            self.record["lifeCycle"]["contribute"].append(
+                {
+                    "role": {
+                        "source": langstring("LOMv1.0"),
+                        "value": langstring(creator["type"]),
+                    },
+                    "entity": creator["name"],
+                },
+            )
+
+    def convert_keywords(self, value: list[str]) -> None:
+        """Convert keywords."""
+
+    def convert_contentLocation(self, value: dict) -> None:
+        """Convert contentlocation."""
+
+    def convert_offer(self, value: list) -> None:
+        """Convert offer."""
+
+    def convert_numberOfCredits(self, value: list) -> None:
+        """Convert numberOfCredits."""
+
+    def convert_educationalCredentialsAwarded(self, value: list[str]) -> None:
+        """Convert educationalCredentialsAwarded."""
+
+    def convert_competencyRequired(self, value: list[dict]) -> None:
+        """Convert competencyRequired."""
+
+    def convert_applicationStartDate(self, value: str) -> None:
+        """Convert applicationStartDate."""
+
+    def convert_applicationDeadline(self, value: str) -> None:
+        """Convert applicationDeadline."""
+
+    def convert_accessMode(self, value: list[str]) -> None:
+        """Convert accessMode."""
+
+    def convert_repeatFrequency(self, value: list[dict]) -> None:
+        """Convert repeatFrequency."""
+
+    def convert_dateCreated(self, value: str) -> None:
+        """Convert dateCreated."""
+
+    def convert_dateModified(self, value: str) -> None:
+        """Convert dateModified."""
+
+    def convert_hollandCode(self, value: list[str]) -> None:
+        """Convert hollandCode."""
+
+    def convert_hasPart(self, value: list[dict]) -> None:
+        """Convert hasPart."""
+
+    def convert_isPartOf(self, value: list[dict]) -> None:
+        """Convert isPartOf."""
