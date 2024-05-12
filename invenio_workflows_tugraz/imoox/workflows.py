@@ -22,13 +22,18 @@ from marshmallow.exceptions import ValidationError
 from .visiter import MoocToLOM
 
 
-def imoox_import_func(imoox_record: dict, identity: Identity) -> None:
+def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) -> None:
     """Create and publish function."""
     course_code = imoox_record["attributes"]["courseCode"]
     try:
         check_about_duplicate(course_code, "imoox")
     except LOMDuplicateRecordError as error:
-        raise RuntimeError(str(error)) from error
+        msg = f"DRY_RUN {error}" if dry_run else str(error)
+        raise RuntimeError(msg) from error
+
+    if dry_run:
+        msg = f"DRY_RUN imoox import success course_code: {course_code}"
+        raise RuntimeError(msg)
 
     converter = MoocToLOM()
     lom_record = LOMMetadata()
