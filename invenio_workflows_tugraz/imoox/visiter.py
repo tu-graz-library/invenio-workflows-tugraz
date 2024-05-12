@@ -8,8 +8,7 @@
 
 """Converter Module to facilitate conversion of metadata."""
 
-# from collections.abc import Callable
-# from functools import wraps
+from contextlib import suppress
 from typing import TypeVar
 
 from invenio_records_lom.utils import LOMMetadata
@@ -67,7 +66,7 @@ class MoocToLOM(Converter):
         self,
         contributors: list,
         record: LOMMetadata,
-        default_role="",
+        default_role: str = "",
     ) -> None:
         """Append to contribute."""
         for contributor in contributors:
@@ -95,6 +94,10 @@ class MoocToLOM(Converter):
 
     def convert_id(self, value: str, record: LOMMetadata) -> None:
         """Convert id attribute."""
+        record.append_identifier(id_=value, catalog="imoox")
+
+    def convert_courseCode(self, value: str, record: LOMMetadata) -> None:
+        """Convert courseCode attribute."""
         record.append_identifier(id_=value, catalog="imoox")
 
     def convert_attributes(self, value: dict, record: LOMMetadata) -> None:
@@ -165,12 +168,10 @@ class MoocToLOM(Converter):
 
     def convert_courseLicenses(self, value: list, record: LOMMetadata) -> None:
         """Convert courseLicenses attribute."""
-        print(f"courseLicense value: [value]")
         record.set_rights_url(url=value[0]["url"])
 
     def convert_license(self, value: list, record: LOMMetadata) -> None:
         """Convert courseLicense attribute."""
-        print(f"license value: {value}")
         record.set_rights_url(url=value[0]["url"])
 
     def convert_categories(self, value: dict, record: LOMMetadata) -> None:
@@ -191,16 +192,13 @@ class MoocToLOM(Converter):
         record: LOMMetadata,
     ) -> None:
         """Convert educationalAlignment."""
-
         for item in value:
             for subitem in item["name"]:
-                try:
+                with suppress(KeyError):
                     record.append_oefos_id(
                         oefos_id=item["shortCode"],
                         language_code=subitem["inLanguage"],
                     )
-                except KeyError:
-                    pass
 
     def convert_creator(self, value: list[dict], record: LOMMetadata) -> None:
         """Convert creator."""
@@ -214,9 +212,6 @@ class MoocToLOM(Converter):
 
     def convert_type(self, value: str, record: LOMMetadata) -> None:
         """Convert type attribute."""
-
-    def convert_courseCode(self, value: dict[list], record: LOMMetadata) -> None:
-        """Convert courseCode attribute."""
 
     def convert_courseMode(self, value: dict[list], record: LOMMetadata) -> None:
         """Convert courseMode attribute."""
