@@ -19,7 +19,7 @@ from invenio_records_lom.utils import (
 )
 from marshmallow.exceptions import ValidationError
 
-from .visiter import MoocToLOM
+from .visiter import IMOOXToLOM
 
 
 def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) -> None:
@@ -35,7 +35,7 @@ def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) 
         msg = f"DRY_RUN imoox import success course_code: {course_code}"
         raise RuntimeError(msg)
 
-    converter = MoocToLOM()
+    converter = IMOOXToLOM()
     lom_record = LOMMetadata()
 
     converter.convert(imoox_record, lom_record)
