@@ -8,8 +8,12 @@
 
 """Configuration file."""
 
+from invenio_i18n import gettext as _
+from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
+
 from .imoox import imoox_import_func
 from .openaccess import pure_import_func, pure_sieve_func
+from .teachcenter import teachcenter_import_func
 from .theses import (
     create_func,
     duplicate_func,
@@ -52,4 +56,27 @@ WORKFLOWS_PURE_SIEVE_FUNC = pure_sieve_func
 """"""
 
 WORKFLOWS_IMOOX_REPOSITORY_IMPORT_FUNC = imoox_import_func
+""""""
+
+WORKFLOWS_LOM_PERSISTENT_IDENTIFIER_PROVIDERS = [
+    ExternalPIDProvider("moodle", "moodle", label=_("MOODLE ID")),
+]
+"""List of persistent identifier providers.
+
+The values are added to the LOM_PERSISTENT_IDENTIFIER_PROVIDERS list.
+"""
+
+WORKFLOWS_LOM_PERSISTENT_IDENTIFIERS = {
+    "moodle": {
+        "providers": ["moodle"],
+        "required": False,
+        "label": _("MOODLE"),
+    },
+}
+"""Dict of persistent identifiers.
+
+The values are added to the LOM_PERSISTENT_IDENTIFIERS dict.
+"""
+
+WORKFLOWS_MOODLE_REPOSITORY_IMPORT_FUNC = teachcenter_import_func
 """"""

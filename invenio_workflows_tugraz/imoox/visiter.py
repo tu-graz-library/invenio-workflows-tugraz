@@ -9,11 +9,8 @@
 """Converter Module to facilitate conversion of metadata."""
 
 from contextlib import suppress
-from typing import TypeVar
 
 from invenio_records_lom.utils import LOMMetadata
-
-T = TypeVar("T")
 
 
 def langstring(value: str, language: str = "x-none") -> dict:
@@ -34,7 +31,7 @@ class Converter:
         for attribute, value in parent.items():
             self.process(attribute, value, record)
 
-    def process(self, attribute: str, value: T, record: LOMMetadata) -> None:
+    def process[T](self, attribute: str, value: T, record: LOMMetadata) -> None:
         """Execute the corresponding method to the attribute."""
 
         def func_not_found(*_: dict, **__: dict) -> None:
@@ -45,7 +42,7 @@ class Converter:
         return convert_func(value, record)
 
 
-class MoocToLOM(Converter):
+class IMOOXToLOM(Converter):
     """Convert class to convert Mooc to LOM."""
 
     def __init__(self) -> None:

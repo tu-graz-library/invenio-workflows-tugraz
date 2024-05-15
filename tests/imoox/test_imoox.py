@@ -16,7 +16,7 @@ import decorator
 import pytest
 from invenio_records_lom.utils import LOMMetadata
 
-from invenio_workflows_tugraz.imoox.visiter import MoocToLOM
+from invenio_workflows_tugraz.imoox.visiter import IMOOXToLOM
 
 
 def load_as_json(func: Callable) -> any:
@@ -41,7 +41,7 @@ def load_as_json(func: Callable) -> any:
 def test_visit(test: dict, expected: dict) -> None:
     """Test visit."""
     record = LOMMetadata
-    visitor = MoocToLOM()
+    visitor = IMOOXToLOM()
 
     visitor.visit(test, record)
 
