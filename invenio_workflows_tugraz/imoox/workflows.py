@@ -55,7 +55,7 @@ def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) 
         # see https://github.com/inveniosoftware/invenio-rdm-records/issues/809
         time.sleep(0.5)
 
-        lom_service.publish(id_=draft.id, identity=identity)
+        return lom_service.publish(id_=draft.id, identity=identity)
     except ValidationError as error:
         msg = f"ValidationError courseCode: {course_code}, error: {error}"
         raise RuntimeError(msg) from error
