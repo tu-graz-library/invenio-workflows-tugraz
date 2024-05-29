@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.6.0 (release 2024-05-29)
+
+- add imoox workflow
+
+
 Version v0.5.3 (release 2024-03-14)
 
 - fix: thesis tasks wrong wording
