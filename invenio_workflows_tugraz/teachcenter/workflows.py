@@ -9,18 +9,15 @@
 """Teachcenter workflows."""
 
 
+from pathlib import Path
+
 from flask_principal import Identity
 from invenio_moodle import MoodleRESTService
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records_lom.proxies import current_records_lom
 from invenio_records_lom.services import LOMRecordService
-from invenio_records_lom.utils import (
-    LOMDuplicateRecordError,
-    LOMRecordData,
-    check_about_duplicate,
-    create_record,
-)
+from invenio_records_lom.utils import LOMRecordData, create_record, update_record
 from invenio_records_resources.services.records.results import RecordItem
 
 from .types import BaseRecord, FileKey, FileRecord, Key, LinkKey, LinkRecord, Status
@@ -68,6 +65,7 @@ def get_from_database_or_create(
 
     """
     moodle_pid_value = key.get_moodle_pid_value()
+    print(f"get_from_database_or_create moodle_pid_value: {moodle_pid_value}")
 
     try:
         moodle_pid = PersistentIdentifier.get(
@@ -101,6 +99,25 @@ def get_from_database_or_create(
     return type_of_record(key, pid, data, status, draft)
 
 
+def is_duplicate(draft: RecordItem, new_course_ids: list[str]) -> bool:
+    """Check about duplicate."""
+    try:
+        existing_course_ids = [
+            identifier["entry"]["langstring"]["#text"]
+            for course in draft["metadata"]["courses"]
+            for identifier in course["course"]["identifier"]
+        ]
+    except KeyError:
+        print(f"is_duplicate draft.id: {draft.id} key-error with no 'course' attribute")
+        existing_course_ids = []
+
+    for new_course_id in new_course_ids:
+        if new_course_id in existing_course_ids:
+            return True
+
+    return False
+
+
 def teachcenter_import_func(
     identity: Identity,
     tc_record: dict,
@@ -116,17 +133,6 @@ def teachcenter_import_func(
     """
     records_service = current_records_lom.records_service
 
-    try:
-        content_hash = tc_record["contenthash"]
-        check_about_duplicate(content_hash, "moodle")
-    except LOMDuplicateRecordError as error:
-        msg = f"DRY_RUN {error}" if dry_run else str(error)
-        raise RuntimeError(msg) from error
-
-    if dry_run:
-        msg = f"DRY_RUN teachcenter import success id: {content_hash}"
-        raise RuntimeError(msg)
-
     record_key = create_key(tc_record)
     draft = get_from_database_or_create(identity, record_key, records_service)
 
@@ -135,13 +141,27 @@ def teachcenter_import_func(
 
     file_url = visitor.file_url
 
+    file_paths = []
     if isinstance(draft, FileRecord) and draft.status == Status.NEW:
-        file_path = moodle_service.download_file(identity, file_url)
+        file_paths += [moodle_service.download_file(identity, file_url)]
 
-    create_record(
-        records_service,
-        draft.data.json,
-        [file_path],
-        identity,
-        pre_created_draft=draft.draft,
-    )
+    if dry_run:
+        if draft.status == Status.NEW:
+            records_service.delete_draft(id_=draft.draft.id, identity=identity)
+        if len(file_paths):
+            for file_path in file_paths:
+                Path(file_path).unlink()
+        msg = f"DRY_RUN teachcenter import success id: {record_key}"
+        raise RuntimeError(msg)
+
+    match draft.status:
+        case Status.NEW:
+            create_record(records_service, draft.data.json, file_paths, identity)
+        case Status.EDIT:
+            if is_duplicate(draft.draft, visitor.course_ids):
+                msg = f"WARNING course already in record pid: {draft.pid}"
+                raise RuntimeError(msg)
+            # TODO: update data with new courses
+            # data = draft.data
+            # data["metadata"]["courses"]
+            update_record(draft.pid, records_service, data.json, identity)

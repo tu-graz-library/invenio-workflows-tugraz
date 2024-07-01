@@ -43,6 +43,7 @@ class CourseToLOM(Visitor):
     def visit_courseid(self, value: str, record: LOMCourseMetadata) -> None:
         """Visit courseid."""
         record.append_identifier(value, catalog="tugrazonline-id")
+        self.course_id = value
 
     def visit_identifier(self, value: str, record: LOMCourseMetadata) -> None:
         """Visit identifier."""
@@ -109,10 +110,12 @@ class TeachCenterToLOM(Visitor):
 
     def visit_courses(self, value: list, _: LOMMetadata) -> None:
         """Visit courses."""
+        self.course_ids = []
         for course in value:
             lom_course_record = LOMCourseMetadata()
             visitor = CourseToLOM()
             visitor.visit(course, lom_course_record)
+            self.course_ids.extend(visitor.course_id)
             self.courses.append(lom_course_record)
 
     def visit_year(self, value: str, record: LOMMetadata) -> None:
