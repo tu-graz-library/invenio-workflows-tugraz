@@ -35,7 +35,7 @@ class Color:
 class FileCacheInfo:
     """Holds a file-path and the file's md5-hash."""
 
-    hash_md5: str
+    hash_sha1: str
     path: Path
 
 
@@ -68,18 +68,18 @@ class FileKey(Key):
     url: str
     year: str
     semester: str
-    hash_md5: str
+    hash_sha1: str
 
     resource_type = "file"
 
     @singledispatchmethod
-    def __init__(self, url: str, year: str, semester: str, hash_md5: str) -> None:
+    def __init__(self, url: str, year: str, semester: str, hash_sha1: str) -> None:
         """Construct."""
         # dataclass frozen is nice but needs following not handy construct
         object.__setattr__(self, "url", url)
         object.__setattr__(self, "year", year)
         object.__setattr__(self, "semester", semester)
-        object.__setattr__(self, "hash_md5", hash_md5)
+        object.__setattr__(self, "hash_sha1", hash_sha1)
 
     @__init__.register
     def _(
@@ -90,20 +90,20 @@ class FileKey(Key):
         url = moodle_file_metadata["fileurl"]
         year = moodle_file_metadata["year"]
         semester = moodle_file_metadata["semester"]
-        hash_md5 = moodle_file_metadata["contenthash"]
-        self.__init__(url, year, semester, hash_md5)
+        hash_sha1 = moodle_file_metadata["contenthash"]
+        self.__init__(url, year, semester, hash_sha1)
 
     def __str__(self) -> str:
         """Get string-representation."""
         url = f"url={self.url}"
         year = f"year={self.year}"
         semester = f"semester={self.semester}"
-        hash_md5 = f"hash_md5={self.hash_md5}"
-        return f"FileKey({url}, {year}, {semester}, {hash_md5})"
+        hash_sha1 = f"hash_sha1={self.hash_sha1}"
+        return f"FileKey({url}, {year}, {semester}, {hash_sha1})"
 
     def get_moodle_pid_value(self) -> str:
         """Get moodle pid value."""
-        return self.hash_md5
+        return self.hash_sha1
 
 
 @dataclass(frozen=True)
@@ -163,9 +163,9 @@ class FileRecord(BaseRecord):
         return self.key.url
 
     @property
-    def hash_md5(self) -> str:
-        """Get hash_md5."""
-        return self.key.hash_md5
+    def hash_sha1(self) -> str:
+        """Get hash_sha1."""
+        return self.key.hash_sha1
 
 
 @dataclass
