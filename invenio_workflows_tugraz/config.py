@@ -72,6 +72,11 @@ WORKFLOWS_LOM_PERSISTENT_IDENTIFIERS = {
         "required": False,
         "label": _("MOODLE"),
     },
+    "moodle-alternative": {
+        "providers": ["moodle"],
+        "required": False,
+        "label": _("MOODLE"),
+    },
 }
 """Dict of persistent identifiers.
 
