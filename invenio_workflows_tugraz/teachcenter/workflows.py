@@ -60,7 +60,7 @@ def get_from_database_or_create(
 
     File:
     A File could be already in database. A File should not be added twice and it
-    is looked up by its file hash (hash_md5). If it is there already it will be
+    is looked up by its file hash (hash_sha1). If it is there already it will be
     linked to the new Unit where it is used.
 
     """
