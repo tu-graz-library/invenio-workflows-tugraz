@@ -87,10 +87,20 @@ class FileKey(Key):
         moodle_file_metadata: dict,
     ) -> None:
         """Create `cls` via info from moodle-json and file-cache."""
-        url = moodle_file_metadata["fileurl"]
+        try:
+            # application profile 1.0
+            url = moodle_file_metadata["fileurl"]
+        except KeyError:
+            # application profile 2.0
+            url = moodle_file_metadata["source"]
         year = moodle_file_metadata["year"]
         semester = moodle_file_metadata["semester"]
-        hash_sha1 = moodle_file_metadata["contenthash"]
+        try:
+            # application profile 1.0
+            hash_sha1 = moodle_file_metadata["contenthash"]
+        except KeyError:
+            # application profile 2.0
+            hash_sha1 = moodle_file_metadata["identifier"].split(":")[-1]
         self.__init__(url, year, semester, hash_sha1)
 
     def __str__(self) -> str:
