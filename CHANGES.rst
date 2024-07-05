@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.7.0 (release 2024-07-05)
+
+- workflows: add teachcenter workflow
+- setup: move to python3.12 only
+
+
 Version v0.6.0 (release 2024-05-29)
 
 - add imoox workflow
