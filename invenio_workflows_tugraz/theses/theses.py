@@ -166,7 +166,8 @@ def import_from_cms_func(
         thesis = cms_service.get_metadata(identity, cms_id)
         file_path = cms_service.download_file(identity, cms_id)
     except CampusOnlineRESTError as error:
-        raise RuntimeError(str(error)) from error
+        msg = f"ERROR: CampusOnlineRESTError cms_id: {cms_id}, msg: {error}"
+        raise RuntimeError(msg) from error
 
     marc21_record = Marc21Metadata()
     converter = CampusOnlineToMarc21(marc21_record)
