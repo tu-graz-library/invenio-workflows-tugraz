@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.7.1 (release 2024-07-18)
+
+- theses: add cms_id to error message
+
+
 Version v0.7.0 (release 2024-07-05)
 
 - workflows: add teachcenter workflow
