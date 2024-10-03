@@ -72,7 +72,7 @@ WORKFLOWS_LOM_PERSISTENT_IDENTIFIERS = {
         "required": False,
         "label": _("MOODLE"),
     },
-    "moodle-alternative": {
+    "moodle_alternative": {
         "providers": ["moodle"],
         "required": False,
         "label": _("MOODLE"),
