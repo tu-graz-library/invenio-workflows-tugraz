@@ -16,7 +16,7 @@ import decorator
 import pytest
 from invenio_records_lom.utils import LOMMetadata
 
-from invenio_workflows_tugraz.imoox.visiter import IMOOXToLOM
+from invenio_workflows_tugraz.imoox.visitor import IMOOXToLOM
 
 
 def load_as_json(func: Callable) -> any:

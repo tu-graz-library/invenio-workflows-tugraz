@@ -19,7 +19,7 @@ from invenio_records_lom.utils import (
 )
 from marshmallow.exceptions import ValidationError
 
-from .visiter import IMOOXToLOM
+from .visitor import IMOOXToLOM
 
 
 def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) -> None:
