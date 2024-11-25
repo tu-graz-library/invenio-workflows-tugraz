@@ -41,7 +41,7 @@ def create_app(instance_path: str) -> Callable:
     return factory
 
 
-@pytest.fixture()
+@pytest.fixture
 def embargoed_record_xml() -> str:
     """Embargoed record fixture."""
     return """
@@ -67,7 +67,7 @@ RunningApp = namedtuple(  # noqa: PYI024
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def running_app(
     app,  # noqa: ANN001
     location,  # noqa: ANN001

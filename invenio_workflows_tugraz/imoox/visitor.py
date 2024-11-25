@@ -228,6 +228,11 @@ class IMOOXToLOM(Converter):
 
     def convert_learningResourceType(self, value: dict, record: LOMMetadata) -> None:
         """Convert learningResourceType."""
+        learningresourcetype: str = value.get(
+            "identifier",
+            "https://w3id.org/kim/hcrt/course",
+        )
+        record.append_learningresourcetype(learningresourcetype)
 
     def convert_expires(self, value: list[str], record: LOMMetadata) -> None:
         """Convert expires."""

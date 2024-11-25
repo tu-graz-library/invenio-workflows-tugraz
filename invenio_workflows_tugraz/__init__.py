@@ -14,7 +14,7 @@ from .proxies import current_workflows_tugraz
 __version__ = "0.7.1"
 
 __all__ = (
-    "__version__",
     "InvenioWorkflowsTugraz",
+    "__version__",
     "current_workflows_tugraz",
 )
