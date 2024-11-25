@@ -23,15 +23,15 @@ from .theses import (
 from .views import create_blueprint
 
 __all__ = (
+    "WorkflowThesesService",
+    "WorkflowThesesServiceConfig",
+    "create_blueprint",
     "theses_create_aggregator",
-    "theses_update_aggregator",
-    "theses_filter",
+    "theses_create_func",
     "theses_duplicate_func",
+    "theses_filter",
     "theses_import_from_alma_func",
     "theses_import_from_cms_func",
+    "theses_update_aggregator",
     "theses_update_func",
-    "theses_create_func",
-    "create_blueprint",
-    "WorkflowThesesServiceConfig",
-    "WorkflowThesesService",
 )
