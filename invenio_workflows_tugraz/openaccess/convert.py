@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,6 +8,7 @@
 
 """Open Access Workflow."""
 
+from contextlib import suppress
 from json import load
 from pathlib import Path
 
@@ -95,15 +96,11 @@ class Pure2Marc21(Converter):
     def convert_journalAssociation(self, value: dict, record: Marc21Metadata) -> None:
         """Add the journalAssociation attribute to the Marc21Metadata."""
         subfs = {}
-        try:
-            subfs["t"] = value["title"]["title"]
-        except KeyError:
-            pass
 
-        try:
+        with suppress(KeyError):
+            subfs["t"] = value["title"]["title"]
+        with suppress(KeyError):
             subfs["x"] = value["issn"]["issn"]
-        except KeyError:
-            pass
 
         if subfs:
             record.emplace_datafield("773.0.8.", subfs=subfs)
