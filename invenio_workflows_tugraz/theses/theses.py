@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -126,7 +126,7 @@ def import_from_alma_func(
     }
 
     if not Path(file_path).is_file():
-        msg = f"ERROR: FileNotFoundError search_value: {ac_number}, file_path: {file_path}"  # noqa: E501
+        msg = f"ERROR: FileNotFoundError search_value: {ac_number}, file_path: {file_path}"
         raise RuntimeError(msg)
 
     if embargo:
@@ -239,7 +239,7 @@ def create_func(
     try:
         alma_service.create_record(marc21_record_etree)
     except AlmaRESTError as error:
-        msg = f"ERROR: alma rest error on marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"  # noqa: E501
+        msg = f"ERROR: alma rest error on marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"
         raise RuntimeError(msg) from error
 
     theses_service.set_state(identity, id_=marc_id, state="created_in_alma")
@@ -268,7 +268,7 @@ def update_func(
             # if this raises also the NoResultFound error it should break!
             data = marc21_service.read(id_=marc_id, identity=identity).data
         except (NoResultFound, PIDDoesNotExistError) as error:
-            msg = f"ERROR: update record marc_id: {marc_id}, cms_id: {cms_id} not found in db"  # noqa: E501
+            msg = f"ERROR: update record marc_id: {marc_id}, cms_id: {cms_id} not found in db"
             raise RuntimeError(msg) from error
 
     if update_access:

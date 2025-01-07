@@ -8,7 +8,7 @@
 
 """Openaccess Workflow utils."""
 
-from invenio_pure import URL, PureRuntimeError
+from invenio_pure import URL
 from invenio_records_marc21 import check_about_duplicate
 
 from .types import PureId
