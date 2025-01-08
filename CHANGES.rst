@@ -8,6 +8,16 @@
 Changes
 =======
 
+Version v0.8.0 (release 2025-01-08)
+
+- fix: docs reference target not found
+- tests: temporary solution
+- setup: update ruff configuration
+- setup: move dependencies
+- openaccess: refactore import function
+- fix: delimter needs to be not '-'
+
+
 Version v0.7.1 (release 2024-07-18)
 
 - theses: add cms_id to error message
