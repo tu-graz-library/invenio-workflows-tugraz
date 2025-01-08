@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -30,6 +30,7 @@ nitpick_ignore = [
     ("py:class", "invenio_pure.types.PureConfigs"),
     ("py:class", "invenio_records_marc21.services.services.Marc21RecordService"),
     ("py:class", "invenio_records_resources.services.records.results.RecordItem"),
+    ("py:class", "invenio_pure.services.services.PureRESTService"),
 ]
 
 # -- General configuration ---------------------------------------------------
