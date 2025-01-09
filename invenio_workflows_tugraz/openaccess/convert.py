@@ -85,6 +85,9 @@ class Pure2Marc21(Converter):
 
     def convert_event(self, value: dict, record: Marc21Metadata) -> None:
         """Add the event attribute to the Marc21Metadata."""
+        if "name" not in value:
+            return
+
         for event_name in value["name"]["text"]:
             record.emplace_datafield("711.2..", value=event_name["value"])
 
