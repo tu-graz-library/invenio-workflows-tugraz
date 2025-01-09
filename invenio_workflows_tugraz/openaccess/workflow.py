@@ -59,7 +59,11 @@ def import_func(
 
     marc21_record = Marc21Metadata()
     converter = Pure2Marc21()
-    converter.convert(pure_record, marc21_record)
+
+    try:
+        converter.convert(pure_record, marc21_record)
+    except KeyError as error:
+        raise RuntimeError(str(error)) from error
 
     data = marc21_record.json
     data["access"] = {
