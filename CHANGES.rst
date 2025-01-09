@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.8.1 (release 2025-01-09)
+
+- fix: handle missing keys
+
+
 Version v0.8.0 (release 2025-01-08)
 
 - fix: docs reference target not found
