@@ -65,6 +65,10 @@ def import_func(
     except KeyError as error:
         raise RuntimeError(str(error)) from error
 
+    # the publisher is not included in the record information
+    publisher = pure_service.get_publisher_name(identity, pure_id)
+    marc21_record.emplace_datafield("264..1.b", value=publisher)
+
     data = marc21_record.json
     data["access"] = {
         "record": "public",
