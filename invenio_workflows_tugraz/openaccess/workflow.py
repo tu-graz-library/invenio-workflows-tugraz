@@ -9,6 +9,7 @@
 """Open Access Workflow."""
 
 
+from flask import current_app
 from flask_principal import Identity
 from invenio_pure import PureRuntimeError
 from invenio_pure.records.models import PureRESTError
@@ -97,11 +98,12 @@ def import_func(
         msg = f"ERROR: PureImport ValidationError pure_id: {pure_id}, error: {error}"
         raise RuntimeError(msg) from error
 
-    try:
-        change_to_exported(pure_record)
-        pure_service.mark_as_exported(identity, pure_id, pure_record)
-    except PureRESTError as error:
-        raise RuntimeError(str(error)) from error
+    if current_app.config.get("WORKFLOWS_PURE_MARK_EXPORTED", False):
+        try:
+            change_to_exported(pure_record)
+            pure_service.mark_as_exported(identity, pure_id, pure_record)
+        except PureRESTError as error:
+            raise RuntimeError(str(error)) from error
 
     # since the valid import has been checked directly after creating the draft
     # the publish should work without errors.

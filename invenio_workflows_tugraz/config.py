@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -85,3 +85,11 @@ WORKFLOWS_PURE_IMPORT_FUNC = import_func
 """See corresponding varaible in invenio-pure."""
 
 WORKFLOWS_PURE_FILTER_RECORDS = openaccess_filter()
+
+WORKFLOWS_PURE_MARK_EXPORTED = False
+"""It enables to configure if imported records should be marked as exported.
+
+In production this should be enabled but for testing purpose it is practical to
+have this flag. it enables the option to import multiple times without changing
+the record in pure.
+"""
