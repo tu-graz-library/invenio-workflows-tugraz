@@ -8,6 +8,7 @@ exclude = ["docs"]
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
+  "A005",
   "D203", "D211", "D212", "D213",
   "DTZ007",
   "E501",
@@ -19,7 +20,7 @@ ignore = [
   "PERF203",
   "PLR0913",
   "S101",
-  "TD002", "TD003", "TD004",
+  "TD002", "TD003", "TD004", "TD005",
   "TID252",
   "TRY300", "TRY400",
   "UP009",
