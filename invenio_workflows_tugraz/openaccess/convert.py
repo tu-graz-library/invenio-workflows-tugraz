@@ -72,8 +72,15 @@ class Pure2Marc21(Converter):
 
     def convert_bibliographicalNote(self, value: dict, record: Marc21Metadata) -> None:
         """Add the bibliographicalNote attribute to the Marc21Metadata."""
-        for text in value["text"]:
-            record.emplace_datafield("500...", value=text["value"])
+        try:
+            text = value["de_DE"]
+        except KeyError:
+            try:
+                text = value["en_GB"]
+            except KeyError:
+                text = None
+        if text:
+            record.emplace_datafield("500...", value=text)
 
     def convert_edition(self, value: str, record: Marc21Metadata) -> None:
         """Add the edition attribute to the Marc21Metadata."""
@@ -181,8 +188,9 @@ class Pure2Marc21(Converter):
 
     def convert_publisher(self, value: dict, record: Marc21Metadata) -> None:
         """Add the publisher attribute to the Marc21Metadata."""
-        for text in value["name"]["text"]:
-            record.emplace_datafield("264..1.b", value=text["value"])
+        # TODO:
+        # maybe think of moving the code about getting the publisher information
+        # over the pure_service which is now in the import_func function to here
 
     def convert_relatedProjects(self, value: list, record: Marc21Metadata) -> None:
         """Add the relatedProjects attribute to the Marc21Metadata."""
