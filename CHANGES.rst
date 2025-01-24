@@ -8,6 +8,14 @@
 Changes
 =======
 
+Version v0.8.2 (release 2025-01-24)
+
+- fix: openaccess convert, structure was wrong
+- chore: update ruff configuration
+- openaccess: make mark optional
+- fix: publisher
+
+
 Version v0.8.1 (release 2025-01-09)
 
 - fix: handle missing keys
