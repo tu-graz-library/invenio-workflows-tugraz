@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2023-2024 Graz University of Technology.
+# Copyright (C) 2023-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -17,7 +17,7 @@ from invenio_records_marc21.proxies import current_records_marc21
 from invenio_records_resources.services.uow import UnitOfWork
 
 from invenio_workflows_tugraz.proxies import current_workflows_tugraz
-from invenio_workflows_tugraz.theses.theses import update_func
+from invenio_workflows_tugraz.theses.theses import theses_update_func
 
 
 def test_update_func(
@@ -107,4 +107,4 @@ def test_update_func(
     current_workflows_tugraz.theses_service = MockThesesService()
     alma_service = MockAlmaService()
 
-    update_func(system_identity, "aiekd-23382", "77777", alma_service)
+    theses_update_func(system_identity, "aiekd-23382", "77777", alma_service)

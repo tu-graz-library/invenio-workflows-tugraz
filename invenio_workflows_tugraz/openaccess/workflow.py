@@ -38,7 +38,7 @@ def openaccess_filter() -> dict:
     }
 
 
-def import_func(
+def openaccess_import_func(
     identity: Identity,
     pure_id: PureID,
     pure_service: PureRESTService,

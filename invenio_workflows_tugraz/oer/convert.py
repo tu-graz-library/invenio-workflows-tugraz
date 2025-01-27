@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -67,6 +67,10 @@ class LOM2Marc21(Visitor):
                 "0": "$$0 (DE-588)107372798X",
                 "2": "gnd-content",
             },
+        )
+        record.emplace_datafield(
+            "995...",
+            subfs={"i": "TU Graz Repository", "a": doi.split("/").pop(), "9": "local"},
         )
 
         self.title = ""
