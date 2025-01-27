@@ -80,7 +80,7 @@ def theses_update_aggregator() -> list[tuple[str, str]]:
     return theses_service.get_ready_to(system_identity, state="update_in_repo")
 
 
-def import_from_alma_func(
+def theses_import_from_alma_func(
     identity: Identity,
     ac_number: str,
     file_path: str,
@@ -148,7 +148,7 @@ def import_from_alma_func(
     return record
 
 
-def import_from_cms_func(
+def theses_import_from_cms_func(
     identity: Identity,
     cms_id: CampusOnlineID,
     cms_service: CampusOnlineRESTService,
@@ -210,7 +210,7 @@ def import_from_cms_func(
     return record
 
 
-def create_func(
+def theses_create_func(
     identity: Identity,
     marc_id: str,
     cms_id: str,
@@ -245,7 +245,7 @@ def create_func(
     theses_service.set_state(identity, id_=marc_id, state="created_in_alma")
 
 
-def update_func(
+def theses_update_func(
     identity: Identity,
     marc_id: str,
     cms_id: str,
@@ -321,7 +321,7 @@ def update_func(
     theses_service.set_state(identity, id_=marc_id, state="updated_in_repo")
 
 
-def duplicate_func(cms_id: str) -> bool:
+def theses_duplicate_func(cms_id: str) -> bool:
     """Check if the cms_id has already been imported."""
     try:
         check_about_duplicate(CampusOnlineId(cms_id))
