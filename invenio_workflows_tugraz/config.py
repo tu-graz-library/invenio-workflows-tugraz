@@ -91,6 +91,20 @@ WORKFLOWS_LOM_PERSISTENT_IDENTIFIERS = {
 The values are added to the LOM_PERSISTENT_IDENTIFIERS dict.
 """
 
+WORKFLOWS_MARC21_PERSISTENT_IDENTIFIER_PROVIDERS = [
+    ExternalPIDProvider("pure", "pure", label="Pure ID"),
+]
+"""A list of configured persistent identifier providers for Marc21."""
+
+WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
+    "pure": {
+        "providers": ["pure"],
+        "required": False,
+        "label": "PURE",
+    },
+}
+"""The configured persistent identifiers for records for marc21."""
+
 WORKFLOWS_MOODLE_REPOSITORY_IMPORT_FUNC = teachcenter_import_func
 """"""
 
