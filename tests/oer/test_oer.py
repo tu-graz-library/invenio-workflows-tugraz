@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -57,9 +57,5 @@ def test_convert(test: dict, expected: dict) -> None:
     visitor = LOM2Marc21(record, doi)
 
     visitor.visit(test, record)
-
-    from json import dumps
-
-    # print(dumps(record.json, indent=4))
 
     assert record.json == expected
