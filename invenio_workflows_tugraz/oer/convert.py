@@ -70,7 +70,7 @@ class LOM2Marc21(Visitor):
         )
         record.emplace_datafield(
             "995...",
-            subfs={"i": "TU Graz Repository", "a": doi.split("/").pop(), "9": "local"},
+            subfs={"i": "TU Graz Repository", "a": doi, "9": "local"},
         )
 
         self.title = ""
