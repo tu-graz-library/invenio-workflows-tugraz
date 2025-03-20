@@ -1,0 +1,174 @@
+{
+  "metadata": {
+    "leader": "07878nam a2200421 c 4500",
+    "fields": {
+      "007": "cr#|||||||||||",
+      "008": "230501s????####   #####om####|||#|#### c",
+      "040": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "a": [
+              "AT-UBTUG"
+            ],
+            "b": [
+              "ger"
+            ],
+            "d": [
+              "AT-UBTUG"
+            ],
+            "e": [
+              "rda"
+            ]
+          }
+        }
+      ],
+      "044": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "c": [
+              "XA-AT"
+            ]
+          }
+        }
+      ],
+      "264": [
+        {
+          "ind1": "_",
+          "ind2": "1",
+          "subfields": {
+            "a": [
+              "Graz"
+            ],
+            "c": [
+              "DATUM"
+            ]
+          }
+        }
+      ],
+      "300": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "a": [
+              "1 Online-Ressource (Seiten)"
+            ],
+            "b": [
+              "ill"
+            ]
+          }
+        }
+      ],
+      "336": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "b": [
+              "txt"
+            ]
+          }
+        }
+      ],
+      "337": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "b": [
+              "c"
+            ]
+          }
+        }
+      ],
+      "338": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "b": [
+              "cr"
+            ]
+          }
+        }
+      ],
+      "347": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "a": [
+              "Textdatei"
+            ],
+            "b": [
+              "PDF"
+            ]
+          }
+        }
+      ],
+      "506": [
+        {
+          "ind1": "0",
+          "ind2": "_",
+          "subfields": {
+            "2": [
+              "star"
+            ],
+            "f": [
+              "Unrestricted online access"
+            ]
+          }
+        }
+      ],
+      "546": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "a": [
+              "Zusammenfassung in"
+            ]
+          }
+        }
+      ],
+      "655": [
+        {
+          "ind1": "_",
+          "ind2": "7",
+          "subfields": {
+            "a": [
+              "Hochschulschrift"
+            ],
+            "0": [
+              "(DE-588)4113937-9"
+            ],
+            "2": [
+              "gnd-content"
+            ]
+          }
+        }
+      ],
+      "995": [
+        {
+          "ind1": "_",
+          "ind2": "_",
+          "subfields": {
+            "9": [
+              "local"
+            ],
+            "a": [
+              "0"
+            ],
+            "i": [
+              "TUGRAZonline"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
