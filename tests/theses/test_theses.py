@@ -8,16 +8,38 @@
 
 """Module test theses."""
 
-from xml.etree.ElementTree import fromstring
+from json import load
+from pathlib import Path
+from xml.etree.ElementTree import fromstring, parse
 
+import pytest
+from decorator import decorator
 from flask import Flask
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
+from invenio_records_marc21 import Marc21Metadata
 from invenio_records_marc21.proxies import current_records_marc21
 from invenio_records_resources.services.uow import UnitOfWork
 
 from invenio_workflows_tugraz.proxies import current_workflows_tugraz
+from invenio_workflows_tugraz.theses.convert import CampusOnlineToMarc21
 from invenio_workflows_tugraz.theses.theses import theses_update_func
+
+
+def load_as_json(func: callable) -> any:
+    """Decorat to load content of file as dictionary from a json file."""
+
+    def wrapper(*args: dict, **__: dict) -> any:
+        parent = Path(__file__).parent
+        tree = parse(Path(f"{parent}/data/{args[1]}.xml"))  # noqa: S314
+        xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
+        test = next(tree.getroot().iter(xpath))
+
+        with Path(f"{parent}/data/{args[2]}.json").open() as fp:
+            expected = load(fp)
+        return func(test, expected)
+
+    return decorator(wrapper, func)
 
 
 def test_update_func(
@@ -108,3 +130,18 @@ def test_update_func(
     alma_service = MockAlmaService()
 
     theses_update_func(system_identity, "aiekd-23382", "77777", alma_service)
+
+
+@pytest.mark.parametrize(
+    ("test", "expected"),
+    [("empty_test", "empty_expected")],
+)
+@load_as_json
+def test_convert(test: dict, expected: dict) -> None:
+    """Test theses convert."""
+    record = Marc21Metadata()
+    visitor = CampusOnlineToMarc21(record)
+
+    visitor.visit(test, record)
+
+    assert record.json == expected
