@@ -50,11 +50,11 @@ class LOM2Marc21(Visitor):
         record.emplace_datafield("040.0.0.", subfs={"b": "ger", "e": "rda"})
         record.emplace_datafield("044.0.0.", subfs={"c": "XA-AT"})
         record.emplace_datafield("336.0.0.", subfs={"b": "txt"})
-        record.emplace_datafield("336.0.0.", subfs={"b": "tdi"})
+        record.add_datafield("336.0.0.", subfs={"b": "tdi"})
         record.emplace_datafield("337.0.0.", subfs={"b": "c"})
         record.emplace_datafield("338.0.0.", subfs={"b": "cr"})
         record.emplace_datafield("347.0.0.", subfs={"a": "Textdatei"})
-        record.emplace_datafield("347.0.0.", subfs={"a": "Videodatei"})
+        record.add_datafield("347.0.0.", subfs={"a": "Videodatei"})
         record.emplace_datafield("500.0.0.", subfs={"a": "Gesehen am"})
         record.emplace_datafield(
             "506.0.0.",
@@ -104,13 +104,13 @@ class LOM2Marc21(Visitor):
     def visit_language(self, value: str, record: Marc21Metadata) -> None:
         """Process ."""
         for language in value:
-            record.emplace_datafield("041.0.0.", subfs={"a": language})
+            record.add_datafield("041.0.0.", subfs={"a": language})
 
     def visit_description(self, value: list, record: Marc21Metadata) -> None:
         """Process ."""
         for description in value:
             text = description["langstring"]["#text"]
-            record.emplace_datafield("520.0.0.", subfs={"a": text})
+            record.add_datafield("520.0.0.", subfs={"a": text})
 
     def visit_educational_description(
         self,
@@ -120,7 +120,7 @@ class LOM2Marc21(Visitor):
         """Process ."""
         for description in value:
             text = description["langstring"]["#text"]
-            record.emplace_datafield("521.0.0.", subfs={"a": text})
+            record.add_datafield("521.0.0.", subfs={"a": text})
 
     def visit_technical(self, value: dict, record: Marc21Metadata) -> None:
         """Process technical."""
