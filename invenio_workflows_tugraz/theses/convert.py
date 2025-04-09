@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2023 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -135,7 +135,7 @@ class CampusOnlineToMarc21(Visitor):
         """Override convert."""
         super().convert(node, record)
         for key, subfs in sorted(self.theses_local_field.items(), key=itemgetter(0)):
-            record.emplace_datafield(key, subfs=subfs)
+            record.add_datafield(key, subfs=subfs)
 
     def visit_ID(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ID."""
