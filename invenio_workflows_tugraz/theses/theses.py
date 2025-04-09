@@ -279,13 +279,22 @@ def theses_update_func(
         # accident. It would be a feature to open the files within the
         # repository by the metadata comming from alma but the risk of
         # exposing files without intention is to high.
-        is_restricted = db_marc21_record.exists_field(
+        category_971_exists = db_marc21_record.exists_field(
             category="971",
             ind1="7",
             ind2=" ",
             subf_code="a",
             subf_value="gesperrt",
         )
+
+        # the import sets the embargo date only if there is an embargo
+        # set in the origin metadata. this means that the metadata
+        # can't control the access. this prevents problems with broken
+        # metadata
+        is_embargoed = "embargo" in data["access"]
+
+        is_restricted = category_971_exists or is_embargoed
+
         data["access"]["record"] = "public"
         data["access"]["files"] = "restricted" if is_restricted else "public"
 
