@@ -21,7 +21,29 @@ from invenio_app.factory import create_api
 
 
 @pytest.fixture(scope="module")
-def create_app(instance_path: FixtureFunctionMarker) -> None:  # noqa: ARG001
+def app_config(app_config: FixtureFunctionMarker) -> None:
+    """Application config fixture."""
+    app_config["RDM_FILES_DEFAULT_MAX_FILE_SIZE"] = 10**10
+    app_config["RDM_FILES_DEFAULT_QUOTA_SIZE"] = 10**10
+    app_config["RDM_FILES_REST_DEFAULT_MAX_FILE_SIZE"] = 10**10
+    app_config["JSONSCHEMAS_HOST"] = "not-used"
+    app_config["OAISERVER_ID_PREFIX"] = "oai:repo"
+    app_config["OAUTH2SERVER_ALLOWED_URLENCODE_CHARACTERS"] = "=&;:%+~,*@!()/?'$'$"
+    app_config["CACHE_TYPE"] = "flask_caching.backends.redis"
+    app_config["REST_CSRF_ENABLED"] = True
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
+    return app_config
+
+
+@pytest.fixture(scope="module")
+def create_app(
+    instance_path: FixtureFunctionMarker,
+) -> None:
     """Application factory fixture."""
     return create_api
 
