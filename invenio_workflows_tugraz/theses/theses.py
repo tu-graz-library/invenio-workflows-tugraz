@@ -28,6 +28,7 @@ from invenio_records_marc21 import (
     MarcDraftProvider,
     check_about_duplicate,
     convert_json_to_marc21xml,
+    convert_marc21xml_to_json,
     create_record,
     current_records_marc21,
 )
@@ -117,7 +118,7 @@ def theses_import_from_alma_func(
         msg = f"ERROR: alma rest search_value: {ac_number}, error: {error}"
         raise RuntimeError(msg) from error
 
-    marc21_record = Marc21Metadata(metadata=metadata)
+    marc21_record = Marc21Metadata(json=convert_marc21xml_to_json(metadata))
 
     data = marc21_record.json
     data["access"] = {
@@ -304,7 +305,9 @@ def theses_update_func(
         msg = f"ERROR: alma rest marc_id: {marc_id}, cms_id: {cms_id}, error: {error}"
         raise RuntimeError(msg) from error
 
-    alma_marc21_record = Marc21Metadata(metadata=alma_marc21_etree[0])
+    alma_marc21_record = Marc21Metadata(
+        json=convert_marc21xml_to_json(alma_marc21_etree[0]),
+    )
 
     # only update and publish records which are associated with
     # "verbund" and have therefore an AC* number. this also shows that
