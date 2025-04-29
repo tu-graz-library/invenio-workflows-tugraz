@@ -37,6 +37,7 @@ def app_config(app_config: FixtureFunctionMarker) -> None:
     app_config["RECORDS_REFRESOLVER_STORE"] = (
         "invenio_jsonschemas.proxies.current_refresolver_store"
     )
+    app_config["THEME_FRONTPAGE"] = False
     return app_config
 
 
