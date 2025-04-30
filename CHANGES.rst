@@ -8,6 +8,27 @@
 Changes
 =======
 
+Version v0.9.0 (release 2025-04-30)
+
+- fix(tests): add configuration
+- theses: add jobs
+- theses: add tests
+- fix(thesis): apply change of marc21 datamodel
+- fix(thesis): use embargo and 971 for keeping close
+- theses: fix caused by new marc21 api
+- oer: fix with new marc21 method
+- theses: add tests
+- oer: fix tests
+- setup: add python3.13 support
+- setup: reduce MANIFEST.in complexity
+- chore: fix ruff error
+- change: make it possible to update papers
+- refactor: to add oer to alma workflows
+- oer: fix small bugs
+- oer: mapping lom -> marc21
+- oer: oer to alma, initial commit
+
+
 Version v0.8.2 (release 2025-01-24)
 
 - fix: openaccess convert, structure was wrong
