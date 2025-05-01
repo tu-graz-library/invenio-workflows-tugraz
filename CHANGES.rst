@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version v0.9.1 (release 2025-05-01)
+
+- fix: quibbles from ruff 0.8.0
+- imoox: convert learningresourcetype
+- cleanup: rename filename for consistency
+
+
 Version v0.9.0 (release 2025-04-30)
 
 - fix(tests): add configuration
