@@ -172,9 +172,25 @@ class BaseMockAlmaService:
                     "leader": "",
                     "fields": {},
                 },
-                "access": {},
+                "access": {
+                    "embargo": {
+                        "until": None,
+                        "active": False,
+                        "reason": None,
+                    },
+                },
             },
             "public",
+        ),
+        (
+            {
+                "metadata": {
+                    "leader": "",
+                    "fields": {},
+                },
+                "access": {},
+            },
+            "restricted",
         ),
     ],
 )

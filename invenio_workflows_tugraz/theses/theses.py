@@ -292,7 +292,14 @@ def theses_update_func(
         # set in the origin metadata. this means that the metadata
         # can't control the access. this prevents problems with broken
         # metadata
-        is_embargoed = "embargo" in data["access"]
+        try:
+            # embargo is only false if it active is set to false, all
+            # other situations mean that is_embargoed is true and the
+            # file is restricted. this behavior is used to prevent
+            # opening up files on some errors
+            is_embargoed = data["access"]["embargo"].get("active", True)
+        except KeyError:
+            is_embargoed = True
 
         is_restricted = category_971_exists or is_embargoed
 
