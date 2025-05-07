@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.9.2 (release 2025-05-07)
+
+- fix(theses): misunderstood embargo field
+
+
 Version v0.9.1 (release 2025-05-01)
 
 - fix: quibbles from ruff 0.8.0
