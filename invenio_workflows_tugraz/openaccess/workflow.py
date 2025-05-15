@@ -9,8 +9,8 @@
 """Open Access Workflow."""
 
 
-from flask import current_app
 from flask_principal import Identity
+from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pure import PureRuntimeError
@@ -26,9 +26,10 @@ from invenio_records_marc21 import (
 from invenio_records_marc21.records import Marc21Draft, Marc21Record
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm.exc import StaleDataError
 
+from ..proxies import current_workflows_tugraz
 from .convert import Pure2Marc21
 from .utils import change_to_exported, extract_files
 
@@ -40,13 +41,20 @@ def openaccess_filter() -> dict:
     }
 
 
-def openaccess_import_func(  # noqa: C901, PLR0915
+def openaccess_mark_as_exported_aggregator() -> list[tuple[str, str]]:
+    """Return a list of tuple[marc21, pure_id] which should be marked as exported in pure."""
+    oa_service = current_workflows_tugraz.openaccess_service
+    return oa_service.get_ready_to(system_identity, state="imported_in_repo")
+
+
+def openaccess_import_func(  # noqa: PLR0915
     identity: Identity,
     pure_id: PureID,
     pure_service: PureRESTService,
 ) -> RecordItem:
     """Import record from pure into the repository."""
     marc21_service = current_records_marc21.records_service
+    oa_service = current_workflows_tugraz.openaccess_service
     ignore_files = False
 
     try:
@@ -133,13 +141,49 @@ def openaccess_import_func(  # noqa: C901, PLR0915
         msg = f"ERROR: PureImport ValidationError pure_id: {pure_id}, error: {error}"
         raise RuntimeError(msg) from error
 
-    if current_app.config.get("WORKFLOWS_PURE_MARK_EXPORTED", False):
-        try:
-            change_to_exported(pure_record)
-            pure_service.mark_as_exported(identity, pure_id, pure_record)
-        except PureRESTError as error:
-            raise RuntimeError(str(error)) from error
-
     # since the valid import has been checked directly after creating the draft
     # the publish should work without errors.
-    return marc21_service.publish(id_=draft.id, identity=identity)
+    record = marc21_service.publish(id_=draft.id, identity=identity)
+
+    try:
+        oa_service.create(identity, record.id, pure_id)
+    except IntegrityError:
+        # if a record will be reimported after resetting the
+        # ready-to-export tag in pure. the record in pure has to be
+        # updated again, to make that happen the marked_as_exported
+        # has to be resetted
+        oa_service.set_state(
+            identity,
+            id_=record.id,
+            state="marked_as_exported",
+            value=False,
+        )
+
+    oa_service.set_state(identity, id_=record.id, state="imported_in_repo")
+
+    return record
+
+
+def openaccess_update_status_in_pure(
+    identity: Identity,
+    marc_id: str,
+    pure_id: PureID,
+    pure_service: PureRESTService,
+) -> None:
+    """Update status in pure."""
+    oa_service = current_workflows_tugraz.openaccess_service
+
+    try:
+        # yes i know this is not nice to nicest way to get the xml record, but
+        # the easiest
+        pure_record = pure_service.get_metadata(identity, pure_id)
+    except (PureRESTError, PureRuntimeError) as error:
+        raise RuntimeError(str(error)) from error
+
+    try:
+        change_to_exported(pure_record)
+        pure_service.mark_as_exported(identity, pure_id, pure_record)
+    except PureRESTError as error:
+        raise RuntimeError(str(error)) from error
+
+    oa_service.set_state(identity, id_=marc_id, state="marked_as_exported")
