@@ -14,7 +14,12 @@ from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
 
 from .imoox import imoox_import_func
 from .oer import oer_create_aggregator, oer_create_in_alma_func
-from .openaccess import openaccess_filter, openaccess_import_func
+from .openaccess import (
+    openaccess_filter,
+    openaccess_import_func,
+    openaccess_mark_as_exported_aggregator,
+    openaccess_update_status_in_pure,
+)
 from .teachcenter import teachcenter_import_func
 from .theses import (
     theses_create_aggregator,
@@ -113,10 +118,6 @@ WORKFLOWS_PURE_IMPORT_FUNC = openaccess_import_func
 
 WORKFLOWS_PURE_FILTER_RECORDS = openaccess_filter()
 
-WORKFLOWS_PURE_MARK_EXPORTED = False
-"""It enables to configure if imported records should be marked as exported.
+WORKFLOWS_PURE_MARK_AS_EXPORTED_FUNC = openaccess_update_status_in_pure
 
-In production this should be enabled but for testing purpose it is practical to
-have this flag. it enables the option to import multiple times without changing
-the record in pure.
-"""
+WORKFLOWS_PURE_MARK_AS_EXPORTED_AGGREGATOR = openaccess_mark_as_exported_aggregator
