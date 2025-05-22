@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.10.0 (release 2025-05-22)
+
+- fix(imoox): configuration
+- openaccess: add separat task for marking
+
+
 Version v0.9.2 (release 2025-05-07)
 
 - fix(theses): misunderstood embargo field
