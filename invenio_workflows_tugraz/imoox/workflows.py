@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -22,7 +22,12 @@ from marshmallow.exceptions import ValidationError
 from .visitor import IMOOXToLOM
 
 
-def imoox_import_func(imoox_record: dict, identity: Identity, *, dry_run: bool) -> None:
+def imoox_import_func(
+    imoox_record: dict,
+    identity: Identity,
+    *,
+    dry_run: bool = False,
+) -> None:
     """Create and publish function."""
     course_code = imoox_record["attributes"]["courseCode"]
     try:
