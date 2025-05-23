@@ -138,8 +138,8 @@ class Pure2Marc21(Converter):
     ) -> None:
         """Add the managingOrganisationalUnit attribute to the Marc21Metadata."""
         for locale in value["name"]["text"]:
-            record.emplace_unique_field("100.1..u", value=locale["value"])
-            record.emplace_unique_field("700.1..u", value=locale["value"])
+            record.add_datafield("100.1..a", value=locale["value"])
+            record.add_datafield("700.1..a", value=locale["value"])
 
     def convert_numberOfPages(self, value: int, record: Marc21Metadata) -> None:
         """Add the numberOfPages attribute to the Marc21Metadata."""
@@ -149,8 +149,8 @@ class Pure2Marc21(Converter):
         """Add the organisationalUnits attribute to the Marc21Metadata."""
         for o_unit in value:
             for locale in o_unit["name"]["text"]:
-                record.emplace_unique_field("100.1..u", value=locale["value"])
-                record.emplace_unique_field("700.1..u", value=locale["value"])
+                record.add_datafield("100.1..a", value=locale["value"])
+                record.add_datafield("700.1..a", value=locale["value"])
 
     def convert_pages(self, value: str, record: Marc21Metadata) -> None:
         """Add the pages attriute to the Marc21Metadata."""
@@ -210,6 +210,13 @@ class Pure2Marc21(Converter):
         """Add the volume attribute to the Marc21Metadata."""
         record.emplace_datafield("490.0..", value=value)
         record.emplace_datafield("773.0.8.g", value=value)
+
+    def convert_contributors(self, value: list, record: Marc21Metadata) -> None:
+        """Convert contributor list."""
+        for contributor in value:
+            last_name = contributor["name"]["lastName"]
+            first_name = contributor["name"]["firstName"]
+            record.add_datafield("700.1..a", value=f"{last_name}, {first_name}")
 
 
 class KeywordGroup(Converter):
