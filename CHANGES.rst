@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.10.1 (release 2025-05-24)
+
+- fix(openaccess): authors mapping
+
+
 Version v0.10.0 (release 2025-05-22)
 
 - fix(imoox): configuration
