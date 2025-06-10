@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.10.2 (release 2025-06-10)
+
+- setup: temp upper pin
+- fix(theses): not emplace, add it is
+
+
 Version v0.10.1 (release 2025-05-24)
 
 - fix(openaccess): authors mapping
