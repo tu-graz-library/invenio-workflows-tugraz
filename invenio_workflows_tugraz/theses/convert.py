@@ -350,7 +350,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_ABS(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
-        record.emplace_datafield("520...", value=node.text)
+        record.add_datafield("520...", value=node.text)
 
     def visit_KEYW(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -364,7 +364,7 @@ class CampusOnlineToMarc21(Visitor):
         )
 
         for subject in subjects:
-            record.emplace_datafield("653...", value=subject)
+            record.add_datafield("653...", value=subject)
 
     def visit_LANG(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
