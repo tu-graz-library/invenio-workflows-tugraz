@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -150,7 +150,8 @@ def teachcenter_import_func(  # noqa: C901
 
     match draft.status:
         case Status.NEW:
-            create_record(records_service, draft.data.json, file_paths, identity)
+            data = draft.data
+            record = create_record(records_service, data.json, file_paths, identity)
         case Status.EDIT:
             if is_duplicate(draft.draft, visitor.course_ids):
                 msg = f"WARNING course already in record pid: {draft.pid}"
@@ -161,4 +162,6 @@ def teachcenter_import_func(  # noqa: C901
                 if course not in data["metadata"]["courses"]:
                     data["metadata"]["courses"].append(course)
 
-            update_record(draft.pid, records_service, data, identity)
+            record = update_record(draft.pid, records_service, data, identity)
+
+    return record
