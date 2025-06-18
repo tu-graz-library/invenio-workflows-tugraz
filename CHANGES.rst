@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.10.3 (release 2025-06-18)
+
+- teachcenter: add return value to workflow
+- setup: remove upper pin
+
+
 Version v0.10.2 (release 2025-06-10)
 
 - setup: temp upper pin
