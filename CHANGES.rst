@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.10.4 (release 2025-06-20)
+
+- fix(tc): missing lecture mapping
+
+
 Version v0.10.3 (release 2025-06-18)
 
 - teachcenter: add return value to workflow
