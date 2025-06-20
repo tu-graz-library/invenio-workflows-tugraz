@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -186,6 +186,7 @@ class TeachCenterToLOM(Visitor):
             "exercise": "assessment",
             "graphic": "image",
             "figure": "image",
+            "lecture": "video",
         }
         if learningresourcetype := learningresourcetype_by_resourcetype[value.lower()]:
             record.append_learningresourcetype(learningresourcetype)
