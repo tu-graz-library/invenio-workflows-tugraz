@@ -26,7 +26,9 @@ from .visitor import TeachCenterToLOM
 
 def create_key(tc_record: dict) -> Key:
     """Create key."""
-    # TODO implement LinkKey (opencast)
+    if "duration" in tc_record:
+        return LinkKey(tc_record)
+
     return FileKey(tc_record)
 
 
@@ -134,10 +136,13 @@ def teachcenter_import_func(  # noqa: C901
     visitor.visit(tc_record, draft.data.metadata)
 
     file_url = visitor.file_url
-
     file_paths = []
+
     if isinstance(draft, FileRecord) and draft.status == Status.NEW:
         file_paths += [moodle_service.download_file(identity, file_url)]
+
+    if isinstance(draft, LinkRecord) and draft.status == Status.NEW:
+        draft.data.metadata.set_location(file_url)
 
     if dry_run:
         if draft.status == Status.NEW:

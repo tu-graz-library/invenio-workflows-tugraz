@@ -173,7 +173,6 @@ class TeachCenterToLOM(Visitor):
     # application profile 2.0
     def visit_source(self, value: str, _: LOMMetadata) -> None:
         """Visit source."""
-        # TODO: this has to be updated in case of adding opencast entries to the schema
         self.file_url = value
 
     def visit_resourcetype(self, value: str, record: LOMMetadata) -> None:
