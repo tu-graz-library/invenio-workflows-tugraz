@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2025 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -120,14 +120,19 @@ class FileKey(Key):
 class LinkKey(Key):
     """Key for links only records."""
 
+    hash_sha1: str
     url: str
 
     resource_type = "link"
 
     @singledispatchmethod
-    def __init__(self, url: str) -> None:
+    def __init__(self, moodle_file_metadata: dict) -> None:
         """Construct."""
+        url = moodle_file_metadata["source"]
+        hash_sha1 = moodle_file_metadata["identifier"].split(":")[-1]
+
         object.__setattr__(self, "url", url)
+        object.__setattr__(self, "hash_sha1", hash_sha1)
 
     def __str__(self) -> str:
         """Get string-representation."""
@@ -136,7 +141,7 @@ class LinkKey(Key):
 
     def get_moodle_pid_value(self) -> str:
         """Get moodle pid value."""
-        return self.url
+        return self.hash_sha1
 
 
 @unique
