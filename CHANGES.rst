@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.10.5 (release 2025-07-05)
+
+- fix(tc): LinkKey not implemented yet
+
+
 Version v0.10.4 (release 2025-06-20)
 
 - fix(tc): missing lecture mapping
