@@ -514,6 +514,23 @@ def test_update_func_metadata(
                             },
                         },
                     ],
+                    "710": [
+                        {
+                            "ind1": "2",
+                            "ind2": "_",
+                            "subfields": {
+                                "0": [
+                                    "(DE-588)2042894-7",
+                                ],
+                                "4": [
+                                    "dgg",
+                                ],
+                                "a": [
+                                    "Technische Universität Graz.",
+                                ],
+                            },
+                        },
+                    ],
                     "971": [
                         {
                             "ind1": "7",

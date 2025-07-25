@@ -130,6 +130,14 @@ class CampusOnlineToMarc21(Visitor):
                 "2": "gnd-content",
             },
         )
+        record.emplace_datafield(
+            "710.2..",
+            subfs={
+                "a": "Technische Universität Graz.",
+                "0": "(DE-588)2042894-7",
+                "4": "dgg",
+            },
+        )
 
     def convert(self, node: Element, record: Marc21Metadata) -> None:
         """Override convert."""
