@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version v0.11.0 (release 2025-07-25)
+
+- feat(theses): add hardcoded field
+
+
 Version v0.10.5 (release 2025-07-05)
 
 - fix(tc): LinkKey not implemented yet
