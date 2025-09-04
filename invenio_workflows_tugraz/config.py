@@ -121,3 +121,7 @@ WORKFLOWS_PURE_FILTER_RECORDS = openaccess_filter()
 WORKFLOWS_PURE_MARK_AS_EXPORTED_FUNC = openaccess_update_status_in_pure
 
 WORKFLOWS_PURE_MARK_AS_EXPORTED_AGGREGATOR = openaccess_mark_as_exported_aggregator
+
+WORKFLOWS_MARC21_CATALOGUE_JAVASCRIPT_EXTENDABLE = [
+    "invenio-workflows-tugraz-publisher.js",
+]
