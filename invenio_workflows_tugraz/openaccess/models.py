@@ -9,11 +9,10 @@
 """Models for theses workflow."""
 
 from invenio_db import db
-from invenio_records.models import Timestamp
 from sqlalchemy import BOOLEAN
 
 
-class WorkflowOpenaccessMetadata(db.Model, Timestamp):
+class WorkflowOpenaccessMetadata(db.Model, db.Timestamp):
     """Workflow theses."""
 
     __tablename__ = "workflows_openaccess"
