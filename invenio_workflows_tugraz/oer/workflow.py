@@ -39,15 +39,26 @@ def oer_create_in_alma_func(
         msg = f"ERROR: lom_id: {lom_id} not found in db"
         raise RuntimeError(msg) from error
 
+    # check if alma pids exists
+    alma_pid = record.pids.get("alma", None)
+
     marc21_record = Marc21Metadata()
     lom_to_marc21 = LOM2Marc21()
+
     # TODO: check what record is, visit would need a dict
     lom_to_marc21.visit(record, marc21_record)
 
     marc21_record_etree = convert_json_to_marc21xml(marc21_record.json["metadata"])
 
     try:
-        alma_service.create_record(marc21_record_etree)
+        if alma_pid:
+            alma_service.update_alma_record(mmsid=alma_pid)
+        else:
+            alma_record = alma_service.create_record(marc21_record_etree)
+
+            # update repo record with new alma pid
+            record.pids["alma"] = alma_record.get("mmsid")
+
     except AlmaRESTError as error:
         msg = f"ERROR: alma rest error on lom_id: {lom_id}, error: {error}"
         raise RuntimeError(msg) from error

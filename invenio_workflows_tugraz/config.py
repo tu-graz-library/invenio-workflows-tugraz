@@ -73,6 +73,7 @@ WORKFLOWS_IMOOX_IMPORT_FUNC = imoox_import_func
 
 WORKFLOWS_LOM_PERSISTENT_IDENTIFIER_PROVIDERS = [
     ExternalPIDProvider("moodle", "moodle", label=_("MOODLE ID")),
+    ExternalPIDProvider("alma", "alma", label=_("ALMA ID")),
 ]
 """List of persistent identifier providers.
 
@@ -89,6 +90,11 @@ WORKFLOWS_LOM_PERSISTENT_IDENTIFIERS = {
         "providers": ["moodle"],
         "required": False,
         "label": _("MOODLE"),
+    },
+    "alma": {
+        "providers": ["alma"],
+        "required": False,
+        "label": _("Alma"),
     },
 }
 """Dict of persistent identifiers.
