@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,7 +8,7 @@
 
 """API for theses workflow."""
 
-from __future__ import annotations
+from typing import ClassVar
 
 from invenio_db import db
 
@@ -18,11 +18,11 @@ from .models import WorkflowOpenaccessMetadata
 class WorkflowOpenaccess:
     """Workflow openaccess api."""
 
-    model_cls = WorkflowOpenaccessMetadata
+    model_cls: ClassVar[type[WorkflowOpenaccessMetadata]] = WorkflowOpenaccessMetadata
 
     def __init__(self, model: WorkflowOpenaccessMetadata) -> None:
         """Construct WorkflowOpenaccess."""
-        self.model = model
+        self.model: WorkflowOpenaccessMetadata = model
 
     @property
     def pid(self) -> str:
@@ -35,24 +35,24 @@ class WorkflowOpenaccess:
         return self.model.pure_id
 
     @classmethod
-    def resolve(cls, id_: str):  # noqa: ANN206
+    def resolve(cls, id_: str) -> WorkflowOpenaccess:
         """Get."""
         model = cls.model_cls.query.filter_by(pid=id_).one_or_none()
         return cls(model=model)
 
     @classmethod
-    def get_ready_to(cls, state: str) -> list:
+    def get_ready_to(cls, state: str) -> list[WorkflowOpenaccess]:
         """Get ready to."""
-        entries = []
         if state == "marked_as_exported":
             entries = cls.model_cls.query.filter_by(
                 imported_in_repo=True,
             )
 
-        return [cls(model=entry) for entry in entries.all()]
+            return [cls(model=entry) for entry in entries.all()]
+        return []
 
     @classmethod
-    def create(cls, id_: str, pure_id: str):  # noqa: ANN206
+    def create(cls, id_: str, pure_id: str) -> WorkflowOpenaccess:
         """Create."""
         with db.session.begin_nested():
             entry = cls(model=cls.model_cls(pid=id_, pure_id=pure_id))

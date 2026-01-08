@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -181,7 +181,7 @@ def openaccess_update_status_in_pure(
         raise RuntimeError(str(error)) from error
 
     try:
-        change_to_exported(pure_record)
+        pure_record = change_to_exported(pure_record)
         pure_service.mark_as_exported(identity, pure_id, pure_record)
     except PureRESTError as error:
         raise RuntimeError(str(error)) from error

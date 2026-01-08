@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -20,23 +20,17 @@ def _(value: PureId) -> None:
     check_about_duplicate(str(value), value.category)
 
 
-def access_type(electronic_version: dict) -> str:
+def access_type(electronic_version: dict[str, dict[str, str]]) -> str:
     """Get Access type."""
-    try:
-        return electronic_version["accessType"]["uri"]
-    except (KeyError, TypeError):
-        return False
+    return electronic_version.get("accessType", {}).get("uri", "")
 
 
-def license_type(electronic_version: dict) -> str:
+def license_type(electronic_version: dict[str, dict[str, str]]) -> str:
     """Get license type."""
-    try:
-        return electronic_version["licenseType"]["uri"]
-    except (KeyError, TypeError):
-        return False
+    return electronic_version.get("licenseType", {}).get("uri", "")
 
 
-def extract_files(pure_record: dict) -> URL:
+def extract_files(pure_record: dict) -> list[URL]:
     """Extract file url."""
 
     def condition(item: dict) -> bool:
@@ -46,7 +40,7 @@ def extract_files(pure_record: dict) -> URL:
         condition_2 = "cc_by" in license_type(item)
         return condition_1 and condition_2
 
-    files = []
+    files: list[URL] = []
     for electronic_version in pure_record["electronicVersions"]:
         try:
             if condition(electronic_version):
@@ -109,3 +103,5 @@ def change_to_exported(pure_record: dict) -> dict:
             ],
         }
         pure_record["keywordGroups"].append(keyword_group_validated)
+
+    return pure_record
