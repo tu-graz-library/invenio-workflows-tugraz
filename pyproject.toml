@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 exclude = ["docs"]
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -34,3 +35,44 @@ ignore = [
   "FBT001",
   "SLF001",
 ]
+
+[tool.mypy]
+extra_checks = true
+strict = true
+strict_bytes = true
+strict_equality = true
+follow_untyped_imports = true
+disallow_any_generics = false
+python_executable = ".venv/bin/python"
+
+[[tool.mypy.overrides]]
+module = [
+  "celery.*",
+  "faker.*",
+  "faker_file.*",
+  "flask.*",
+  "flask_login.*",
+  "flask_principal.*",
+  "flask_resources.*",
+  "invenio_access.*",
+  "invenio_accounts.*",
+  "invenio_alma.*",
+  "invenio_assets.*",
+  "invenio_db.*",
+  "invenio_drafts_resources.*",
+  "invenio_i18n.*",
+  "invenio_pidstore.*",
+  "invenio_records.*",
+  "invenio_records_marc21.*",
+  "invenio_records_resources.*",
+  "invenio_rdm_records.*",
+  "invenio_stats.*",
+  "marshmallow.*",
+  "marshmallow_utils.*",
+  "sqlalchemy.*",
+  "werkzeug.*",
+]
+ignore_missing_imports = true
+
+[tool.ty.environment]
+python-version = "3.14"

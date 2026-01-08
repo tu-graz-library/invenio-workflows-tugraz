@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2025-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -17,10 +17,10 @@ class WorkflowOpenaccessMetadata(db.Model, db.Timestamp):
 
     __tablename__ = "workflows_openaccess"
 
-    pid = db.Column(db.String(255), primary_key=True)
+    pid: str = db.Column(db.String(255), primary_key=True)
 
-    pure_id = db.Column(db.String(255))
+    pure_id: str = db.Column(db.String(255))
 
-    imported_in_repo = db.Column(BOOLEAN, default=False)
+    imported_in_repo: bool = db.Column(BOOLEAN, default=False)
 
-    marked_as_exported = db.Column(BOOLEAN, default=False)
+    marked_as_exported: bool = db.Column(BOOLEAN, default=False)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -32,7 +32,7 @@ class Converter:
 
         return {language["name"]: language["iso6393"] for language in languages}
 
-    def convert(self, value: object, record: Marc21Metadata) -> None:
+    def convert(self, value: dict, record: Marc21Metadata) -> None:
         """Convert record from Pure JSON format to MARC21XML."""
         for attribute, val in value.items():
             self.convert_attribute(attribute, val, record)
