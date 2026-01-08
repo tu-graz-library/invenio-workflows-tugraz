@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -122,6 +122,8 @@ WORKFLOWS_PURE_MARK_AS_EXPORTED_FUNC = openaccess_update_status_in_pure
 
 WORKFLOWS_PURE_MARK_AS_EXPORTED_AGGREGATOR = openaccess_mark_as_exported_aggregator
 
-WORKFLOWS_MARC21_CATALOGUE_JAVASCRIPT_EXTENDABLE = [
-    "invenio-workflows-tugraz-publisher.js",
-]
+WORKFLOWS_MARC21_CATALOGUE_JAVASCRIPT_EXTENDABLE: list[str] = []
+
+WORKFLOWS_MARC21_CATALOGUE_IMPORT_CLS_TYPES: dict[str, str] = {
+    "publisher": "invenio_workflows_tugraz.publisher.convert:CSVToMarc21",
+}
