@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -11,7 +11,7 @@
 from .ext import InvenioWorkflowsTugraz
 from .proxies import current_workflows_tugraz
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 
 __all__ = (
     "InvenioWorkflowsTugraz",

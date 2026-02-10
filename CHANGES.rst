@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2022 Graz University of Technology.
+    Copyright (C) 2022-2026 Graz University of Technology.
 
     invenio-workflows-tugraz is free software; you can redistribute it and/or
     modify it under the terms of the MIT License; see LICENSE file for more
@@ -7,6 +7,22 @@
 
 Changes
 =======
+
+Version v0.12.0 (released 2026-02-10)
+
+- chore(black): update formatting to >= 26.0
+- fix: missing __init__.py file
+- fix(setup): add missing dep
+- chore(fix): ruff rules
+- chore(setup): increase min python version
+- chore(setup): bump dependencies
+- chore(alembic): add datetime change types recipe
+- wip(type): openaccess
+- docs(publisher): added README
+- refactor(publisher): reorganize UploadCSV
+- refactor: use invenio-db for Timestamp
+- feat(migration): init
+- wip: add workflow for publisher
 
 Version v0.11.0 (release 2025-07-25)
 
