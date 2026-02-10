@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -236,7 +236,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_SPVON(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
         text = node.text
-        self.spvon = text if text else ""
+        self.spvon = text or ""
 
     def visit_SPBIS(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""

@@ -84,7 +84,7 @@ class CSVToMarc21:
             subfs={"3": "Volltext", "u": f"https://doi.org/{value}", "z": "kostenfrei"},
         )
 
-    def visit_filename(self, value: str, record: Marc21Metadata) -> None:
+    def visit_filename(self, value: str, _: Marc21Metadata) -> None:
         """Visit filename."""
         self.filename = value
 
