@@ -7,6 +7,7 @@
 # details.
 
 """Service for openaccess workflow."""
+
 from typing import cast
 
 from flask_principal import Identity

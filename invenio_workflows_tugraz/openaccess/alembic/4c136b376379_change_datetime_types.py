@@ -8,7 +8,6 @@
 
 """Alembic create tables for openaccess workflow."""
 
-
 from invenio_db.utils import (
     update_table_columns_column_type_to_datetime,
     update_table_columns_column_type_to_utc_datetime,

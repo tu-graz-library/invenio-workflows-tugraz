@@ -8,7 +8,6 @@
 
 """Alembic create branch for theses workflow."""
 
-
 # revision identifiers, used by Alembic.
 revision = "9d446c6a77e2"
 down_revision = None

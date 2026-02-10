@@ -8,7 +8,6 @@
 
 """Open Access Workflow."""
 
-
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError

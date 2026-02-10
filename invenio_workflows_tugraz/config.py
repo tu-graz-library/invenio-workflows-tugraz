@@ -8,7 +8,6 @@
 
 """Configuration file."""
 
-
 from invenio_i18n import gettext as _
 from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
 
