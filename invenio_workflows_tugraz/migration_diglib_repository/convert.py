@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2025-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -63,9 +63,7 @@ class Visitor:
 
         def func_not_found(fie: Field, __: Marc21Metadata) -> Callable:
             msg = f"NO visitor for field.fien: {fie.fien}"
-            print(msg)
-            # raise ValueError(msg)
-            return lambda _, __: True
+            raise ValueError(msg)
 
         field = Field(node)
         fien = "1XX" if 100 < field < 200 else str(field.fien)  # noqa: PLR2004
@@ -92,7 +90,7 @@ class Visitor:
 class MabToMarc21(Visitor):
     """Mab to marc21."""
 
-    def __init__(self, record: Marc21Metadata, publisher: str = "") -> None:
+    def __init__(self, _: Marc21Metadata, publisher: str = "") -> None:
         """Construct."""
         super().__init__()
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,9 +8,8 @@
 
 """Theses Workflows."""
 
-
 from pathlib import Path
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
@@ -86,9 +85,9 @@ def theses_import_from_alma_func(
     ac_number: str,
     file_path: str,
     access: str,
-    embargo: Union[str, None] = None,  # change: str|None after end python3.9 support
-    marcid: Union[str, None] = None,
-    alma_service: AlmaSRUService = None,
+    embargo: str | None = None,  # change: str|None after end python3.9 support
+    marcid: str | None = None,
+    alma_service: AlmaSRUService | None = None,
     **_: dict,
 ) -> None:
     """Process a single import by cli of a alma record by ac number.
@@ -104,7 +103,7 @@ def theses_import_from_alma_func(
         MarcDraftProvider.predefined_pid_value = marcid
 
     if embargo and not validate_date(embargo):
-        msg = (f"NotValidEmbargo search_value: {ac_number}, embargo: {embargo}",)
+        msg = f"NotValidEmbargo search_value: {ac_number}, embargo: {embargo}"
         raise RuntimeError(msg)
 
     try:

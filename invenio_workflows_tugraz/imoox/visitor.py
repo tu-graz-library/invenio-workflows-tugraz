@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2024 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it
 # and/or modify it under the terms of the MIT License; see LICENSE
@@ -120,7 +120,7 @@ class IMOOXToLOM(Converter):
 
     def convert_startDate(self, value: str, record: LOMMetadata) -> None:
         """Convert startDate attribute."""
-        record.set_datetime(value[0].split("T")[0])
+        record.set_datetime(value[0].split("T", maxsplit=1)[0])
 
     def convert_image(self, value: dict, record: LOMMetadata) -> None:
         """Convert image attribute."""
