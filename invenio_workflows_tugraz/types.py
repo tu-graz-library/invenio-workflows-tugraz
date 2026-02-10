@@ -8,7 +8,6 @@
 
 """Types for workflows."""
 
-
 from dataclasses import dataclass
 
 

@@ -8,7 +8,6 @@
 
 """Teachcenter workflows."""
 
-
 from pathlib import Path
 
 from flask_principal import Identity

@@ -8,7 +8,6 @@
 
 """CLI for theses workflow."""
 
-
 from click import group, secho
 from flask.cli import with_appcontext
 from invenio_access.permissions import system_identity

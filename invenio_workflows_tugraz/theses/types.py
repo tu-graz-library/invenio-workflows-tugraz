@@ -8,7 +8,6 @@
 
 """Theses Workflows."""
 
-
 from invenio_records_marc21.services.record.types import Marc21Category
 
 
