@@ -68,7 +68,7 @@ def process_id(
         else directory_files
     )
 
-    is_file = False
+    file_paths: list[Path] = []
     if convert.filename:
         base = (
             directory_files
@@ -77,16 +77,14 @@ def process_id(
         )
         file_path = base / f"{convert.filename}.pdf"
 
-        while not is_file:
-            is_file = file_path.exists()
-            if not is_file:
-                secho(
-                    f"file path: {file_path} doesn't exists, look input_file: {input_file}",
-                    fg="yellow",
-                )
-                wait()
+        while not file_path.exists():
+            secho(
+                f"file path: {file_path} doesn't exists, look input_file: {input_file}",
+                fg="yellow",
+            )
+            wait()
 
-    file_paths = [file_path] if is_file else []
+        file_paths.append(file_path)
 
     # only the root node in openlib has the access setting, all child notes have
     # to inherit it
@@ -151,7 +149,7 @@ def migration_group() -> None:
 
 
 @migration_group.command("import")
-@option("--input-file", type=ClickPath(file_okay=True, dir_okay=False))
+@option("--input-file", type=ClickPath(file_okay=True, dir_okay=False, path_type=Path))
 @option(
     "--directory-files",
     type=ClickPath(file_okay=False, dir_okay=True, path_type=Path),
