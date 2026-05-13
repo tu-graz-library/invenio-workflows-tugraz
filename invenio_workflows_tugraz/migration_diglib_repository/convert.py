@@ -90,7 +90,12 @@ class Visitor:
 class MabToMarc21(Visitor):
     """Mab to marc21."""
 
-    def __init__(self, _: Marc21Metadata, publisher: str = "") -> None:
+    def __init__(
+        self,
+        _: Marc21Metadata,
+        publisher: str = "N/A",
+        publication_year: str = "",
+    ) -> None:
         """Construct."""
         super().__init__()
 
@@ -99,6 +104,7 @@ class MabToMarc21(Visitor):
         self.all_child_ids: list[str] = []
         self.directory_name: str = ""
         self.publisher = publisher
+        self.year = publication_year
         self.filename: str = ""
 
         # record.emplace_leader("07878nam a2200421 c 4500")
@@ -123,18 +129,19 @@ class MabToMarc21(Visitor):
         """Convert."""
         super().convert(node, record)
 
+        if self.publisher and self.year:
+            record.emplace_datafield(
+                "264..1.",
+                subfs={"a": "Graz", "b": self.publisher, "c": self.year},
+            )
+
         if self.resource_type in ["book", "journal"]:
             record.emplace_datafield(
                 "502...",
                 subfs={
-                    # "b": node.text,
                     "c": self.publisher,
                     "d": self.year,
                 },
-            )
-            record.emplace_datafield(
-                "264..1.",
-                subfs={"a": "Graz", "b": self.publisher, "c": self.year},
             )
 
         if self.resource_type == "coverSheet":
@@ -184,12 +191,17 @@ class MabToMarc21(Visitor):
 
     def visit_406(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
+        for subf in field.subfs:
+            if subf.subfn == "j":
+                self.year = subf.subfv
 
     def visit_410(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
 
     def visit_412(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
+        # todo: check if this mapping is correct
+        self.publisher = field.subfs[0].subfv
 
     def visit_425(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
@@ -467,6 +479,7 @@ class MabToMarc21(Visitor):
     def visit_1401(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
         self.directory_name = field.subfs[0].subfv
+        self.year = field.subfs[0].subfv
         record.emplace_datafield("245.1.0.", subfs={"a": field.subfs[0].subfv})
 
     def visit_1402(self, field: Field, record: Marc21Metadata) -> None:
@@ -549,8 +562,6 @@ class MabToMarc21(Visitor):
 
     def visit_1504(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
-        # TODO:
-        # should go into marc21 metadata
         self.publisher = field.subfs[0].subfv
 
     def visit_1505(self, field: Field, record: Marc21Metadata) -> None:

@@ -44,6 +44,7 @@ def process_id(
     root_id: PID = "",
     parent_id: PID = "",
     publisher: str = "",
+    publication_year: str = "",
     file_access: Literal["public", "restricted"] = "restricted",
 ) -> PID:
     """Process id."""
@@ -53,7 +54,7 @@ def process_id(
     root = tree.getroot()
 
     metadata = Marc21Metadata()
-    convert = MabToMarc21(metadata, publisher)
+    convert = MabToMarc21(metadata, publisher, publication_year)
 
     try:
         convert.convert(root, metadata)
@@ -134,12 +135,12 @@ def process_id(
             root_id,
             parent_id,
             convert.publisher,
+            convert.year,
             file_access,
         )
 
     sleep(1)
     record = records_service.publish(system_identity, draft.id)
-
     return record.id
 
 
