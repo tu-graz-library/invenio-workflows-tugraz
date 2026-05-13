@@ -23,13 +23,13 @@ from .teachcenter import teachcenter_import_func
 from .theses import (
     theses_create_aggregator,
     theses_create_func,
-    theses_duplicate_func,
     theses_filter,
     theses_import_from_alma_func,
     theses_import_from_cms_func,
     theses_update_aggregator,
     theses_update_func,
 )
+from .theses.pids.providers import CMSPIDProvider
 
 WORKFLOWS_ALMA_REPOSITORY_RECORDS_IMPORT_FUNCS = {
     "theses": theses_import_from_alma_func,
@@ -64,9 +64,6 @@ WORKFLOWS_CAMPUSONLINE_THESES_FILTER = theses_filter()
 WORKFLOWS_CAMPUSONLINE_IMPORT_FUNC = theses_import_from_cms_func
 """"""
 
-WORKFLOWS_CAMPUSONLINE_DUPLICATE_FUNC = theses_duplicate_func
-""""""
-
 WORKFLOWS_IMOOX_IMPORT_FUNC = imoox_import_func
 """"""
 
@@ -97,6 +94,7 @@ The values are added to the LOM_PERSISTENT_IDENTIFIERS dict.
 
 WORKFLOWS_MARC21_PERSISTENT_IDENTIFIER_PROVIDERS = [
     ExternalPIDProvider("pure", "pure", label="Pure ID"),
+    CMSPIDProvider(),
 ]
 """A list of configured persistent identifier providers for Marc21."""
 
@@ -105,6 +103,11 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
         "providers": ["pure"],
         "required": False,
         "label": "PURE",
+    },
+    "cms": {
+        "providers": ["cms"],
+        "required": False,
+        "label": "CMS",
     },
 }
 """The configured persistent identifiers for records for marc21."""

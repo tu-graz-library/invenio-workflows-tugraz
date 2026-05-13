@@ -21,6 +21,7 @@ from invenio_campusonline.records.models import CampusOnlineRESTError
 from invenio_campusonline.types import CampusOnlineID, ThesesFilter
 from invenio_campusonline.utils import extract_embargo_range
 from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_rdm_records.services.errors import ValidationErrorWithMessageAsList
 from invenio_records_marc21 import (
     DuplicateRecordError,
     Marc21Metadata,
@@ -39,15 +40,8 @@ from sqlalchemy.orm.exc import NoResultFound, StaleDataError
 
 from ..proxies import current_workflows_tugraz
 from .convert import CampusOnlineToMarc21
-from .types import CampusOnlineId
 
 error_record = NamedTuple("ErrorRecord", ["id"])
-
-
-@check_about_duplicate.register
-def _(value: CampusOnlineId) -> None:
-    """Check about double campus online id."""
-    check_about_duplicate(str(value), value.category)
 
 
 def theses_filter() -> ThesesFilter:
@@ -158,11 +152,6 @@ def theses_import_from_cms_func(
     theses_service = current_workflows_tugraz.theses_service
 
     try:
-        check_about_duplicate(CampusOnlineId(cms_id))
-    except DuplicateRecordError as error:
-        raise RuntimeError(str(error)) from error
-
-    try:
         thesis = cms_service.get_metadata(identity, cms_id)
         file_path = cms_service.download_file(identity, cms_id)
     except CampusOnlineRESTError as error:
@@ -189,6 +178,11 @@ def theses_import_from_cms_func(
             "reason": None,
         }
 
+    data.setdefault("pids", {})["cms"] = {
+        "provider": "cms",
+        "identifier": cms_id,
+    }
+
     try:
         record = create_record(
             marc21_service,
@@ -197,6 +191,9 @@ def theses_import_from_cms_func(
             identity,
             do_publish=False,
         )
+    except ValidationErrorWithMessageAsList as error:
+        msg = f"WARNING: Duplication error cms_id: {cms_id}, error: {error.messages}"
+        raise RuntimeError(msg) from error
     except StaleDataError as error:
         msg = f"ERROR: StaleDataError cms_id: {cms_id}"
         raise RuntimeError(msg) from error
@@ -337,12 +334,3 @@ def theses_update_func(
         raise RuntimeError(msg) from error
 
     theses_service.set_state(identity, id_=marc_id, state="updated_in_repo")
-
-
-def theses_duplicate_func(cms_id: str) -> bool:
-    """Check if the cms_id has already been imported."""
-    try:
-        check_about_duplicate(CampusOnlineId(cms_id))
-        return False
-    except DuplicateRecordError:
-        return True
