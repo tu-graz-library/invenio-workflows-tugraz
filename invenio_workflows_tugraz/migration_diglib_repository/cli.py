@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2025-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -18,7 +18,10 @@ from click import group, option, secho
 from flask.cli import with_appcontext
 from invenio_access.permissions import system_identity
 from invenio_catalogue_marc21.proxies import current_catalogue_marc21
+from invenio_pidstore.models import PersistentIdentifier
+from invenio_rdm_records.services.errors import ValidationErrorWithMessageAsList
 from invenio_records_marc21 import Marc21Metadata, create_record
+from sqlalchemy.exc import NoResultFound
 
 from .convert import MabToMarc21
 
@@ -93,6 +96,12 @@ def process_id(
 
     data = {
         "metadata": metadata.json["metadata"],
+        "pids": {
+            "odi": {
+                "provider": "legacy",
+                "identifier": input_file.stem,
+            },
+        },
         "files": {"enabled": bool(file_paths)},
         "access": {
             "files": file_access,
@@ -114,6 +123,19 @@ def process_id(
             identity=system_identity,
             do_publish=False,
         )
+
+    except ValidationErrorWithMessageAsList:
+        pid = PersistentIdentifier.get(pid_type="odi", pid_value=input_file.stem)
+
+        try:
+            tmp_draft = records_service.draft_cls.get_record(pid.object_uuid)
+            draft = records_service.edit(system_identity, tmp_draft.pid.pid_value)
+        except NoResultFound:
+            record = records_service.record_cls.get_record(pid.object_uuid)
+            draft = records_service.edit(system_identity, record.pid.pid_value)
+
+        records_service.update_draft(system_identity, draft.id, data)
+
     except Exception as error:
         secho(f"error: {error} process_id input_file: {input_file}", fg="red")
         raise error from error

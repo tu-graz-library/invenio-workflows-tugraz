@@ -96,6 +96,7 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIER_PROVIDERS = [
     ExternalPIDProvider("pure", "pure", label="Pure ID"),
     CMSPIDProvider(),
     VerbundPIDProvider(),
+    ExternalPIDProvider("legacy", pid_type="odi", label=_("ODI")),
 ]
 """A list of configured persistent identifier providers for Marc21."""
 
@@ -114,6 +115,11 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
         "providers": ["verbund"],
         "required": False,
         "label": "AC",
+    },
+    "odi": {  # openlib diglib identifier
+        "providers": ["legacy"],
+        "required": False,
+        "label": _("ODI"),
     },
 }
 """The configured persistent identifiers for records for marc21."""
