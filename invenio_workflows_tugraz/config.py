@@ -29,7 +29,7 @@ from .theses import (
     theses_update_aggregator,
     theses_update_func,
 )
-from .theses.pids.providers import CMSPIDProvider
+from .theses.pids.providers import CMSPIDProvider, VerbundPIDProvider
 
 WORKFLOWS_ALMA_REPOSITORY_RECORDS_IMPORT_FUNCS = {
     "theses": theses_import_from_alma_func,
@@ -95,6 +95,7 @@ The values are added to the LOM_PERSISTENT_IDENTIFIERS dict.
 WORKFLOWS_MARC21_PERSISTENT_IDENTIFIER_PROVIDERS = [
     ExternalPIDProvider("pure", "pure", label="Pure ID"),
     CMSPIDProvider(),
+    VerbundPIDProvider(),
 ]
 """A list of configured persistent identifier providers for Marc21."""
 
@@ -108,6 +109,11 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
         "providers": ["cms"],
         "required": False,
         "label": "CMS",
+    },
+    "ac": {
+        "providers": ["verbund"],
+        "required": False,
+        "label": "AC",
     },
 }
 """The configured persistent identifiers for records for marc21."""

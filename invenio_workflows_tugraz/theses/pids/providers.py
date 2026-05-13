@@ -36,3 +36,27 @@ class CMSPIDProvider(PIDProvider):
     def is_enabled(cls, _: Flask) -> bool:
         """Determine if verbund is enabled or not."""
         return True
+
+
+class VerbundPIDProvider(PIDProvider):
+    """Verbund id PID Provider."""
+
+    name = "verbund"
+
+    def __init__(self) -> None:
+        """Construct."""
+        super().__init__(
+            "verbund",
+            pid_type="ac",
+            label="Verbund ID",
+        )
+
+    def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str:
+        """Generate an identifier value."""
+        metadata = Marc21Metadata(json=record.metadata)
+        return metadata.get_value("009")
+
+    @classmethod
+    def is_enabled(cls, _: Flask) -> bool:
+        """Determine if verbund is enabled or not."""
+        return True

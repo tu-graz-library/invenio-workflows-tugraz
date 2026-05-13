@@ -19,7 +19,7 @@ from invenio_records_marc21.proxies import current_records_marc21
 from invenio_records_marc21.records import Marc21Draft, Marc21Record
 from invenio_records_marc21.services.record.metadata import Marc21Metadata
 
-from ..pids.providers import CMSPIDProvider
+from ..pids.providers import CMSPIDProvider, VerbundPIDProvider
 
 
 @shared_task(ignore_result=True)
@@ -33,6 +33,7 @@ def update_pids(recid: str) -> None:
     pids: list[tuple[PersistentIdentifier, str] | tuple[None, None]] = []
 
     pids.append(update_pids_cms(record))
+    pids.append(update_pids_ac(record))
 
     update_record(record, pids)
     db.session.commit()
@@ -54,6 +55,30 @@ def update_pids_cms(
     try:
         pid_value = metadata.get_field("995...a")["subfields"]["a"][0]
     except (AttributeError, IndexError, TypeError):
+        return None, None
+
+    try:
+        pid = provider.create(record=record, pid_value=pid_value)
+    except PIDAlreadyExists as error:
+        pid = PersistentIdentifier.get(error.pid_type, error.pid_value)
+
+    return pid, provider.name
+
+
+def update_pids_ac(
+    record: Marc21Record | Marc21Draft,
+) -> tuple[PersistentIdentifier, str] | tuple[None, None]:
+    """Update pids."""
+    if record.is_deleted:
+        return None, None
+
+    provider: VerbundPIDProvider = (
+        current_records_marc21.records_service.config.pids_providers["ac"]["verbund"]
+    )
+    metadata = Marc21Metadata(json=record.metadata)
+    pid_value = metadata.get_value("009")
+
+    if not pid_value:
         return None, None
 
     try:

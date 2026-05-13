@@ -23,16 +23,13 @@ from invenio_campusonline.utils import extract_embargo_range
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_rdm_records.services.errors import ValidationErrorWithMessageAsList
 from invenio_records_marc21 import (
-    DuplicateRecordError,
     Marc21Metadata,
     MarcDraftProvider,
-    check_about_duplicate,
     convert_json_to_marc21xml,
     convert_marc21xml_to_json,
     create_record,
     current_records_marc21,
 )
-from invenio_records_marc21.services.record.types import ACNumber
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
 from opensearchpy.exceptions import RequestError
@@ -91,6 +88,7 @@ def theses_import_from_alma_func(
     if not alma_service:
         msg = "ERROR: alma_service for import_from_alma_func not set."
         raise RuntimeError(msg)
+
     marc21_service = current_records_marc21.records_service
 
     if marcid:
@@ -99,11 +97,6 @@ def theses_import_from_alma_func(
     if embargo and not validate_date(embargo):
         msg = f"NotValidEmbargo search_value: {ac_number}, embargo: {embargo}"
         raise RuntimeError(msg)
-
-    try:
-        check_about_duplicate(ACNumber(ac_number))
-    except DuplicateRecordError as error:
-        raise RuntimeError(str(error)) from error
 
     try:
         metadata = alma_service.get_record(ac_number)[0]
@@ -130,8 +123,16 @@ def theses_import_from_alma_func(
             "reason": None,
         }
 
+    data.setdefault("pids", {})["ac"] = {
+        "provider": "verbund",
+        "identifier": ac_number,
+    }
+
     try:
         record = create_record(marc21_service, data, [file_path], identity)
+    except ValidationErrorWithMessageAsList as error:
+        msg = f"WARNING: Duplication error ac_number: {ac_number}, error: {error.messages}"
+        raise RuntimeError(msg) from error
     except StaleDataError as error:
         msg = f"ERROR: StaleDataError search_value: {ac_number}"
         raise RuntimeError(msg) from error
@@ -321,11 +322,18 @@ def theses_update_func(
         raise RuntimeError(msg)
 
     data["metadata"] = alma_marc21_record.json["metadata"]
+    data.setdefault("pids", {})["ac"] = {
+        "provider": "verbund",
+        "identifier": ac_field,
+    }
 
     try:
         marc21_service.edit(id_=marc_id, identity=identity)
         marc21_service.update_draft(id_=marc_id, identity=identity, data=data)
         marc21_service.publish(id_=marc_id, identity=identity)
+    except ValidationErrorWithMessageAsList as error:
+        msg = f"WARNING: Duplication error cms_id: {cms_id}, error: {error.messages}"
+        raise RuntimeError(msg) from error
     except ValidationError as error:
         msg = f"ValidationError cms_id: {cms_id}, error: {error}"
         raise RuntimeError(msg) from error
