@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2023 Graz University of Technology.
+# Copyright (C) 2023-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -46,12 +46,12 @@ def pass_record_from_pid(f: Callable) -> Callable:
         hits = hits.to_dict()
 
         try:
-            record = current_records_marc21.records_service.read_draft(
+            record = current_records_marc21.records_service.read(
                 id_=hits["id"],
                 identity=g.identity,
             )
         except (PIDDoesNotExistError, NoResultFound):
-            record = current_records_marc21.records_service.read(
+            record = current_records_marc21.records_service.read_draft(
                 id_=hits["id"],
                 identity=g.identity,
             )
