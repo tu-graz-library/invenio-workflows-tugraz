@@ -8,6 +8,7 @@
 
 """Configuration file."""
 
+from idutils import is_doi, normalize_doi
 from invenio_i18n import gettext as _
 from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
 
@@ -19,6 +20,7 @@ from .openaccess import (
     openaccess_mark_as_exported_aggregator,
     openaccess_update_status_in_pure,
 )
+from .publisher.pids.providers import PublisherDataCitePIDProvider
 from .teachcenter import teachcenter_import_func
 from .theses import (
     theses_create_aggregator,
@@ -96,6 +98,7 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIER_PROVIDERS = [
     ExternalPIDProvider("pure", "pure", label="Pure ID"),
     CMSPIDProvider(),
     VerbundPIDProvider(),
+    PublisherDataCitePIDProvider(),
     ExternalPIDProvider("legacy", pid_type="odi", label=_("ODI")),
 ]
 """A list of configured persistent identifier providers for Marc21."""
@@ -120,6 +123,13 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
         "providers": ["legacy"],
         "required": False,
         "label": _("ODI"),
+    },
+    "publ": {  # publisher
+        "providers": ["datacite", "external"],
+        "required": False,
+        "label": _("DOI"),
+        "validator": is_doi,
+        "normalizer": normalize_doi,
     },
 }
 """The configured persistent identifiers for records for marc21."""
