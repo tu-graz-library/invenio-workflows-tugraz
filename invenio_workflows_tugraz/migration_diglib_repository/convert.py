@@ -189,7 +189,7 @@ class MabToMarc21(Visitor):
     def visit_405(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
 
-    def visit_406(self, field: Field, record: Marc21Metadata) -> None:
+    def visit_406(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
         for subf in field.subfs:
             if subf.subfn == "j":
@@ -198,7 +198,7 @@ class MabToMarc21(Visitor):
     def visit_410(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
 
-    def visit_412(self, field: Field, record: Marc21Metadata) -> None:
+    def visit_412(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
         # todo: check if this mapping is correct
         self.publisher = field.subfs[0].subfv
