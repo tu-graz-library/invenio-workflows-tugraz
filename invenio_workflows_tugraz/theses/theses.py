@@ -154,7 +154,7 @@ def theses_import_from_cms_func(
 
     try:
         thesis = cms_service.get_metadata(identity, cms_id)
-        file_path = cms_service.download_file(identity, cms_id)
+        file_path = Path(cms_service.download_file(identity, cms_id))
     except CampusOnlineRESTError as error:
         msg = f"ERROR: CampusOnlineRESTError cms_id: {cms_id}, msg: {error}"
         raise RuntimeError(msg) from error
