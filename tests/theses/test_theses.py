@@ -630,6 +630,21 @@ def test_import_from_cms_func(
         "status": "embargoed",
     }
     assert draft.data["metadata"] == expected_in_database
+    assert "cms" in draft.data["pids"]
+    assert draft.data["pids"]["cms"]["identifier"] == "77777"
+    assert draft.data["pids"]["cms"]["provider"] == "cms"
+
+    with pytest.raises(
+        RuntimeError,
+        match=escape(
+            "WARNING: Duplication error cms_id: 77777, error: [{'field': 'pids.cms', 'messages': [l'cms:77777 already exists.']}]",
+        ),
+    ):
+        theses_import_from_cms_func(
+            system_identity,
+            "77777",
+            cast(CampusOnlineRESTService, cms_service),
+        )
 
 
 @pytest.mark.parametrize(
