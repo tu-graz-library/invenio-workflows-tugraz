@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2023-2025 Graz University of Technology.
+# Copyright (C) 2023-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -8,10 +8,14 @@
 
 """Module test theses."""
 
+from abc import ABC, abstractmethod
+from collections.abc import Callable
 from io import BytesIO
 from json import load
 from pathlib import Path
+from re import escape
 from shutil import copyfileobj
+from typing import cast
 from xml.etree.ElementTree import Element, fromstring, parse
 
 import pytest
@@ -20,9 +24,12 @@ from decorator import decorator
 from flask import Flask
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
+from invenio_alma import AlmaSRUService
+from invenio_campusonline import CampusOnlineRESTService
 from invenio_campusonline.types import CampusOnlineID, FilePath
 from invenio_records_marc21 import Marc21Metadata
 from invenio_records_marc21.proxies import current_records_marc21
+from invenio_records_resources.services.records.results import RecordItem
 from invenio_records_resources.services.uow import UnitOfWork
 
 from invenio_workflows_tugraz.proxies import current_workflows_tugraz
@@ -33,10 +40,10 @@ from invenio_workflows_tugraz.theses.theses import (
 )
 
 
-def load_as_json(func: callable) -> any:
+def load_as_json[T](func: Callable[..., T]) -> Callable:
     """Decorat to load content of file as dictionary from a json file."""
 
-    def wrapper(*args: dict, **__: dict) -> any:
+    def wrapper(*args: dict, **__: dict) -> T:
         parent = Path(__file__).parent
         tree = parse(Path(f"{parent}/data/{args[1]}.xml"))  # noqa: S314
         xpath = "{http://www.campusonline.at/thesisservice/basetypes}thesis"
@@ -49,20 +56,36 @@ def load_as_json(func: callable) -> any:
     return decorator(wrapper, func)
 
 
-class BaseMockRecordService:
+class BaseMockRecordItem:
+    """Mock RecordItem."""
+
+    @property
+    def data(self) -> dict:
+        """Mock data."""
+        return {
+            "metadata": {},
+            "access": {},
+        }
+
+
+class BaseMockRecordService(ABC):
     """Mock RecordsService class."""
 
-    def read_draft(self, id_: str, identity: Identity) -> dict:
+    def read_draft(self, id_: str, identity: Identity) -> RecordItem:  # noqa: ARG002
         """Mock read_draft."""
+        return cast(RecordItem, BaseMockRecordItem())
 
-    def edit(self, id_: str, identity: Identity) -> None:
+    def edit(self, id_: str, identity: Identity) -> RecordItem:  # noqa: ARG002
         """Mock edit."""
+        return cast(RecordItem, BaseMockRecordItem())
 
-    def update_draft(self, id_: str, identity: Identity, data: dict) -> None:
+    @abstractmethod
+    def update_draft(self, id_: str, identity: Identity, data: dict) -> RecordItem:
         """Mock update draft."""
 
-    def publish(self, id_: str, identity: Identity) -> None:
+    def publish(self, id_: str, identity: Identity) -> RecordItem:  # noqa: ARG002
         """Mock publish."""
+        return cast(RecordItem, BaseMockRecordItem())
 
 
 class BaseMockThesesService:
@@ -73,7 +96,7 @@ class BaseMockThesesService:
         identity: Identity,
         id_: str,
         state: str,
-        uow: UnitOfWork = None,
+        uow: UnitOfWork | None = None,
     ) -> None:
         """Mock set state."""
 
@@ -82,15 +105,16 @@ class BaseMockThesesService:
         _: Identity,
         id_: str,
         cms_id: str,
-        uow: UnitOfWork = None,
+        uow: UnitOfWork | None = None,
     ) -> None:
         """Create."""
 
 
-class BaseMockAlmaService:
+class BaseMockAlmaService(ABC):
     """Mock AlmaService class."""
 
-    def get_record(self, cms_id: str, search_key: str) -> list[str]:
+    @abstractmethod
+    def get_record(self, cms_id: str, search_key: str) -> list[Element]:
         """Get record."""
 
 
@@ -202,7 +226,7 @@ def test_update_func_keep_restricted_file_access(
 ) -> None:
     """Test update func."""
 
-    class MockRecordItem:
+    class MockRecordItem(BaseMockRecordItem):
         """Mock RecordItem class."""
 
         @property
@@ -213,19 +237,29 @@ def test_update_func_keep_restricted_file_access(
     class MockRecordsService(BaseMockRecordService):
         """Mock RecordsService class."""
 
-        def read_draft(self, *_: tuple, **__: dict) -> dict:
+        def read_draft(
+            self,
+            id_: str,  # noqa: ARG002
+            identity: Identity,  # noqa: ARG002
+        ) -> RecordItem:
             """Mock read_draft."""
-            return MockRecordItem()
+            return cast(RecordItem, MockRecordItem())
 
-        def update_draft(self, data: dict, *_: dict, **__: dict) -> None:
+        def update_draft(
+            self,
+            id_: str,  # noqa: ARG002
+            identity: Identity,  # noqa: ARG002
+            data: dict,
+        ) -> RecordItem:
             """Mock update draft."""
             assert data["access"]["record"] == "public"
             assert data["access"]["files"] == file_access
+            return cast(RecordItem, MockRecordItem())
 
     class MockAlmaService(BaseMockAlmaService):
         """Mock AlmaService class."""
 
-        def get_record(self, *_: tuple, **__: dict) -> list[str]:
+        def get_record(self, _1: str, _2: str) -> list[Element]:
             doc = fromstring(embargoed_record_xml)  # noqa: S314
             return [doc]
 
@@ -235,7 +269,12 @@ def test_update_func_keep_restricted_file_access(
     current_workflows_tugraz.theses_service = BaseMockThesesService()
     alma_service = MockAlmaService()
 
-    theses_update_func(system_identity, "aiekd-23382", "77777", alma_service)
+    theses_update_func(
+        system_identity,
+        "aiekd-23382",
+        "77777",
+        cast(AlmaSRUService, alma_service),
+    )
 
     current_records_marc21.records_service = backup_records_services
 
@@ -304,32 +343,26 @@ def test_update_func_metadata(
 ) -> None:
     """Test update func."""
 
-    class MockRecordItem:
+    class MockRecordItem(BaseMockRecordItem):
         """Mock RecordItem class."""
-
-        @property
-        def data(self) -> dict:
-            """Mock data."""
-            return {
-                "metadata": {},
-                "access": {},
-            }
 
     class MockRecordsService(BaseMockRecordService):
         """Mock RecordsService class."""
 
-        def read_draft(self, *_: tuple, **__: dict) -> dict:
-            """Mock read_draft."""
-            return MockRecordItem()
-
-        def update_draft(self, data: dict, *_: dict, **__: dict) -> None:
+        def update_draft(
+            self,
+            id_: str,  # noqa: ARG002
+            identity: Identity,  # noqa: ARG002
+            data: dict,
+        ) -> RecordItem:
             """Mock update draft."""
             assert data["metadata"] == metadata_expected_in_database["metadata"]
+            return cast(RecordItem, MockRecordItem())
 
     class MockAlmaService(BaseMockAlmaService):
         """Mock AlmaService class."""
 
-        def get_record(self, *_: tuple, **__: dict) -> list[str]:
+        def get_record(self, _1: str, _2: str) -> list[Element]:
             doc = fromstring(metadata_from_alma)  # noqa: S314
             return [doc]
 
@@ -339,7 +372,12 @@ def test_update_func_metadata(
     current_workflows_tugraz.theses_service = BaseMockThesesService()
     alma_service = MockAlmaService()
 
-    theses_update_func(system_identity, "aiekd-23382", "77777", alma_service)
+    theses_update_func(
+        system_identity,
+        "aiekd-23382",
+        "77777",
+        cast(AlmaSRUService, alma_service),
+    )
 
     current_records_marc21.records_service = backup_records_services
 
@@ -575,7 +613,11 @@ def test_import_from_cms_func(
 
     cms_service = MockCampusOnlineService()
 
-    draft = theses_import_from_cms_func(system_identity, "77777", cms_service)
+    draft = theses_import_from_cms_func(
+        system_identity,
+        "77777",
+        cast(CampusOnlineRESTService, cms_service),
+    )
 
     assert draft.data["access"] == {
         "embargo": {
@@ -595,7 +637,7 @@ def test_import_from_cms_func(
     [("empty_test", "empty_expected")],
 )
 @load_as_json
-def test_convert(test: dict, expected: dict) -> None:
+def test_convert(test: Element, expected: Element) -> None:
     """Test theses convert."""
     record = Marc21Metadata()
     visitor = CampusOnlineToMarc21(record)
