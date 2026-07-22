@@ -230,6 +230,10 @@ class MabToMarc21(Visitor):
 
     def visit_552(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
+        record.add_datafield(
+            "024...a",
+            subfs={"a": field.subfs[0].subfv, "q": "tugraz-publisher"},
+        )
 
     def visit_580(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
