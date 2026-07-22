@@ -157,6 +157,7 @@ def process_id(
             file_access,
         )
 
+    # TODO: set the custom publisher doi in pidstore_pid to registered, then the publish should update the url automatically
     sleep(1)
     record = records_service.publish(system_identity, draft.id)
     return record.id
