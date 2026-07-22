@@ -36,10 +36,11 @@ class PublisherDataCitePIDProvider(Marc21DataCitePIDProvider):
     def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str | None:
         """Generate an identifier value."""
         metadata = Marc21Metadata(json=record.metadata)
-        if not metadata.exists_field("024", "7", "_", "q", "tugraz-publisher"):
-            return None
         identifier_field = metadata.get_field("024.7..q", subf_value="tugraz-publisher")
-        return identifier_field["subfields"]["a"][0]
+        if identifier_field is None:
+            return None
+
+        return identifier_field.get("a")
 
     @classmethod
     def is_enabled(cls, _: Flask | None = None) -> bool:
