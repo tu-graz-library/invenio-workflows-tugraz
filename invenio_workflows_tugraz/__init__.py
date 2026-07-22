@@ -11,7 +11,7 @@
 from .ext import InvenioWorkflowsTugraz
 from .proxies import current_workflows_tugraz
 
-__version__ = "0.13.0"
+__version__ = "0.14.0"
 
 __all__ = (
     "InvenioWorkflowsTugraz",

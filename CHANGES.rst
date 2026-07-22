@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version v0.14.0 (released 2026-07-22)
+
+- feat(publisher): use conditional provider
+- fix(publisher): wrong doi provider used
+- refactor(publisher): simplify code
+- chore(migration): add TODO
+- fix(migration): use 024 doi field
+- chore(typing): improve types
+
 Version v0.13.0 (released 2026-07-02)
 
 - chore(theses): test duplicate pids feature
