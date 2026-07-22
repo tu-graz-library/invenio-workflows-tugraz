@@ -126,7 +126,8 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
     },
     "publ": {  # publisher
         "providers": ["grazpubl"],
-        "required": False,
+        "required": True,
+        "condition": PublisherDataCitePIDProvider.condition,
         "label": _("DOI"),
         "validator": is_doi,
         "normalizer": normalize_doi,

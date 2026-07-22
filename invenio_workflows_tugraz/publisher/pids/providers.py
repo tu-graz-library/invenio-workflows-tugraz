@@ -46,3 +46,25 @@ class PublisherDataCitePIDProvider(Marc21DataCitePIDProvider):
     def is_enabled(cls, _: Flask | None = None) -> bool:
         """Determine if verbund is enabled or not."""
         return True
+
+    @classmethod
+    def condition(cls, record: Marc21Draft | Marc21Record) -> bool:
+        """If the field exists don't remove it, otherwise remove it.
+
+        Intuitive it could be strange, but since required has to be
+        set to True, the provider is used every time, but NOT if the
+        condition doesn't hold. So if the field exists it stays in
+        required_schemes otherwise it is removed.
+
+        This text refers to the behavior of the create and publish
+        methods in
+        invenio_records_marc21.services.components.pids.PIDsComponent.
+
+        """
+        metadata = Marc21Metadata(json=record.metadata)
+        return metadata.exists_field(
+            "024",
+            "7",
+            subf_code="q",
+            subf_value="tugraz-publisher",
+        )

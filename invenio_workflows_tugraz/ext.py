@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -12,6 +12,7 @@ from flask import Flask
 
 from . import config
 from .openaccess import WorkflowOpenaccessService, WorkflowOpenaccessServiceConfig
+from .publisher.pids.providers import PublisherDataCitePIDProvider
 from .theses import WorkflowThesesService, WorkflowThesesServiceConfig
 
 
@@ -65,3 +66,10 @@ class InvenioWorkflowsTugraz:
 
         openaccess_config = WorkflowOpenaccessServiceConfig.build(app)
         self.openaccess_service = WorkflowOpenaccessService(config=openaccess_config)
+
+
+def finalize_app(app: Flask) -> None:
+    """Finalize app."""
+    app.config["MARC21_PERSISTENT_IDENTIFIERS"]["doi"]["condition"] = (
+        lambda record: not PublisherDataCitePIDProvider.condition(record)
+    )
