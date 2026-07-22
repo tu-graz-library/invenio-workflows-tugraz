@@ -125,7 +125,7 @@ WORKFLOWS_MARC21_PERSISTENT_IDENTIFIERS = {
         "label": _("ODI"),
     },
     "publ": {  # publisher
-        "providers": ["datacite", "external"],
+        "providers": ["grazpubl"],
         "required": False,
         "label": _("DOI"),
         "validator": is_doi,

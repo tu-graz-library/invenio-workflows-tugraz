@@ -26,7 +26,7 @@ class PublisherDataCitePIDProvider(Marc21DataCitePIDProvider):
     def __init__(self) -> None:
         """Construct."""
         super().__init__(
-            "publisher",
+            "grazpubl",
             client=DataCiteClient("datacite", config_prefix="DATACITE"),  # type: ignore[no-untyped-call]
             pid_type="publ",  # publisher
             serializer=Marc21DataCite43JSONSerializer(),
