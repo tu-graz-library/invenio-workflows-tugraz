@@ -29,7 +29,7 @@ class PublisherDataCitePIDProvider(Marc21DataCitePIDProvider):
             "publisher",
             client=DataCiteClient("datacite", config_prefix="DATACITE"),  # type: ignore[no-untyped-call]
             pid_type="publ",  # publisher
-            serializer=Marc21DataCite43JSONSerializer(),  # type: ignore[no-untyped-call]
+            serializer=Marc21DataCite43JSONSerializer(),
             label="DOI",
         )
 
@@ -42,6 +42,6 @@ class PublisherDataCitePIDProvider(Marc21DataCitePIDProvider):
         return identifier_field["subfields"]["a"][0]
 
     @classmethod
-    def is_enabled(cls, _: Flask) -> bool:
+    def is_enabled(cls, _: Flask | None = None) -> bool:
         """Determine if verbund is enabled or not."""
         return True

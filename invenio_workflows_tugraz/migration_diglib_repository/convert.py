@@ -42,9 +42,9 @@ class Field:
 
     def __init__(self, node: Element) -> None:
         """Construct."""
-        self.fien = cast(Element, node.find("fien")).attrib["val"]
-        self.ind = cast(Element, node.find("ind")).attrib["val"]
-        self.subfs = [Subf(subf) for subf in node.findall("subf")]
+        self.fien: str = cast(Element, node.find("fien")).attrib["val"]
+        self.ind: str = cast(Element, node.find("ind")).attrib["val"]
+        self.subfs: list[Subf] = [Subf(subf) for subf in node.findall("subf")]
 
     def __lt__(self, other: int) -> bool:
         """Less than."""

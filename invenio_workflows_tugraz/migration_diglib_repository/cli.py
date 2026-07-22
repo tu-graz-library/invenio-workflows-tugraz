@@ -26,8 +26,6 @@ from sqlalchemy.exc import NoResultFound
 from .convert import MabToMarc21
 
 type PID = str
-type DirectoryName = str
-type UbtugIds = list[str]
 
 
 def wait() -> None:
