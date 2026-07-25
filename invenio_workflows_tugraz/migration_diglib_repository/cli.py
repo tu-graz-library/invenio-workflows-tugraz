@@ -38,7 +38,7 @@ def wait() -> None:
             response = input("Please answer 'yes' or 'no': ")
 
 
-def process_id(
+def process_id(  # noqa: PLR0917
     input_file: Path,
     directory_files: Path,
     directory_ids: Path,
