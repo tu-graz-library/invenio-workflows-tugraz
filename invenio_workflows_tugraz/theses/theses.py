@@ -71,7 +71,7 @@ def theses_update_aggregator() -> list[tuple[str, str]]:
     return theses_service.get_ready_to(system_identity, state="update_in_repo")
 
 
-def theses_import_from_alma_func(
+def theses_import_from_alma_func(  # noqa: PLR0917
     identity: Identity,
     ac_number: str,
     file_path: str,
