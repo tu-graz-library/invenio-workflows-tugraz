@@ -159,6 +159,7 @@ def process_id(  # noqa: PLR0917
 
     # TODO: set the custom publisher doi in pidstore_pid to registered, then the publish should update the url automatically
     sleep(1)
+
     record = records_service.publish(system_identity, draft.id)
     return record.id
 
@@ -179,12 +180,24 @@ def migration_group() -> None:
     "--directory-ids",
     type=ClickPath(file_okay=False, dir_okay=True, path_type=Path),
 )
+@option(
+    "--base",
+    type=ClickPath(file_okay=False, dir_okay=True, path_type=Path),
+    default=None,
+)
 def import_from_diglib(
     input_file: Path,
     directory_files: Path,
     directory_ids: Path,
+    base: Path,
 ) -> None:
     """Import from diglib."""
+    if base:
+        filename = list(base.parts)[-1]
+        input_file = base / f"{filename}.xml"
+        directory_ids = base
+        directory_files = base
+
     record_id = process_id(input_file, directory_files, directory_ids)
     secho(
         f"input_file {input_file} successfully imported to record: {record_id}",
