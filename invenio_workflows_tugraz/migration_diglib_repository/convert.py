@@ -54,6 +54,10 @@ class Field:
         """Greater than."""
         return other < int(self.fien)
 
+    def __contains__(self, subfn: str) -> bool:
+        """Contains subfn."""
+        return subfn in [subf.subfn for subf in self.subfs]
+
 
 class Visitor:
     """Visitor base class."""
@@ -95,6 +99,8 @@ class MabToMarc21(Visitor):
         _: Marc21Metadata,
         publisher: str = "N/A",
         publication_year: str = "",
+        *,
+        production: bool = False,
     ) -> None:
         """Construct."""
         super().__init__()
@@ -105,7 +111,11 @@ class MabToMarc21(Visitor):
         self.directory_name: str = ""
         self.publisher = publisher
         self.year = publication_year
+        self.production = production
         self.filename: str = ""
+        self.doi: str = ""
+        self.isbn: str = ""
+        self.ac_number: str = ""  # TODO: find out which field contains the ac_number
 
         # record.emplace_leader("07878nam a2200421 c 4500")
         # record.emplace_controlfield("007", "cr#|||||||||||")
@@ -203,9 +213,24 @@ class MabToMarc21(Visitor):
         # todo: check if this mapping is correct
         self.publisher = field.subfs[0].subfv
 
+    def visit_419(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
+
     def visit_425(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
         self.year = field.subfs[0].subfv
+
+    def visit_433(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
+
+    def visit_443(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
+
+    def visit_444(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
+
+    def visit_451(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
 
     def visit_501(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -230,10 +255,22 @@ class MabToMarc21(Visitor):
 
     def visit_552(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
+        if "-" in field:
+            # ignore deleted fields
+            return
+
         record.add_datafield(
-            "024...a",
-            subfs={"a": field.subfs[0].subfv, "q": "tugraz-publisher"},
+            "024.7..",
+            subfs={
+                "a": self.doi,
+                "q": "tugraz-publisher",
+            },
         )
+
+        # yes there exists the 540 field which contains a isbn too, but this
+        # value is the isbn of the printed version and we need the digital
+        # version
+        self.isbn = field.subfs[0].subfv.replace("10.3217/", "")
 
     def visit_580(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
