@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -28,7 +28,6 @@ def app_config(app_config: FixtureFunctionMarker) -> None:
     app_config["JSONSCHEMAS_HOST"] = "not-used"
     app_config["OAISERVER_ID_PREFIX"] = "oai:repo"
     app_config["OAUTH2SERVER_ALLOWED_URLENCODE_CHARACTERS"] = "=&;:%+~,*@!()/?'$'$"
-    app_config["CACHE_TYPE"] = "flask_caching.backends.redis"
     app_config["REST_CSRF_ENABLED"] = True
     app_config["RECORDS_REFRESOLVER_CLS"] = (
         "invenio_records.resolver.InvenioRefResolver"
