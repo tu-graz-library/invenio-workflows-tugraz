@@ -170,6 +170,8 @@ def teachcenter_import_func(  # noqa: C901 PLR0912
 
             data = draft.draft.data
             for course in draft.data.metadata.get_courses():
+                data["metadata"].setdefault("courses", [])
+
                 if course not in data["metadata"]["courses"]:
                     data["metadata"]["courses"].append(course)
 
