@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -14,6 +14,7 @@ from flask_principal import Identity
 from invenio_moodle import MoodleRESTService
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
+from invenio_rdm_records.services.errors import ValidationErrorWithMessageAsList
 from invenio_records_lom.proxies import current_records_lom
 from invenio_records_lom.services import LOMRecordService
 from invenio_records_lom.utils import LOMRecordData, create_record, update_record
@@ -113,7 +114,7 @@ def is_duplicate(draft: RecordItem, new_course_ids: list[str]) -> bool:
     return any(id_ in existing_course_ids for id_ in new_course_ids)
 
 
-def teachcenter_import_func(  # noqa: C901
+def teachcenter_import_func(  # noqa: C901 PLR0912
     identity: Identity,
     tc_record: dict,
     moodle_service: MoodleRESTService,
@@ -155,7 +156,13 @@ def teachcenter_import_func(  # noqa: C901
     match draft.status:
         case Status.NEW:
             data = draft.data
-            record = create_record(records_service, data.json, file_paths, identity)
+
+            try:
+                record = create_record(records_service, data.json, file_paths, identity)
+            except ValidationErrorWithMessageAsList as error:
+                msg = f"Validation error {error.messages}"
+                raise RuntimeError(msg) from error
+
         case Status.EDIT:
             if is_duplicate(draft.draft, visitor.course_ids):
                 msg = f"WARNING course already in record pid: {draft.pid}"
@@ -166,6 +173,10 @@ def teachcenter_import_func(  # noqa: C901
                 if course not in data["metadata"]["courses"]:
                     data["metadata"]["courses"].append(course)
 
-            record = update_record(draft.pid, records_service, data, identity)
+            try:
+                record = update_record(draft.pid, records_service, data, identity)
+            except ValidationErrorWithMessageAsList as error:
+                msg = f"Validation error {error.messages}"
+                raise RuntimeError(msg) from error
 
     return record
