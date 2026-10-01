@@ -8,6 +8,18 @@
 Changes
 =======
 
+Version v0.15.0 (released 2026-10-01)
+
+- fix(tests): remove deprecated config
+- fix(setup): add decorator dependency
+- fix(tests): add init file in all directories
+- fix(ruff): add ignore rule
+- fix(tc): handle case key not exits
+- fix(tc): handle validation exception
+- chore(migration): improve migration script
+- feat(migration): add base option
+- chore(linter): apply new ruff
+
 Version v0.14.0 (released 2026-07-22)
 
 - feat(publisher): use conditional provider
