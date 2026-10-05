@@ -6,17 +6,22 @@
 from celery import shared_task
 from collections.abc import Callable
 from dataclasses import dataclass
+from deepdiff import DeepDiff
 from flask import current_app
+from flask_resources.serializers import MarshmallowSerializer
 
 from datacite.errors import DataCiteError, DataCiteNotFoundError
 from invenio_access.permissions import system_identity
 from invenio_drafts_resources.records import Record
 from invenio_jobs.errors import TaskExecutionPartialError
 from invenio_rdm_records.records.api import RDMRecord
+from invenio_rdm_records.resources.serializers import DataCite43JSONSerializer
 from invenio_rdm_records.services import RDMRecordService
 from invenio_rdm_records.services.pids.providers import DataCiteClient
 from invenio_records_lom.records.api import LOMRecord
+from invenio_records_lom.resources.serializers import LOMToDataCite44Serializer
 from invenio_records_marc21.records.api import Marc21Record
+from invenio_records_marc21.resources.serializers import Marc21DataCite43JSONSerializer
 
 
 class TaskExecutionStatistics:
@@ -32,6 +37,8 @@ class TaskExecutionStatistics:
             "DOI REST API errors": 0,
             "restricted access (skipped)": 0,
             "DOI republished": 0,
+            "differing metadata": 0,
+            "diff: dictionary_item_removed": 0,
         }
 
     def increment(self, base_key: str, item: str | None = None) -> None:
@@ -87,6 +94,7 @@ class RecordType:
     name: str
     record_api: type[Record]
     service_api: str
+    serializer: type[MarshmallowSerializer]
     url_expected: Callable[[str], list[str]]
     statistics: TaskExecutionStatistics
 
@@ -96,6 +104,7 @@ record_types: list[RecordType] = [
         name="Publications",
         record_api=Marc21Record,
         service_api="invenio-records-marc21",
+        serializer=Marc21DataCite43JSONSerializer,
         url_expected=lambda record_id: [
             f"{current_app.config['SITE_UI_URL']}/publications/{record_id}",  # current
         ],
@@ -105,6 +114,7 @@ record_types: list[RecordType] = [
         name="Educational Resources",
         record_api=LOMRecord,
         service_api="invenio-records-lom",
+        serializer=LOMToDataCite44Serializer,
         url_expected=lambda record_id: [
             f"{current_app.config['SITE_UI_URL']}/oer/{record_id}",  # current
             f"{current_app.config['SITE_UI_URL']}/oer/doi/{current_app.config['DATACITE_PREFIX']}/{record_id}",  # legacy
@@ -115,6 +125,7 @@ record_types: list[RecordType] = [
         name="Research Results",
         record_api=RDMRecord,
         service_api="invenio-rdm-records",
+        serializer=DataCite43JSONSerializer,
         url_expected=lambda record_id: [
             f"{current_app.config['SITE_UI_URL']}/doi/{current_app.config['DATACITE_PREFIX']}/{record_id}",  # current
             f"{current_app.config['SITE_UI_URL']}/records/{record_id}",  # legacy
@@ -228,6 +239,196 @@ def reconcile_records_dois() -> None:
                 client=client,
                 statistics=statistics,
             )
+
+        statistics.log(record_type.name)
+        statistics_total.accumulate(statistics.stat)
+        statistics.reset()
+
+    if statistics_total.failure():
+        raise TaskExecutionPartialError(statistics_total.summary("Overall"))
+
+
+def query_metadata(
+    record: Record,
+    client: DataCiteClient,
+    statistics: TaskExecutionStatistics,
+) -> dict | None:
+    """Query the records metadata stored in datacite."""
+    record_id = record.data.get("id", None)
+    record_doi = record.data.get("pids", {}).get("doi", {}).get("identifier", None)
+
+    query_params = "?affiliation=true"
+
+    json_query = None
+    try:
+        json_query = client.api.get_metadata(record_doi + query_params)
+    except DataCiteError:
+        statistics.increment(base_key="DOI REST API errors", item=record_id)
+
+    return json_query
+
+
+def compare_metadata(
+    ours: dict,
+    theirs: dict,
+    statistics: TaskExecutionStatistics,
+) -> bool:
+    """Compare the records metadata stored in repository ('ours') and DataCite ('theirs').
+
+    Consider only those DataCite MetaData Properties in DeepDiff-argument 'include_paths'
+    that can actually be supplied for a DOI.
+    The two provided dictionaries contain usually more entries than those.
+
+    The DeepDiff return value is a dictionary itself that can contains following keys:
+    - type_changes:
+        - root['publicationYear'] will always be present here, because 'ours' will hold the
+          publication year as a string in the serialized record, and datacite will always
+          return an int here -> to check for a difference compare the (casted) values,
+          the presence of type changes alone does not mean that there are difference.
+    - dictionary_item_added:
+        - 'theirs' always holds all keys. The additional keys can be ignored, because their
+          absence in 'ours' means, that there are no metadata available in the record
+          that could be matched to these properties.
+    - dictionary_item_removed:
+        - Missing keys mean 'ours' holds metadata properties that aren't datacite metadata
+          properties. There may be following reasons:
+            1) Coding error on our side (e.g. misspelling of a property-name),
+          but more likely:
+            2) the DataCite metadata schema changed
+        - Removed items will be ignored in the diff, but to raise awareness, this incidence
+          will be logged.
+    - values_changed:
+        - Indicates that the metadata differ.
+    - iterable_item_removed:
+        - Indicates that the metadata differ.
+    - ... there may be further, but these are unrelated to the current use case.
+
+    General considerations:
+    As soon as there is a single difference metadata differ.
+    The actual difference in the values does not matter.
+    """
+    diff = DeepDiff(
+        t1=ours,
+        t2=theirs,
+        include_paths=[
+            "root['types']",
+            "root['titles']",
+            "root['creators']",
+            "root['publisher']",
+            "root['publicationYear']",
+            "root['schemaVersion']",
+            "root['subjects']",
+            "root['contributors']",
+            "root['language']",
+            "root['dates']",
+            "root['alternateIdentifiers']",
+            "root['relatedIdentifiers']",
+            "root['rightsList']",
+            "root['descriptions']",
+            "root['geoLocations']",
+            "root['relatedItems']",
+            "root['sizes']",
+            "root['formats']",
+            "root['fundingReferences']",
+        ],
+        ignore_order=True,
+        verbose_level=2,
+    )
+
+    # log if some of the above keys have been removed in 'theirs':
+    if "dictionary_item_removed" in diff:
+        statistics.increment(base_key="diff: dictionary_item_removed")
+
+    # values of type string changed:
+    if "values_changed" in diff:
+        if "root['language']" in diff["values_changed"]:
+            # datacite seems to perform some kind of mapping of language keys,
+            # for example sending "eng" will be stored as "en"
+            # hence check whether the first two letters match
+            old_value = diff["values_changed"]["root['language']"]["old_value"]
+            new_value = diff["values_changed"]["root['language']"]["new_value"]
+            if old_value[:2] != new_value[:2]:
+                return True
+
+        else:
+            return True
+
+    # values of type list or dict changed:
+    if "iterable_item_removed" in diff:
+        return True
+
+    # analyze the type changes:
+    if "type_changes" in diff:
+        for item in diff["type_changes"]:
+            # In 'ours' the deepest-level value type is str.
+            # example: "root['publicationYear']": {
+            #                   'old_type': <class 'str'>,
+            #                   'new_type': <class 'int'>,
+            #                   'old_value': '2024',
+            #                   'new_value': 2024}
+            #                   }
+            if diff["type_changes"][item]["old_value"] != str(
+                diff["type_changes"][item]["new_value"],
+            ):
+                return True
+
+    return False
+
+
+@shared_task
+def update_metadata_in_datacite() -> None:
+    """Update record metadata of in DataCite, when differing to repository metadata."""
+    client = DataCiteClient("datacite")
+
+    statistics_total = TaskExecutionStatistics()
+
+    for record_type in record_types:
+        records = record_type.record_api.model_cls.query.all()
+
+        statistics = record_type.statistics
+        statistics.stat["total number"] = len(records)
+
+        for record in records:
+            record_id = record.data.get("id", None)
+            record_doi = (
+                record.data.get("pids", {}).get("doi", {}).get("identifier", None)
+            )
+
+            if record_doi is None or record_doi == "":
+                continue
+            statistics.increment(base_key="a DOI")
+
+            if restricted_access_record(record):
+                statistics.increment(base_key="restricted access (skipped)")
+                continue
+
+            # record metadata from datacite serializer
+            serialized_record = record_type.serializer().dump_obj(record.json)
+
+            # datacite metadata
+            if (
+                json_remote := query_metadata(
+                    record=record,
+                    client=client,
+                    statistics=statistics,
+                )
+            ) is None:
+                continue
+
+            # compare and update metadata in datacite if indicated
+            if compare_metadata(
+                ours=serialized_record,
+                theirs=json_remote,
+                statistics=statistics,
+            ):
+                statistics.increment(base_key="differing metadata", item=record_id)
+                current_app.extensions[
+                    record_type.service_api
+                ].records_service.pids.register_or_update(
+                    id_=record_id,
+                    identity=system_identity,
+                    scheme="doi",
+                )
 
         statistics.log(record_type.name)
         statistics_total.accumulate(statistics.stat)

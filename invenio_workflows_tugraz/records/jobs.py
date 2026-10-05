@@ -8,7 +8,7 @@ from invenio_jobs.jobs import JobType, PredefinedArgsSchema
 
 from marshmallow import fields
 
-from .tasks import reconcile_records_dois
+from .tasks import reconcile_records_dois, update_metadata_in_datacite
 
 
 class RecordsPredefinedArgsSchema(PredefinedArgsSchema):
@@ -29,3 +29,13 @@ class ReconcileRecordsDOIsJob(JobType):
     id = "reconcile_records_dois"
     task = reconcile_records_dois
     title = _("Reconcile Record URLs in DataCite")
+
+
+class UpdateMetadataDataCiteJob(JobType):
+    """Job for updating record metadata in datacite with the ones from repository."""
+
+    arguments_schema = RecordsPredefinedArgsSchema
+    description = _("Update Record Metadata in DataCite.")
+    id = "update_metadata_in_datacite"
+    task = update_metadata_in_datacite
+    title = _("Update Record Metadata in DataCite")

@@ -21,6 +21,7 @@ dependencies = [
   "invenio-pure>=0.1.1",
   "invenio-records-lom>=0.20.0",
   "invenio-records-marc21>=0.28.0",
+  "deepdiff>=9.1.0",
 ]
 dynamic = ["version"]
 python_requires = ">=3.14"
@@ -62,6 +63,7 @@ messages = "invenio_workflows_tugraz"
 theses_status_arch = "invenio_workflows_tugraz.theses.jobs:StatusArchJob"
 theses_status_pub = "invenio_workflows_tugraz.theses.jobs:StatusPubJob"
 records_validate_dois = "invenio_workflows_tugraz.records.jobs:ReconcileRecordsDOIsJob"
+update_records_metadata_in_datacite = "invenio_workflows_tugraz.records.jobs:UpdateMetadataDataCiteJob"
 
 [project.optional-dependencies]
 tests = [
