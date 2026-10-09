@@ -259,6 +259,8 @@ class MabToMarc21(Visitor):
             # ignore deleted fields
             return
 
+        self.doi = field.subfs[0].subfv
+
         record.add_datafield(
             "024.7..",
             subfs={
