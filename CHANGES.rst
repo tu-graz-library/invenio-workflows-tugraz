@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version v0.15.1 (released 2026-10-09)
+
+- fix(migrate): forgot to set doi
+
 Version v0.15.0 (released 2026-10-01)
 
 - fix(tests): remove deprecated config
