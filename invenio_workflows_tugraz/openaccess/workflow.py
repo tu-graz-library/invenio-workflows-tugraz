@@ -22,13 +22,13 @@ from invenio_records_marc21 import (
     create_record,
     current_records_marc21,
 )
-from invenio_records_marc21.records import Marc21Draft, Marc21Record
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm.exc import StaleDataError
 
 from ..proxies import current_workflows_tugraz
+from .api import WorkflowOpenaccess
 from .convert import Pure2Marc21
 from .utils import change_to_exported, extract_files
 
@@ -40,7 +40,7 @@ def openaccess_filter() -> dict:
     }
 
 
-def openaccess_mark_as_exported_aggregator() -> list[tuple[str, str]]:
+def openaccess_mark_as_exported_aggregator() -> list[WorkflowOpenaccess]:
     """Return a list of tuple[marc21, pure_id] which should be marked as exported in pure."""
     oa_service = current_workflows_tugraz.openaccess_service
     return oa_service.get_ready_to(system_identity, state="imported_in_repo")
@@ -52,22 +52,21 @@ def openaccess_import_func(  # noqa: PLR0915
     pure_service: PureRESTService,
 ) -> RecordItem:
     """Import record from pure into the repository."""
-    marc21_service = current_records_marc21.records_service
+    records_service = current_records_marc21.records_service
     oa_service = current_workflows_tugraz.openaccess_service
     ignore_files = False
 
     try:
         # resolve record over pure_id
-        pid = PersistentIdentifier.get("pure", pure_id)
-        obj = pid.get_assigned_object(object_type="rec")
+        pid = PersistentIdentifier.get(pid_type="pure", pid_value=pure_id)
 
         try:
-            draft_model = Marc21Draft.get_record(obj)
+            tmp_draft = records_service.draft_cls.get_record(pid.object_uuid)
             # the edit is not necessary, but to get a resultitem draft this is the easiest way
-            draft = marc21_service.edit(identity=identity, id_=draft_model["id"])
+            draft = records_service.edit(identity=identity, id_=tmp_draft.pid.pid_value)
         except NoResultFound:
-            record_model = Marc21Record.get_record(obj)
-            draft = marc21_service.edit(identity=identity, id_=record_model["id"])
+            record = records_service.record_cls.get_record(pid.object_uuid)
+            draft = records_service.edit(identity=identity, id_=record.pid.pid_value)
         ignore_files = True
     except PIDDoesNotExistError:
         # not found create a record
@@ -79,7 +78,7 @@ def openaccess_import_func(  # noqa: PLR0915
             },
         }
         draft = create_record(
-            marc21_service,
+            records_service,
             data=data,
             file_paths=[],
             identity=identity,
@@ -89,31 +88,34 @@ def openaccess_import_func(  # noqa: PLR0915
     try:
         pure_record = pure_service.get_metadata(identity, pure_id)
         files = extract_files(pure_record)
-        file_paths = [pure_service.download_file(identity, file_) for file_ in files]
+        file_paths = [
+            pure_service.download_file(identity, pure_file) for pure_file in files
+        ]
     except (PureRESTError, PureRuntimeError) as error:
         # todo: delete draft
         draft.delete_draft(identity=identity, id_=draft.id)
         raise RuntimeError(str(error)) from error
 
-    marc21_record = Marc21Metadata()
+    metadata = Marc21Metadata()
     converter = Pure2Marc21()
 
     try:
-        converter.convert(pure_record, marc21_record)
+        converter.convert(pure_record, metadata)
     except KeyError as error:
         raise RuntimeError(str(error)) from error
 
     # the publisher is not included in the record information
     publisher = pure_service.get_publisher_name(identity, pure_id)
-    marc21_record.emplace_datafield("264..1.b", value=publisher)
+    metadata.emplace_datafield("264..1.b", value=publisher)
 
     # TODO merge with draft.data
     # find out how to get data from draft
-    data = draft.to_dict() | marc21_record.json
+    # why is this strange thing necessary in the first place
+    data = draft.to_dict() | metadata.json
     data["pids"]["pure"] = {"provider": "pure", "identifier": pure_id}
 
     try:
-        marc21_service.update_draft(identity, id_=draft.id, data=data)
+        records_service.update_draft(identity, id_=draft.id, data=data)
 
         # TODO:
         # there exists a problem with reupload files, this is the easiest solution for the moment
@@ -122,13 +124,13 @@ def openaccess_import_func(  # noqa: PLR0915
                 add_file_to_record(
                     marcid=draft.id,
                     file_path=file_path,
-                    file_service=marc21_service.draft_files,
+                    file_service=records_service.draft_files,
                     identity=identity,
                 )
 
         # validate the draft here so that the record could be marked as exported
         # because the publish will go through without problems
-        marc21_service.validate_draft(
+        records_service.validate_draft(
             identity,
             id_=draft.id,
             ignore_field_permissions=True,
@@ -142,7 +144,7 @@ def openaccess_import_func(  # noqa: PLR0915
 
     # since the valid import has been checked directly after creating the draft
     # the publish should work without errors.
-    record = marc21_service.publish(id_=draft.id, identity=identity)
+    record = records_service.publish(id_=draft.id, identity=identity)
 
     try:
         oa_service.create(identity, record.id, pure_id)
