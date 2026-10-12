@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version v0.15.2 (released 2026-10-12)
+
+- chore(migration): add ruff ignore rule
+- fix(migration): set publisher on alma metadata
+- chore(migration): rename bool variable with prefix
+
 Version v0.15.1 (released 2026-10-09)
 
 - fix(migrate): forgot to set doi
