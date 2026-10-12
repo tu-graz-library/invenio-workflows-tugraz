@@ -100,7 +100,7 @@ class MabToMarc21(Visitor):
         publisher: str = "N/A",
         publication_year: str = "",
         *,
-        production: bool = False,
+        is_production: bool = False,
     ) -> None:
         """Construct."""
         super().__init__()
@@ -111,7 +111,7 @@ class MabToMarc21(Visitor):
         self.directory_name: str = ""
         self.publisher = publisher
         self.year = publication_year
-        self.production = production
+        self.is_production = is_production
         self.filename: str = ""
         self.doi: str = ""
         self.isbn: str = ""
