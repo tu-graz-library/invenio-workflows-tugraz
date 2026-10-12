@@ -56,6 +56,7 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
     file_access: Literal["public", "restricted"] = "restricted",
     *,
     is_production: bool = False,
+    is_publisher: bool = False,
 ) -> PID:
     """Process id."""
     records_service = current_catalogue_marc21.records_service
@@ -70,6 +71,7 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
         publisher,
         publication_year,
         is_production=is_production,
+        is_publisher=is_publisher,
     )
 
     try:
@@ -89,12 +91,21 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
             )
             metadata = Marc21Metadata(json=convert_marc21xml_to_json(metadata_xml))
 
+            if is_publisher:
+                # the record from alma doesn't contain the $$q subfield
+                metadata.emplace_datafield("024.7..q", value="tugraz-publisher")
+
         if convert.ac_number != "":
             metadata_xml = alma_sru_service.get_record(
                 search_value=convert.isbn,
                 search_key="other_system_number",
             )
             metadata = Marc21Metadata(json=convert_marc21xml_to_json(metadata_xml))
+
+            if is_publisher:
+                # the record from alma doesn't contain the $$q subfield
+                metadata.emplace_datafield("024.7..q", value="tugraz-publisher")
+
     except AlmaAPIError:
 
         pass
@@ -192,6 +203,7 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
             convert.year,
             file_access,
             is_production=is_production,
+            is_publisher=is_publisher,
         )
 
     # TODO: set the custom publisher doi in pidstore_pid to registered, then the publish should update the url automatically
@@ -234,6 +246,7 @@ def migration_group() -> None:
     default=None,
 )
 @option("--is-production", type=BOOL, is_flag=True, default=False)
+@option("--is-publisher", type=BOOL, is_flag=True, default=False)
 def import_from_diglib(
     input_file: Path,
     directory_files: Path,
@@ -241,6 +254,7 @@ def import_from_diglib(
     base: Path,
     *,
     is_production: bool,
+    is_publisher: bool,
 ) -> None:
     """Import from diglib."""
     if base:
@@ -254,6 +268,7 @@ def import_from_diglib(
         directory_files,
         directory_ids,
         is_production=is_production,
+        is_publisher=is_publisher,
     )
     secho(
         f"input_file {input_file} successfully imported to record: {record_id}",
