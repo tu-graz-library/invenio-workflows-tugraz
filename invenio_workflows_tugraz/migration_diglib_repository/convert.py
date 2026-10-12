@@ -101,6 +101,7 @@ class MabToMarc21(Visitor):
         publication_year: str = "",
         *,
         is_production: bool = False,
+        is_publisher: bool = False,
     ) -> None:
         """Construct."""
         super().__init__()
@@ -112,6 +113,7 @@ class MabToMarc21(Visitor):
         self.publisher = publisher
         self.year = publication_year
         self.is_production = is_production
+        self.is_publisher = is_publisher
         self.filename: str = ""
         self.doi: str = ""
         self.isbn: str = ""
@@ -261,12 +263,17 @@ class MabToMarc21(Visitor):
 
         self.doi = field.subfs[0].subfv
 
+        subfs = {
+            "2": "doi",
+            "a": self.doi,
+        }
+
+        if self.is_publisher:
+            subfs["q"] = "tugraz-publisher"
+
         record.add_datafield(
             "024.7..",
-            subfs={
-                "a": self.doi,
-                "q": "tugraz-publisher",
-            },
+            subfs=subfs,
         )
 
         # yes there exists the 540 field which contains a isbn too, but this
