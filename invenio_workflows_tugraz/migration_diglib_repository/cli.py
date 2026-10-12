@@ -55,7 +55,7 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
     publication_year: str = "",
     file_access: Literal["public", "restricted"] = "restricted",
     *,
-    production: bool = False,
+    is_production: bool = False,
 ) -> PID:
     """Process id."""
     records_service = current_catalogue_marc21.records_service
@@ -65,7 +65,12 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
     root = tree.getroot()
 
     metadata = Marc21Metadata()
-    convert = MabToMarc21(metadata, publisher, publication_year, production=production)
+    convert = MabToMarc21(
+        metadata,
+        publisher,
+        publication_year,
+        is_production=is_production,
+    )
 
     try:
         convert.convert(root, metadata)
@@ -186,15 +191,15 @@ def process_id(  # noqa: C901 PLR0915 PLR0917
             convert.publisher,
             convert.year,
             file_access,
-            production=production,
+            is_production=is_production,
         )
 
     # TODO: set the custom publisher doi in pidstore_pid to registered, then the publish should update the url automatically
     sleep(1)
 
-    # do this only in production. locally please not, because otherwise testing
+    # do this only in is_production. locally please not, because otherwise testing
     # would not be possible anymore
-    if production:
+    if is_production:
         pid = PersistentIdentifier.get(pid_type="publ", pid_value=convert.doi)
         # with this hack it is possible to update the dois on datacite directly.
         # normally the pid status would be "N" which says to the provider please
@@ -248,7 +253,7 @@ def import_from_diglib(
         input_file,
         directory_files,
         directory_ids,
-        production=is_production,
+        is_production=is_production,
     )
     secho(
         f"input_file {input_file} successfully imported to record: {record_id}",
