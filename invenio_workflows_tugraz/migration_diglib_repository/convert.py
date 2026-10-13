@@ -58,6 +58,22 @@ class Field:
         """Contains subfn."""
         return subfn in [subf.subfn for subf in self.subfs]
 
+    def __getitem__(self, i: str | int) -> str:
+        """Get subfv."""
+        match i:
+            case str():
+                for subf in self.subfs:
+                    if subf.subfn == i:
+                        return subf.subfv
+
+                msg = f"i: {i} not found in field"
+                raise KeyError(msg)
+            case int():
+                return self.subfs[i].subfv
+
+        msg = f"i: {i} should have str or int type but had {type(i)} type."
+        raise KeyError(msg)
+
 
 class Visitor:
     """Visitor base class."""
@@ -598,8 +614,10 @@ class MabToMarc21(Visitor):
 
     def visit_1500(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
-        # TODO:
-        # should go into marc21 metadata
+        record.add_datafield(
+            "520.3..",
+            subfs={"a": field["t"], "l": field["l"]},
+        )
 
     def visit_1501(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -664,8 +682,14 @@ class MabToMarc21(Visitor):
 
     def visit_1701(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
-        # TODO:
-        # should go into marc21 metadata
+        record.add_datafield(
+            "540...",
+            subfs={
+                "a": field["n"],
+                "f": field["a"],
+                "u": field["u"],
+            },
+        )
 
     def visit_1702(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
