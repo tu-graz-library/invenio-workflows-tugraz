@@ -8,7 +8,8 @@
 
 """Configuration file."""
 
-from idutils import is_doi, normalize_doi
+from idutils.normalizers import normalize_doi
+from idutils.validators import is_doi
 from invenio_i18n import gettext as _
 from invenio_rdm_records.services.pids.providers import ExternalPIDProvider
 

@@ -9,7 +9,6 @@
 """Theses Workflows."""
 
 from pathlib import Path
-from typing import NamedTuple
 
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
@@ -33,12 +32,12 @@ from invenio_records_marc21 import (
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
 from opensearchpy.exceptions import RequestError
-from sqlalchemy.orm.exc import NoResultFound, StaleDataError
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm.exc import StaleDataError
 
 from ..proxies import current_workflows_tugraz
+from .api import WorkflowTheses
 from .convert import CampusOnlineToMarc21
-
-error_record = NamedTuple("ErrorRecord", ["id"])
 
 
 def theses_filter() -> ThesesFilter:
@@ -59,13 +58,13 @@ def theses_filter() -> ThesesFilter:
     return ThesesFilter(filter_)
 
 
-def theses_create_aggregator() -> list[tuple[str, str]]:
+def theses_create_aggregator() -> list[WorkflowTheses]:
     """Return list of marc21,cmsid tuple which should be created in alma."""
     theses_service = current_workflows_tugraz.theses_service
     return theses_service.get_ready_to(system_identity, state="create_in_alma")
 
 
-def theses_update_aggregator() -> list[tuple[str, str]]:
+def theses_update_aggregator() -> list[WorkflowTheses]:
     """Return a list of tuple(marc21, cms_id) which should be updated in repo."""
     theses_service = current_workflows_tugraz.theses_service
     return theses_service.get_ready_to(system_identity, state="update_in_repo")
@@ -80,7 +79,7 @@ def theses_import_from_alma_func(  # noqa: PLR0917
     marcid: str | None = None,
     alma_service: AlmaSRUService | None = None,
     **_: dict,
-) -> None:
+) -> RecordItem:
     """Process a single import by cli of a alma record by ac number.
 
     Embargo has to be YYYY-MM-DD
