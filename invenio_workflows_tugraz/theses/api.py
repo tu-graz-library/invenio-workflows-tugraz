@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -20,7 +20,7 @@ class WorkflowTheses:
 
     model_cls = WorkflowThesesMetadata
 
-    def __init__(self, model: WorkflowThesesMetadata = None) -> None:
+    def __init__(self, model: WorkflowThesesMetadata) -> None:
         """Construct WorkflowTheses."""
         self.model = model
 
@@ -32,16 +32,16 @@ class WorkflowTheses:
     @property
     def cms_id(self) -> str:
         """Get cms_id."""
-        return self.model.cms_id
+        return str(self.model.cms_id)
 
     @classmethod
-    def resolve(cls, id_: str):  # noqa: ANN206
+    def resolve(cls, id_: str) -> WorkflowTheses:
         """Get."""
         model = cls.model_cls.query.filter_by(pid=id_).one_or_none()
         return cls(model=model)
 
     @classmethod
-    def create(cls, id_: str, cms_id: str):  # noqa: ANN206
+    def create(cls, id_: str, cms_id: str) -> WorkflowTheses:
         """Create."""
         with db.session.begin_nested():
             entry = cls(model=cls.model_cls(pid=id_, cms_id=cms_id))
@@ -68,9 +68,8 @@ class WorkflowTheses:
         db.session.merge(self.model)
 
     @classmethod
-    def get_ready_to(cls, state: str) -> list:
+    def get_ready_to(cls, state: str) -> list[WorkflowTheses]:
         """Get ready to."""
-        entries = []
         if state == "archive_in_cms":
             entries = cls.model_cls.query.filter_by(
                 imported_in_repo=True,

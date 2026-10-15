@@ -19,7 +19,7 @@ from .theses import WorkflowThesesService, WorkflowThesesServiceConfig
 class InvenioWorkflowsTugraz:
     """invenio-workflows-tugraz extension."""
 
-    def __init__(self, app: Flask = None) -> None:
+    def __init__(self, app: Flask | None = None) -> None:
         """Extension initialization."""
         if app:
             self.init_app(app)

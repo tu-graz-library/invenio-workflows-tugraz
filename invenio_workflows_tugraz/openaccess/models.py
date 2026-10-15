@@ -12,7 +12,7 @@ from invenio_db import db
 from sqlalchemy import BOOLEAN
 
 
-class WorkflowOpenaccessMetadata(db.Model, db.Timestamp):
+class WorkflowOpenaccessMetadata(db.Model, db.Timestamp):  # type: ignore[name-defined, misc]
     """Workflow theses."""
 
     __tablename__ = "workflows_openaccess"

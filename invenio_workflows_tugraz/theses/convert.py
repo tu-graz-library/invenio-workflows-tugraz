@@ -8,6 +8,7 @@
 
 """Convert from CampusOnline to Marc21."""
 
+from collections.abc import Generator
 from datetime import datetime
 from operator import itemgetter
 from re import split
@@ -36,7 +37,7 @@ class Visitor:
     def process(self, node: Element, record: Marc21Metadata) -> None:
         """Execute the corresponding method to the tag name."""
 
-        def func_not_found(*_: dict, **__: dict) -> None:
+        def func_not_found(node: Element, _: Marc21Metadata) -> None:
             localname = QName(node).localname
             namespace = QName(node).namespace
             msg = f"NO visitor node: '{localname}' ns: '{namespace}'"
@@ -44,7 +45,7 @@ class Visitor:
 
         tag_name = QName(node).localname
         visit_func = getattr(self, f"visit_{tag_name}", func_not_found)
-        return visit_func(node, record)
+        visit_func(node, record)
 
     def visit(self, node: Element, record: Marc21Metadata) -> None:
         """Entry point for visitor."""
@@ -53,12 +54,12 @@ class Visitor:
 
     def visit_attr(self, node: Element, record: Marc21Metadata) -> None:
         """Run attr function."""
-        key = node.attrib["key"]
 
-        def func_not_found(*_: dict, **__: dict) -> None:
-            msg = f"NO visitor node: '{key}'"
+        def func_not_found(node: Element, _: Marc21Metadata) -> None:
+            msg = f"NO visitor node: '{node.attrib["key"]}'"
             raise ValueError(msg)
 
+        key = node.attrib["key"]
         visit_func = getattr(self, f"visit_{key}", func_not_found)
         visit_func(node, record)
 
@@ -72,7 +73,7 @@ class ThesesLocalField:
 
     def __init__(self) -> None:
         """Construct class."""
-        self.theses_local_field = {}
+        self.theses_local_field: dict = {}
 
     def add(self, key: str, value: dict) -> None:
         """Add key value pair."""
@@ -82,7 +83,7 @@ class ThesesLocalField:
         if value not in self.theses_local_field[key]:
             self.theses_local_field[key].append(value)
 
-    def items(self) -> tuple:
+    def items(self) -> Generator:
         """Return list of tuples."""
         for key, values in self.theses_local_field.items():
             for subfs in values:
@@ -95,10 +96,11 @@ class CampusOnlineToMarc21(Visitor):
     def __init__(self, record: Marc21Metadata) -> None:
         """Construct."""
         super().__init__()
-        self.author_name = "N/A"
+        self.author_name = {"fn": "", "ln": ""}
         self.state = ""
         self.metaclass_name = ""
         self.theses_local_field = ThesesLocalField()
+        self.typ = ""
 
         record.emplace_leader("07878nam a2200421 c 4500")
         record.emplace_controlfield("007", "cr#|||||||||||")
@@ -149,7 +151,7 @@ class CampusOnlineToMarc21(Visitor):
         """Visit ID."""
         record.emplace_datafield(
             "995...",
-            subfs={"i": "TUGRAZonline", "a": str(node.text), "9": "local"},
+            subfs={"i": "TUGRAZonline", "a": (node.text or ""), "9": "local"},
         )
 
     def visit_PAG(self, node: Element, record: Marc21Metadata) -> None:
@@ -179,17 +181,17 @@ class CampusOnlineToMarc21(Visitor):
     def visit_STATUSD(self, node: Element, _: Marc21Metadata) -> None:
         """Visit Status date."""
         try:
-            year = datetime.strptime(node.text, "%Y-%m-%d %H:%M:%S").year
+            year = str(datetime.strptime(node.text or "", "%Y-%m-%d %H:%M:%S").year)
         except ValueError:
             year = "JAHR"
-        self.year = str(year)
+        self.year = year
 
     def visit_ORG(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
 
     def visit_ORGP(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
-        orgp = node.text.split("&gt;")
+        orgp = (node.text or "").split("&gt;")
 
         faculty = orgp[1] if len(orgp) > 1 else ""
         institute = orgp[2] if len(orgp) > 2 else ""  # noqa: PLR2004
@@ -212,7 +214,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_TYP(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
         if self.state == "metaobj":
-            self.typ = node.text
+            self.typ = node.text or ""
             return
 
         record.emplace_datafield(
@@ -262,7 +264,7 @@ class CampusOnlineToMarc21(Visitor):
     def visit_OLANG(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
         self.object_language = node.text
-        record.emplace_datafield("041...a", value=language_decode(node.text))
+        record.emplace_datafield("041...a", value=language_decode(node.text or ""))
 
     def visit_TLANGS(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -276,7 +278,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_name(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
-        self.metaclass_name = node.text
+        self.metaclass_name = node.text or ""
 
     def visit_metaobj(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -318,11 +320,11 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_FN(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
-        self.name["fn"] = node.text
+        self.name["fn"] = node.text or ""
 
     def visit_LN(self, node: Element, _: Marc21Metadata) -> None:
         """Visit ."""
-        self.name["ln"] = node.text
+        self.name["ln"] = node.text or ""
 
     def visit_FNLN(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
@@ -347,7 +349,7 @@ class CampusOnlineToMarc21(Visitor):
 
     def visit_TIT(self, node: Element, record: Marc21Metadata) -> None:
         """Visit ."""
-        text = node.text.replace("\n", " ")
+        text = (node.text or "").replace("\n", " ")
         author = f"{self.author_name['fn']} {self.author_name['ln']}"
 
         if self.state == "metaobj" and self.language == self.object_language:

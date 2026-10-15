@@ -27,13 +27,17 @@ class CMSPIDProvider(PIDProvider):
             label="CMS ID",
         )
 
-    def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str:
+    def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str:  # type: ignore[override]
         """Generate an identifier value."""
         metadata = Marc21Metadata(json=record.metadata)
-        return metadata.get_field("995...a")["subfields"]["a"][0]
+        datafield = metadata.get_field("995...a")
+        if datafield is None:
+            msg = "no 995 field found to generate an id."
+            raise RuntimeError(msg)
+        return datafield.get("a")
 
     @classmethod
-    def is_enabled(cls, _: Flask) -> bool:
+    def is_enabled(cls, _: Flask | None) -> bool:
         """Determine if verbund is enabled or not."""
         return True
 
@@ -51,12 +55,12 @@ class VerbundPIDProvider(PIDProvider):
             label="Verbund ID",
         )
 
-    def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str:
+    def generate_id(self, record: Marc21Draft | Marc21Record, **__: dict) -> str:  # type: ignore[override]
         """Generate an identifier value."""
         metadata = Marc21Metadata(json=record.metadata)
         return metadata.get_value("009")
 
     @classmethod
-    def is_enabled(cls, _: Flask) -> bool:
+    def is_enabled(cls, _: Flask | None) -> bool:
         """Determine if verbund is enabled or not."""
         return True
