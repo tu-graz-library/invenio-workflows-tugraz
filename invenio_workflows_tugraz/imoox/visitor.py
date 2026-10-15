@@ -34,12 +34,12 @@ class Converter:
     def process[T](self, attribute: str, value: T, record: LOMMetadata) -> None:
         """Execute the corresponding method to the attribute."""
 
-        def func_not_found(*_: dict, **__: dict) -> None:
+        def func_not_found(_: T, __: LOMMetadata) -> None:
             msg = f"NO convert method for {attribute}"
             raise ValueError(msg)
 
         convert_func = getattr(self, f"convert_{attribute}", func_not_found)
-        return convert_func(value, record)
+        convert_func(value, record)
 
 
 class IMOOXToLOM(Converter):
@@ -133,9 +133,9 @@ class IMOOXToLOM(Converter):
     def convert_learningobjectives(self, value: str, record: LOMMetadata) -> None:
         """Convert learningobjectives attribute."""
         for desc in value:
-            record.append_educational_desription(
+            record.append_educational_description(
                 description=desc,
-                language_code=self.langugage,
+                language_code=self.language,
             )
 
     def convert_duration(self, value: str, record: LOMMetadata) -> None:
@@ -210,7 +210,7 @@ class IMOOXToLOM(Converter):
     def convert_type(self, value: str, record: LOMMetadata) -> None:
         """Convert type attribute."""
 
-    def convert_courseMode(self, value: dict[list], record: LOMMetadata) -> None:
+    def convert_courseMode(self, value: dict, record: LOMMetadata) -> None:
         """Convert courseMode attribute."""
 
     def convert_availableUntil(self, value: str, record: LOMMetadata) -> None:
@@ -223,7 +223,7 @@ class IMOOXToLOM(Converter):
     def convert_video(self, value: str, record: LOMMetadata) -> None:
         """Convert video attribute."""
 
-    def convert_access(self, value: dict[list], record: LOMMetadata) -> None:
+    def convert_access(self, value: dict, record: LOMMetadata) -> None:
         """Convert access attribute."""
 
     def convert_learningResourceType(self, value: dict, record: LOMMetadata) -> None:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -17,7 +17,7 @@ from invenio_records_lom.utils import LOMCourseMetadata, LOMMetadata
 class Visitor:
     """Visitor base class."""
 
-    def visit(self, value: dict, record: LOMMetadata) -> None:
+    def visit(self, value: dict, record: LOMMetadata | LOMCourseMetadata) -> None:
         """Convert record from Moodle JSON format to LOMMetadata."""
         for attribute, val in value.items():
             self.visit_attribute(attribute, val, record)
@@ -26,11 +26,11 @@ class Visitor:
         self,
         attribute: str,
         value: dict,
-        record: LOMMetadata,
+        record: LOMMetadata | LOMCourseMetadata,
     ) -> None:
         """Traverse first level elements of dictionary and extract attributes."""
 
-        def func_not_found(*_: dict, **__: dict) -> None:
+        def func_not_found(_: dict, __: LOMMetadata | LOMCourseMetadata) -> None:
             """Ignore keys that are not converted."""
 
         visit_function = getattr(self, f"visit_{attribute}", func_not_found)
@@ -87,9 +87,9 @@ class CourseToLOM(Visitor):
 class TeachCenterToLOM(Visitor):
     """Teach Center file to lom file."""
 
-    def visit(self, value: dict, record: LOMMetadata) -> None:
+    def visit(self, value: dict, record: LOMMetadata) -> None:  # type: ignore[override]
         """Visit."""
-        self.courses = []
+        self.courses: list[LOMCourseMetadata] = []
 
         super().visit(value, record)
 
@@ -110,7 +110,7 @@ class TeachCenterToLOM(Visitor):
 
     def visit_courses(self, value: list, _: LOMMetadata) -> None:
         """Visit courses."""
-        self.course_ids = []
+        self.course_ids: list[str] = []
         for course in value:
             lom_course_record = LOMCourseMetadata()
             visitor = CourseToLOM()
@@ -145,7 +145,7 @@ class TeachCenterToLOM(Visitor):
         """Visit tags."""
         self.tags = value
 
-    def visit_persons(self, value: str, record: LOMMetadata) -> None:
+    def visit_persons(self, value: dict, record: LOMMetadata) -> None:
         """Visit persons."""
         for person in value:
             name = f"{person['firstname']} {person['lastname']}"
@@ -190,11 +190,11 @@ class TeachCenterToLOM(Visitor):
         if learningresourcetype := learningresourcetype_by_resourcetype[value.lower()]:
             record.append_learningresourcetype(learningresourcetype)
 
-    def visit_license(self, value: str, record: LOMMetadata) -> None:
+    def visit_license(self, value: dict, record: LOMMetadata) -> None:
         """Visit license."""
         record.set_rights_url(value["source"])
 
-    def visit_classification(self, classifications: str, record: LOMMetadata) -> None:
+    def visit_classification(self, classifications: dict, record: LOMMetadata) -> None:
         """Visit classification."""
         oefos_ids = [
             value["identifier"]

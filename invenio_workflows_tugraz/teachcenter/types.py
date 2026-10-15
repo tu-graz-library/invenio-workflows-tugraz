@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2022-2025 Graz University of Technology.
+# Copyright (C) 2022-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -51,7 +51,7 @@ class Key(ABC):
     def __str__(self) -> str:
         """Convert `self` to unique string representation."""
 
-    def __hash__(self) -> str:
+    def __hash__(self) -> str:  # type: ignore[override]
         """Get hash."""
         return self.get_moodle_pid_value()
 
@@ -71,8 +71,8 @@ class FileKey(Key):
 
     resource_type = "file"
 
-    @singledispatchmethod
-    def __init__(self, url: str, year: str, semester: str, hash_sha1: str) -> None:
+    @singledispatchmethod  # type: ignore[misc]
+    def __init__(self, url: str, year: str, semester: str, hash_sha1: str) -> None:  # type: ignore[misc]
         """Construct."""
         # dataclass frozen is nice but needs following not handy construct
         object.__setattr__(self, "url", url)
@@ -124,8 +124,8 @@ class LinkKey(Key):
 
     resource_type = "link"
 
-    @singledispatchmethod
-    def __init__(self, moodle_file_metadata: dict) -> None:
+    @singledispatchmethod  # type: ignore[misc]
+    def __init__(self, moodle_file_metadata: dict) -> None:  # type: ignore[misc]
         """Construct."""
         url = moodle_file_metadata["source"]
         hash_sha1 = moodle_file_metadata["identifier"].split(":")[-1]

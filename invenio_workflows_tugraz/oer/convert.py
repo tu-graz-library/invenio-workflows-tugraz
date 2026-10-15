@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -29,12 +29,12 @@ class Visitor:
     ) -> None:
         """Traverse first level elements of dictionary and extract attributes."""
 
-        def func_not_found(*_: dict, **__: dict) -> None:
+        def func_not_found(_: dict, __: Marc21Metadata) -> None:
             msg = f"NO visitor node: '{attribute}'"
             raise ValueError(msg)
 
         visit_function = getattr(self, f"visit_{attribute}", func_not_found)
-        return visit_function(value, record)
+        visit_function(value, record)
 
 
 class LOM2Marc21(Visitor):
@@ -74,7 +74,7 @@ class LOM2Marc21(Visitor):
         )
 
         self.title = ""
-        self.entities = []
+        self.entities: list[dict] = []
 
     def visit(self, value: dict, record: Marc21Metadata) -> None:
         """Visit."""
