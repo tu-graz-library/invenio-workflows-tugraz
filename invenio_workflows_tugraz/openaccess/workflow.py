@@ -8,6 +8,8 @@
 
 """Open Access Workflow."""
 
+from typing import cast
+
 from flask_principal import Identity
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError
@@ -15,20 +17,20 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pure import PureRuntimeError
 from invenio_pure.records.models import PureRESTError
 from invenio_pure.services import PureRESTService
-from invenio_pure.types import PureID
+from invenio_pure.types import PureId
 from invenio_records_marc21 import (
     Marc21Metadata,
     add_file_to_record,
     create_record,
     current_records_marc21,
 )
-from invenio_records_marc21.records import Marc21Draft, Marc21Record
 from invenio_records_resources.services.records.results import RecordItem
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm.exc import StaleDataError
 
 from ..proxies import current_workflows_tugraz
+from .api import WorkflowOpenaccess
 from .convert import Pure2Marc21
 from .utils import change_to_exported, extract_files
 
@@ -40,15 +42,15 @@ def openaccess_filter() -> dict:
     }
 
 
-def openaccess_mark_as_exported_aggregator() -> list[tuple[str, str]]:
+def openaccess_mark_as_exported_aggregator() -> list[WorkflowOpenaccess]:
     """Return a list of tuple[marc21, pure_id] which should be marked as exported in pure."""
     oa_service = current_workflows_tugraz.openaccess_service
     return oa_service.get_ready_to(system_identity, state="imported_in_repo")
 
 
-def openaccess_import_func(  # noqa: PLR0915
+def openaccess_import_func(
     identity: Identity,
-    pure_id: PureID,
+    pure_id: PureId,
     pure_service: PureRESTService,
 ) -> RecordItem:
     """Import record from pure into the repository."""
@@ -58,16 +60,18 @@ def openaccess_import_func(  # noqa: PLR0915
 
     try:
         # resolve record over pure_id
-        pid = PersistentIdentifier.get("pure", pure_id)
-        obj = pid.get_assigned_object(object_type="rec")
+        pure_pid = PersistentIdentifier.get("pure", str(pure_id))
+        pid = PersistentIdentifier.get_by_object(
+            "marcid",
+            object_type=pure_pid.object_type,
+            object_uuid=pure_pid.object_uuid,
+        )
 
         try:
-            draft_model = Marc21Draft.get_record(obj)
-            # the edit is not necessary, but to get a resultitem draft this is the easiest way
-            draft = marc21_service.edit(identity=identity, id_=draft_model["id"])
+            draft = marc21_service.edit(id_=pid.pid_value, identity=identity)
         except NoResultFound:
-            record_model = Marc21Record.get_record(obj)
-            draft = marc21_service.edit(identity=identity, id_=record_model["id"])
+            draft = marc21_service.edit(id_=pid.pid_value, identity=identity)
+
         ignore_files = True
     except PIDDoesNotExistError:
         # not found create a record
@@ -91,8 +95,7 @@ def openaccess_import_func(  # noqa: PLR0915
         files = extract_files(pure_record)
         file_paths = [pure_service.download_file(identity, file_) for file_ in files]
     except (PureRESTError, PureRuntimeError) as error:
-        # todo: delete draft
-        draft.delete_draft(identity=identity, id_=draft.id)
+        marc21_service.delete_draft(identity=identity, id_=draft.id)
         raise RuntimeError(str(error)) from error
 
     marc21_record = Marc21Metadata()
@@ -160,13 +163,13 @@ def openaccess_import_func(  # noqa: PLR0915
 
     oa_service.set_state(identity, id_=record.id, state="imported_in_repo")
 
-    return record
+    return cast(RecordItem, record)
 
 
 def openaccess_update_status_in_pure(
     identity: Identity,
     marc_id: str,
-    pure_id: PureID,
+    pure_id: PureId,
     pure_service: PureRESTService,
 ) -> None:
     """Update status in pure."""

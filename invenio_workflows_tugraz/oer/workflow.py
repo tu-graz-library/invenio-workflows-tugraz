@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2025 Graz University of Technology.
+# Copyright (C) 2025-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -15,8 +15,7 @@ from invenio_alma.utils import is_duplicate_in_alma
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records_lom import current_records_lom
 from invenio_records_marc21 import Marc21Metadata, convert_json_to_marc21xml
-from invenio_records_resources.services.records.results import RecordItem
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound
 
 from .convert import LOM2Marc21
 
@@ -25,7 +24,7 @@ def oer_create_in_alma_func(
     identity: Identity,
     lom_id: str,
     alma_service: AlmaRESTService,
-) -> RecordItem:
+) -> None:
     """Export OER to Alma."""
     lom_service = current_records_lom.records_service
 
@@ -55,3 +54,4 @@ def oer_create_in_alma_func(
 
 def oer_create_aggregator() -> list[tuple[str, str]]:
     """OER create aggregator."""
+    return []

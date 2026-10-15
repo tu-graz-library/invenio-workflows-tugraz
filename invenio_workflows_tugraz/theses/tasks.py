@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # invenio-workflows-tugraz is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see LICENSE file for more
@@ -21,7 +21,7 @@ from ..proxies import current_workflows_tugraz
 @shared_task(ignore_result=True)
 def status_arch() -> None:
     """Set status to ARCH (archived)."""
-    today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    today = datetime.now(tz=timezone.utc)
 
     theses_service = current_workflows_tugraz.theses_service
     cms_service = current_campusonline.campusonline_rest_service
@@ -46,7 +46,7 @@ def status_arch() -> None:
 @shared_task(ignore_result=True)
 def status_pub() -> None:
     """Set status to PUB (published)."""
-    today = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    today = datetime.now(tz=timezone.utc)
 
     theses_service = current_workflows_tugraz.theses_service
     cms_service = current_campusonline.campusonline_rest_service

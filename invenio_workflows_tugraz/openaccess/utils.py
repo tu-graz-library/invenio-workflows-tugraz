@@ -8,16 +8,7 @@
 
 """Openaccess Workflow utils."""
 
-from invenio_pure import URL
-from invenio_records_marc21 import check_about_duplicate
-
-from .types import PureId
-
-
-@check_about_duplicate.register
-def _(value: PureId) -> None:
-    """Check about double pure id."""
-    check_about_duplicate(str(value), value.category)
+from invenio_pure import PureFile
 
 
 def access_type(electronic_version: dict[str, dict[str, str]]) -> str:
@@ -30,7 +21,7 @@ def license_type(electronic_version: dict[str, dict[str, str]]) -> str:
     return electronic_version.get("licenseType", {}).get("uri", "")
 
 
-def extract_files(pure_record: dict) -> list[URL]:
+def extract_files(pure_record: dict) -> list[PureFile]:
     """Extract file url."""
 
     def condition(item: dict) -> bool:
@@ -40,11 +31,11 @@ def extract_files(pure_record: dict) -> list[URL]:
         condition_2 = "cc_by" in license_type(item)
         return condition_1 and condition_2
 
-    files: list[URL] = []
+    files: list[PureFile] = []
     for electronic_version in pure_record["electronicVersions"]:
         try:
             if condition(electronic_version):
-                files.append(electronic_version["file"])
+                files.append(PureFile(**electronic_version["file"]))
         except (KeyError, TypeError):
             continue
 
