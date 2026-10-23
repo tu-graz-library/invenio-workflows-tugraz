@@ -1,9 +1,7 @@
 ..
-    Copyright (C) 2024-2026 Graz University of Technology.
+    SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
+    SPDX-License-Identifier: MIT
 
-    invenio-workflows-tugraz is free software; you can redistribute it and/or
-    modify it under the terms of the MIT License; see LICENSE file for more
-    details.
 
 ==========================
  invenio-workflows-tugraz
