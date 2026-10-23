@@ -1,11 +1,10 @@
-..
-    SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
-    SPDX-License-Identifier: MIT
+<!--
+SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
+SPDX-License-Identifier: MIT
+-->
 
 
-==========================
- invenio-workflows-tugraz
-==========================
+# invenio-workflows-tugraz
 
 This package implements TU Graz specific features of InvenioRDM. TU Graz
 implements packages like invenio-records-marc21 and invenio-records-lom in a way
@@ -15,9 +14,7 @@ an object like a book with chapters and journals with articles.
 
 the configuration of those package will be in invenio-workflows-tugraz.
 
-
-Parts
-=====
+# Parts
 
 publisher : invenio_workflows_tugraz/publisher/README.rst
 theses : invenio_workflows_tugraz/theses/README.rst

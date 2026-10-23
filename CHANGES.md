@@ -1,21 +1,21 @@
-..
-    SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
-    SPDX-License-Identifier: MIT
+<!--
+SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
+SPDX-License-Identifier: MIT
+-->
 
-Changes
-=======
+# Changes
 
-Version v0.15.2 (released 2026-10-12)
+## Version v0.15.2 (released 2026-10-12)
 
 - chore(migration): add ruff ignore rule
 - fix(migration): set publisher on alma metadata
 - chore(migration): rename bool variable with prefix
 
-Version v0.15.1 (released 2026-10-09)
+## Version v0.15.1 (released 2026-10-09)
 
 - fix(migrate): forgot to set doi
 
-Version v0.15.0 (released 2026-10-01)
+## Version v0.15.0 (released 2026-10-01)
 
 - fix(tests): remove deprecated config
 - fix(setup): add decorator dependency
@@ -27,7 +27,7 @@ Version v0.15.0 (released 2026-10-01)
 - feat(migration): add base option
 - chore(linter): apply new ruff
 
-Version v0.14.0 (released 2026-07-22)
+## Version v0.14.0 (released 2026-07-22)
 
 - feat(publisher): use conditional provider
 - fix(publisher): wrong doi provider used
@@ -36,7 +36,7 @@ Version v0.14.0 (released 2026-07-22)
 - fix(migration): use 024 doi field
 - chore(typing): improve types
 
-Version v0.13.0 (released 2026-07-02)
+## Version v0.13.0 (released 2026-07-02)
 
 - chore(theses): test duplicate pids feature
 - chore(typing): type tests_theses
@@ -49,11 +49,11 @@ Version v0.13.0 (released 2026-07-02)
 - chore(migration): refactor path handling
 - fix(migration): handle publication year
 
-Version v0.12.1 (released 2026-05-20)
+## Version v0.12.1 (released 2026-05-20)
 
 - fix(theses): redirect from theses url
 
-Version v0.12.0 (released 2026-02-10)
+## Version v0.12.0 (released 2026-02-10)
 
 - chore(black): update formatting to >= 26.0
 - fix: missing __init__.py file
@@ -69,57 +69,48 @@ Version v0.12.0 (released 2026-02-10)
 - feat(migration): init
 - wip: add workflow for publisher
 
-Version v0.11.0 (release 2025-07-25)
+## Version v0.11.0 (release 2025-07-25)
 
 - feat(theses): add hardcoded field
 
-
-Version v0.10.5 (release 2025-07-05)
+## Version v0.10.5 (release 2025-07-05)
 
 - fix(tc): LinkKey not implemented yet
 
-
-Version v0.10.4 (release 2025-06-20)
+## Version v0.10.4 (release 2025-06-20)
 
 - fix(tc): missing lecture mapping
 
-
-Version v0.10.3 (release 2025-06-18)
+## Version v0.10.3 (release 2025-06-18)
 
 - teachcenter: add return value to workflow
 - setup: remove upper pin
 
-
-Version v0.10.2 (release 2025-06-10)
+## Version v0.10.2 (release 2025-06-10)
 
 - setup: temp upper pin
 - fix(theses): not emplace, add it is
 
-
-Version v0.10.1 (release 2025-05-24)
+## Version v0.10.1 (release 2025-05-24)
 
 - fix(openaccess): authors mapping
 
-
-Version v0.10.0 (release 2025-05-22)
+## Version v0.10.0 (release 2025-05-22)
 
 - fix(imoox): configuration
 - openaccess: add separat task for marking
 
-
-Version v0.9.2 (release 2025-05-07)
+## Version v0.9.2 (release 2025-05-07)
 
 - fix(theses): misunderstood embargo field
 
-
-Version v0.9.1 (release 2025-05-01)
+## Version v0.9.1 (release 2025-05-01)
 
 - fix: quibbles from ruff 0.8.0
 - imoox: convert learningresourcetype
 - cleanup: rename filename for consistency
 
-
-Version v0.9.0 (release 2025-04-30)
+## Version v0.9.0 (release 2025-04-30)
 
 - fix(tests): add configuration
 - theses: add jobs
@@ -139,21 +130,18 @@ Version v0.9.0 (release 2025-04-30)
 - oer: mapping lom -> marc21
 - oer: oer to alma, initial commit
 
-
-Version v0.8.2 (release 2025-01-24)
+## Version v0.8.2 (release 2025-01-24)
 
 - fix: openaccess convert, structure was wrong
 - chore: update ruff configuration
 - openaccess: make mark optional
 - fix: publisher
 
-
-Version v0.8.1 (release 2025-01-09)
+## Version v0.8.1 (release 2025-01-09)
 
 - fix: handle missing keys
 
-
-Version v0.8.0 (release 2025-01-08)
+## Version v0.8.0 (release 2025-01-08)
 
 - fix: docs reference target not found
 - tests: temporary solution
@@ -162,40 +150,33 @@ Version v0.8.0 (release 2025-01-08)
 - openaccess: refactore import function
 - fix: delimter needs to be not '-'
 
-
-Version v0.7.1 (release 2024-07-18)
+## Version v0.7.1 (release 2024-07-18)
 
 - theses: add cms_id to error message
 
-
-Version v0.7.0 (release 2024-07-05)
+## Version v0.7.0 (release 2024-07-05)
 
 - workflows: add teachcenter workflow
 - setup: move to python3.12 only
 
-
-Version v0.6.0 (release 2024-05-29)
+## Version v0.6.0 (release 2024-05-29)
 
 - add imoox workflow
 
-
-Version v0.5.3 (release 2024-03-14)
+## Version v0.5.3 (release 2024-03-14)
 
 - fix: thesis tasks wrong wording
 
-
-Version v0.5.2 (release 2024-03-12)
+## Version v0.5.2 (release 2024-03-12)
 
 - fix: theses task variable handling
 
-
-Version v0.5.1 (release 2024-03-01)
+## Version v0.5.1 (release 2024-03-01)
 
 - setup: add missing dependency
 - theses: fix alembic
 
-
-Version v0.5.0 (release 2024-02-27)
+## Version v0.5.0 (release 2024-02-27)
 
 - fix: due python version not possible to use Self
 - theses: add update_access parameter
@@ -209,25 +190,21 @@ Version v0.5.0 (release 2024-02-27)
 - theses: improve campusonline filter
 - theses: change requirement for import
 
-
-Version v0.4.0 (release 2024-02-02)
+## Version v0.4.0 (release 2024-02-02)
 
 - theses: change error to 423
 - theses: add endpoint for theses uploads
 
-
-Version v0.3.2 (release 2024-01-24)
+## Version v0.3.2 (release 2024-01-24)
 
 - theses: fix not catched exception
 
-
-Version v0.3.1 (release 2024-01-07)
+## Version v0.3.1 (release 2024-01-07)
 
 - fix: add changed error except
 - theses: implement changed requirement for embargo
 
-
-Version v0.3.0 (release 2023-11-03)
+## Version v0.3.0 (release 2023-11-03)
 
 - theses: add implementation for duplicate check
 - theses: add check if record has AC number
@@ -235,31 +212,26 @@ Version v0.3.0 (release 2023-11-03)
 - theses: pass through the duplicate error message
 - ruff: apply new ruff rules
 
-
-Version v0.2.4 (release 2023-10-20)
+## Version v0.2.4 (release 2023-10-20)
 
 - fix: ruff upgrade introduced discrepancy
 - fix: 995 subfield notation was wrong
 - tests: add test for update_func
 
-
-Version v0.2.3 (release 2023-06-05)
+## Version v0.2.3 (release 2023-06-05)
 
 - theses: revert to simple version
 
-
-Version v0.2.2 (release 2023-06-05)
+## Version v0.2.2 (release 2023-06-05)
 
 - fix: wrong method used to get the record
 
-
-Version v0.2.1 (release 2023-06-02)
+## Version v0.2.1 (release 2023-06-02)
 
 - theses: not only drafts should be updated
 - fix: theses update_func api used wrong
 
-
-Version v0.2.0 (release 2023-05-26)
+## Version v0.2.0 (release 2023-05-26)
 
 - fix: use data instead of metadata
 - fix: tests
@@ -270,13 +242,11 @@ Version v0.2.0 (release 2023-05-26)
 - theses: remove locked generator
 - setup: migrate to ruff
 
-
-Version v0.1.19 (release 2023-05-17)
+## Version v0.1.19 (release 2023-05-17)
 
 - fix: apply requested changes for field 008
 
-
-Version v0.1.18 (release 2023-05-12)
+## Version v0.1.18 (release 2023-05-12)
 
 - fix: position 19 was the wrong value
 - fix: keyw was not processed
@@ -285,96 +255,76 @@ Version v0.1.18 (release 2023-05-12)
 - fix: revert back change of 007 field
 - fix: 245 field missed author
 
-
-Version v0.1.17 (release 2023-05-11)
+## Version v0.1.17 (release 2023-05-11)
 
 - fix: errors
 
-
-Version v0.1.16 (release 2023-05-11)
+## Version v0.1.16 (release 2023-05-11)
 
 - fix: int not serializable
 
-
-Version v0.1.15 (release 2023-05-11)
+## Version v0.1.15 (release 2023-05-11)
 
 - theses: fix german language code
 
+## Version v0.1.14 (release 2023-05-11)
 
-Version v0.1.14 (release 2023-05-11)
-
-
-
-
-Version v0.1.13 (release 2023-05-10)
+## Version v0.1.13 (release 2023-05-10)
 
 - theses: apply requested marc21 field changes
 - fix: date for status
 
-
-Version v0.1.12 (release 2023-05-10)
+## Version v0.1.12 (release 2023-05-10)
 
 - fix: the crap from last commit
 
-
-Version v0.1.11 (release 2023-05-10)
+## Version v0.1.11 (release 2023-05-10)
 
 - fix: date and format where not compatible
 
-
-Version v0.1.10 (release 2023-05-10)
+## Version v0.1.10 (release 2023-05-10)
 
 - fix: used wrong date format
 
-
-Version v0.1.9 (release 2023-05-10)
+## Version v0.1.9 (release 2023-05-10)
 
 - theses: apply marc21 request changes
 
-
-Version v0.1.8 (release 2023-04-25)
+## Version v0.1.8 (release 2023-04-25)
 
 - theses: add necessary need to import
 
-
-Version v0.1.7 (release 2023-01-26)
+## Version v0.1.7 (release 2023-01-26)
 
 - theses: change alma import size
 - theses: change import start date
 
-
-Version v0.1.6 (release 2023-01-23)
+## Version v0.1.6 (release 2023-01-23)
 
 - modification: create an endpoint for theses records
 
-
-Version v0.1.5 (release 2023-01-23)
+## Version v0.1.5 (release 2023-01-23)
 
 - fix: return value of import_func
 - fix: wrong alias name
 
-
-Version v0.1.4 (release 2023-01-20)
+## Version v0.1.4 (release 2023-01-20)
 
 - theses fix: play safe with real data
 
-
-Version v0.1.3 (release 2023-01-20)
+## Version v0.1.3 (release 2023-01-20)
 
 - theses: mapping change
 
-
-Version v0.1.2 (release 2023-01-20)
+## Version v0.1.2 (release 2023-01-20)
 
 - fix: remove print
 
-
-Version v0.1.1 (release 2023-01-18)
+## Version v0.1.1 (release 2023-01-18)
 
 - theses: convert abstract and keywords
 
-
-Version v0.1.0 (release 2023-01-18)
+## Version v0.1.0 (release 2023-01-18)
 
 
 
