@@ -1,41 +1,104 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2021-2026 Graz University of Technology.
+#
+# invenio-workflows-tugraz is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see LICENSE file for more
+# details.
+[project]
+name = "invenio-workflows-tugraz"
+
+description = "Package serves as a place for the workflows of the repository of the TU Graz."
+readme = "README.rst"
+license = "MIT"
+authors = [{ name = "Graz University of Technology" }]
+keywords = ["TUGraz", "invenio", "workflows"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+]
+urls = { Repository = "https://github.com/tu-graz-library/invenio-workflows-tugraz" }
+dependencies = [
+  "invenio-alma>=0.7.1",
+  "invenio-campusonline>=0.1.1",
+  "invenio-catalogue-marc21>=0.2.0",
+  "invenio-jobs>=7.0.0",
+  "invenio-moodle>=1.0.0",
+  "invenio-pure>=0.1.1",
+  "invenio-records-lom>=0.20.0",
+  "invenio-records-marc21>=0.28.0",
+]
+dynamic = ["version"]
+python_requires = ">=3.14"
+
+[project.entry-points."flask.commands"]
+workflows = "invenio_workflows_tugraz.cli:workflows"
+
+[project.entry-points."invenio_base.api_apps"]
+invenio_workflows_tugraz = "invenio_workflows_tugraz:InvenioWorkflowsTugraz"
+
+[project.entry-points."invenio_base.api_finalize_app"]
+invenio_workflows_tugraz = "invenio_workflows_tugraz.ext:finalize_app"
+
+[project.entry-points."invenio_base.apps"]
+invenio_workflows_tugraz = "invenio_workflows_tugraz:InvenioWorkflowsTugraz"
+
+[project.entry-points."invenio_base.blueprints"]
+invenio_workflows_tugraz_theses = "invenio_workflows_tugraz.theses:create_blueprint"
+
+[project.entry-points."invenio_base.finalize_app"]
+invenio_workflows_tugraz = "invenio_workflows_tugraz.ext:finalize_app"
+
+[project.entry-points."invenio_celery.tasks"]
+invenio_workflows_tugraz_theses = "invenio_workflows_tugraz.theses.tasks"
+invenio_workflows_tugraz_theses_migration = "invenio_workflows_tugraz.theses.migration.tasks"
+
+[project.entry-points."invenio_db.alembic"]
+invenio_workflows_tugraz_theses = "invenio_workflows_tugraz.theses:alembic"
+invenio_workflows_tugraz_openaccess = "invenio_workflows_tugraz.openaccess:alembic"
+
+[project.entry-points."invenio_db.models"]
+invenio_workflows_tugraz_theses = "invenio_workflows_tugraz.theses.models"
+invenio_workflows_tugraz_openaccess = "invenio_workflows_tugraz.openaccess.models"
+
+[project.entry-points."invenio_i18n.translations"]
+messages = "invenio_workflows_tugraz"
+
+[project.entry-points."invenio_jobs.jobs"]
+theses_status_arch = "invenio_workflows_tugraz.theses.jobs:StatusArchJob"
+theses_status_pub = "invenio_workflows_tugraz.theses.jobs:StatusPubJob"
+
+[project.optional-dependencies]
+tests = [
+  "decorator>=5.0.0",
+  "invenio-app>=3.0.0",
+  "invenio-search[opensearch2]>=3.0.0",
+  "invenio-rdm-records>=24.0.0",
+  "pytest-black>=0.6.0",
+  "pytest-invenio>=4.0.0",
+  "ruff>=0.4.10",
+  "sphinx>=4.5",
+]
+
 [build-system]
-requires = ["setuptools", "wheel", "babel>2.8"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.ruff]
-exclude = ["docs"]
-target-version = "py314"
+[tool.hatch.version]
+path = "invenio_workflows_tugraz/__init__.py"
 
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = [
-  "A005",
-  "D203", "D211", "D212", "D213",
-  "DTZ007",
-  "E501",
-  "ERA001",
-  "FIX002",
-  "FA",
-  "I001", # isort and ruff have different opinions
-  "INP001",
-  "N802", "N999",
-  "PERF203",
-  "PLR0913",
-  "S101",
-  "TC",
-  "TD",
-  "TID252",
-  "TRY300", "TRY400",
-  "UP009", "UP017",
-  "RUF022",
+[tool.hatch.build]
+exclude = [
+  ".github/**",
+  "tests/**",
+  ".gitignore",
+  "run-tests.sh",
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"tests/**.py" = [
-  "ARG001",
-  "FBT001",
-  "SLF001",
-]
+[tool.hatch.build.targets.sdist]
+include = ["/invenio_workflows_tugraz"]
+
+[tool.isort]
+profile = "black"
 
 [tool.mypy]
 extra_checks = true
@@ -74,6 +137,51 @@ module = [
   "werkzeug.*",
 ]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = '--black --doctest-glob="*.rst" --doctest-modules --cov=invenio_workflows_tugraz --cov-report=term-missing'
+testpaths = "docs tests invenio_workflows_tugraz"
+
+[tool.ruff]
+exclude = ["docs"]
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "A005",
+  "D203",
+  "D211",
+  "D212",
+  "D213",
+  "DTZ007",
+  "E501",
+  "ERA001",
+  "FIX002",
+  "FA",
+  "I001",  # isort and ruff have different opinions
+  "INP001",
+  "N802",
+  "N999",
+  "PERF203",
+  "PLR0913",
+  "S101",
+  "TC",
+  "TD",
+  "TID252",
+  "TRY300",
+  "TRY400",
+  "UP009",
+  "UP017",
+  "RUF022",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**.py" = [
+  "ARG001",
+  "FBT001",
+  "SLF001",
+]
 
 [tool.ty.environment]
 python-version = "3.14"
