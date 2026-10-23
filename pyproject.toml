@@ -1,13 +1,8 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2021-2026 Graz University of Technology.
-#
-# invenio-workflows-tugraz is free software; you can redistribute it and/or
-# modify it under the terms of the MIT License; see LICENSE file for more
-# details.
+# SPDX-FileCopyrightText: 2021-2026 Graz University of Technology.
+# SPDX-License-Identifier: MIT
+
 [project]
 name = "invenio-workflows-tugraz"
-
 description = "Package serves as a place for the workflows of the repository of the TU Graz."
 readme = "README.rst"
 license = "MIT"
@@ -181,6 +176,9 @@ ignore = [
   "FBT001",
   "SLF001",
 ]
+
+[tool.ruff.lint.flake8-copyright]
+notice-rgx = "(?i)# SPDX-FileCopyrightText:\\s\\d{4}(-(\\d{4}|present))*"
 
 [tool.ty.environment]
 python-version = "3.14"
