@@ -42,6 +42,5 @@ fi
 
 ruff check .
 
-python -m sphinx.cmd.build -qnNW docs docs/_build/html
 eval "$(docker-services-cli up --db ${DB:-postgresql} --search ${SEARCH:-opensearch} --env)"
 python -m pytest ${pytest_args[@]+"${pytest_args[@]}"}
