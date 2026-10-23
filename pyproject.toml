@@ -143,7 +143,6 @@ addopts = '--black --doctest-glob="*.rst" --doctest-modules --cov=invenio_workfl
 testpaths = "docs tests invenio_workflows_tugraz"
 
 [tool.ruff]
-exclude = ["docs"]
 target-version = "py314"
 
 [tool.ruff.lint]
