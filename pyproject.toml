@@ -4,7 +4,7 @@
 [project]
 name = "invenio-workflows-tugraz"
 description = "Package serves as a place for the workflows of the repository of the TU Graz."
-readme = "README.rst"
+readme = "README.md"
 license = "MIT"
 authors = [{ name = "Graz University of Technology" }]
 keywords = ["TUGraz", "invenio", "workflows"]
