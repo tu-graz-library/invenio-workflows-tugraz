@@ -5,6 +5,19 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.16.0 (released 2026-10-27)
+
+- chore(ci): temporary
+- chore(tests): simplify run-tests
+- fix(ci): isa has to be build
+- chore(docs): mv to Markdown files
+- chore: change to SPDX license
+- chore: remove unused files
+- chore: remove unused docs
+- chore: move to hatchling
+- chore(types): improve types
+- feat(migration): add two fields to the mapping
+
 ## Version v0.15.2 (released 2026-10-12)
 
 - chore(migration): add ruff ignore rule
