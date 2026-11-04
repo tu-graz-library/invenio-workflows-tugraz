@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.16.1 (released 2026-11-04)
+
+- fix(publisher): csv convert
+- chore(publish): migrate to trusted publisher
+
 ## Version v0.16.0 (released 2026-10-27)
 
 - chore(ci): temporary
