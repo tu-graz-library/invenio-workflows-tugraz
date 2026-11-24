@@ -128,6 +128,7 @@ class MabToMarc21(Visitor):
         self.filename: str = ""
         self.doi: str = ""
         self.isbn: str = ""
+        self.digital_object_identifier: str = ""
         self.ac_number: str = ""  # TODO: find out which field contains the ac_number
 
         # record.emplace_leader("07878nam a2200421 c 4500")
@@ -290,7 +291,8 @@ class MabToMarc21(Visitor):
         # yes there exists the 540 field which contains a isbn too, but this
         # value is the isbn of the printed version and we need the digital
         # version
-        self.isbn = field.subfs[0].subfv.replace("10.3217/", "")
+        self.isbn = self.doi.replace("10.3217/", "")
+        self.digital_object_identifier = self.doi
 
     def visit_580(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
