@@ -75,14 +75,26 @@ def process_id(  # noqa: C901 PLR0915 PLR0917 PLR0912
         secho(f"process_id input_file: {input_file}", fg="yellow")
         raise error from error
 
-    # if there exists a isbn or ac number which can be used to get metadata from
-    # alma please use that metadata, otherwise ignore that path and use the
-    # converted metadata
+    # if there exists a digital_object_identifier (doi), isbn or ac number which
+    # can be used to get metadata from alma please use that metadata, otherwise
+    # ignore that path and use the converted metadata
     try:
-        if convert.isbn != "":
+        if convert.digital_object_identifier != "":
+            metadata_xml = alma_sru_service.get_record(
+                search_value=convert.digital_object_identifier,
+                search_key="digital_object_identifier",
+            )
+
+            metadata = Marc21Metadata(json=convert_marc21xml_to_json(metadata_xml))
+
+            if is_publisher:
+                # the record from alma doesn't contain the $$q subfield
+                metadata.emplace_datafield("024.7..q", value="tugraz-publisher")
+
+        elif convert.ac_number != "":
             metadata_xml = alma_sru_service.get_record(
                 search_value=convert.isbn,
-                search_key="isbn",
+                search_key="other_system_number",
             )
             metadata = Marc21Metadata(json=convert_marc21xml_to_json(metadata_xml))
 
@@ -90,11 +102,12 @@ def process_id(  # noqa: C901 PLR0915 PLR0917 PLR0912
                 # the record from alma doesn't contain the $$q subfield
                 metadata.emplace_datafield("024.7..q", value="tugraz-publisher")
 
-        if convert.ac_number != "":
+        elif convert.isbn != "":
             metadata_xml = alma_sru_service.get_record(
                 search_value=convert.isbn,
-                search_key="other_system_number",
+                search_key="isbn",
             )
+
             metadata = Marc21Metadata(json=convert_marc21xml_to_json(metadata_xml))
 
             if is_publisher:
