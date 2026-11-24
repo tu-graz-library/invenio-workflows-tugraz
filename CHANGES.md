@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.17.0 (released 2026-11-24)
+
+- feat(migration): add 1400 to create directory
+- fix(migrate): use of isbn
+
 ## Version v0.16.1 (released 2026-11-04)
 
 - fix(publisher): csv convert
