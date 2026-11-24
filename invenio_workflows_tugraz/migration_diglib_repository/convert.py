@@ -237,6 +237,9 @@ class MabToMarc21(Visitor):
     def visit_433(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
 
+    def visit_435(self, field: Field, _: Marc21Metadata) -> None:
+        """Visit ."""
+
     def visit_443(self, field: Field, _: Marc21Metadata) -> None:
         """Visit ."""
 
@@ -536,12 +539,21 @@ class MabToMarc21(Visitor):
 
     def visit_1400(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
-        # TODO:
-        # should go into marc21 metadata
+        volume = int(field.subfs[0].subfv)
+
+        if self.directory_name == "":
+            self.directory_name = f"{volume:02d}"
+        else:
+            self.directory_name = f"{volume:02d}_{self.directory_name}"
+
+        record.emplace_datafield("245.1.0.", subfs={"a": field.subfs[0].subfv})
 
     def visit_1401(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
-        self.directory_name = field.subfs[0].subfv
+        if self.directory_name == "":
+            self.directory_name = field.subfs[0].subfv
+        else:
+            self.directory_name = f"{self.directory_name}_{field.subfs[0].subfv}"
         self.year = field.subfs[0].subfv
         record.emplace_datafield("245.1.0.", subfs={"a": field.subfs[0].subfv})
 
