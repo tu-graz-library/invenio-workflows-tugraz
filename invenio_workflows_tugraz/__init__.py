@@ -6,7 +6,7 @@
 from .ext import InvenioWorkflowsTugraz
 from .proxies import current_workflows_tugraz
 
-__version__ = "0.17.0"
+__version__ = "0.17.1"
 
 __all__ = (
     "InvenioWorkflowsTugraz",
