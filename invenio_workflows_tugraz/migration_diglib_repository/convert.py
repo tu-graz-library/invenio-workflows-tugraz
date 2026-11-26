@@ -131,24 +131,6 @@ class MabToMarc21(Visitor):
         self.digital_object_identifier: str = ""
         self.ac_number: str = ""  # TODO: find out which field contains the ac_number
 
-        # record.emplace_leader("07878nam a2200421 c 4500")
-        # record.emplace_controlfield("007", "cr#|||||||||||")
-        # # record.emplace_controlfield("008", "230501s????####   #####om####|||#|#### c")
-        # record.emplace_datafield(
-        #     "040...",
-        #     subfs={"a": "AT-UBTUG", "b": "ger", "d": "AT-UBTUG", "e": "rda"},
-        # )
-        # record.emplace_datafield("044...", subfs={"c": "XA-AT"})
-
-        # record.emplace_datafield(
-        #     "300...",
-        #     subfs={"a": "1 Online-Ressource (Seiten)", "b": "ill"},
-        # )
-        # record.emplace_datafield("336...", subfs={"b": "txt"})
-        # record.emplace_datafield("337...", subfs={"b": "c"})
-        # record.emplace_datafield("338...", subfs={"b": "cr"})
-        # record.emplace_datafield("347...", subfs={"a": "Textdatei", "b": "PDF"})
-
     def convert(self, node: Element, record: Marc21Metadata) -> None:
         """Convert."""
         super().convert(node, record)
@@ -266,6 +248,14 @@ class MabToMarc21(Visitor):
 
     def visit_540(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
+        isbn = field.subfs[0].subfv
+        record.add_datafield(
+            "020...",
+            subfs={
+                "a": isbn.replace("-", ""),
+                "9": isbn,
+            },
+        )
 
     def visit_542(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
