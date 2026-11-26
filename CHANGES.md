@@ -5,6 +5,10 @@ SPDX-License-Identifier: MIT
 
 # Changes
 
+## Version v0.17.1 (released 2026-11-26)
+
+- feat(migration): add isbn field
+
 ## Version v0.17.0 (released 2026-11-24)
 
 - feat(migration): add 1400 to create directory
