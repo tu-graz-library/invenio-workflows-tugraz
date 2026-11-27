@@ -173,6 +173,9 @@ class MabToMarc21(Visitor):
     def visit_200(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
 
+    def visit_204(self, field: Field, record: Marc21Metadata) -> None:
+        """Visit ."""
+
     def visit_331(self, field: Field, record: Marc21Metadata) -> None:
         """Visit ."""
         record.emplace_datafield("245.1.0.", subfs={"a": field.subfs[0].subfv})
