@@ -61,6 +61,7 @@ messages = "invenio_workflows_tugraz"
 [project.entry-points."invenio_jobs.jobs"]
 theses_status_arch = "invenio_workflows_tugraz.theses.jobs:StatusArchJob"
 theses_status_pub = "invenio_workflows_tugraz.theses.jobs:StatusPubJob"
+records_validate_dois = "invenio_workflows_tugraz.records.jobs:ReconcileRecordsDOIsJob"
 
 [project.optional-dependencies]
 tests = [
